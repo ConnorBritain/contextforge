@@ -7,10 +7,10 @@ ENV NODE_ENV=production
 
 # -------- DEPENDENCIES STAGE --------
 FROM base AS dependencies
-# Copy package.json and package-lock.json files
-COPY package*.json ./
+# Copy package.json file
+COPY package.json ./
 # Install dependencies for both client and server
-RUN npm ci
+RUN npm install
 
 # -------- BUILD STAGE --------
 FROM base AS build
@@ -19,7 +19,7 @@ COPY --from=dependencies /app/node_modules ./node_modules
 # Copy application code
 COPY . .
 # Build client
-RUN cd client && npm ci && npm run build
+RUN cd client && npm install && npm run build
 
 # -------- PRODUCTION STAGE --------
 FROM base AS production
