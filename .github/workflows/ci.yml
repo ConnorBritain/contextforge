@@ -81,7 +81,7 @@ jobs:
           docker build -t context-generator:${{ github.sha }} .
       
       - name: Cache Docker image
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /tmp/docker-image
           key: docker-${{ github.sha }}
