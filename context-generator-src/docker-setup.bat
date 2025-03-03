@@ -5,100 +5,48 @@ echo ========================================
 echo.
 
 echo This script will set up the Context Generator application with Docker.
-echo.
-echo Prerequisites:
-echo - Docker Desktop must be installed and running
-echo - You should have API keys for Anthropic and/or OpenAI
+echo Docker containers will be started with dynamic port allocation.
 echo.
 
-echo Press any key to continue or CTRL+C to cancel...
-pause > nul
-
-echo.
-echo Step 1: Checking Docker...
-echo.
-docker --version > nul 2>&1
+REM Check if Node.js is installed
+where node >nul 2>nul
 if %errorlevel% neq 0 (
-    echo ERROR: Docker not found or not running.
-    echo Please install Docker Desktop and make sure it's running.
-    echo.
-    pause
-    exit /b 1
-) else (
-    echo Docker is available:
-    docker --version
-)
-
-echo.
-echo Step 2: Setting up environment file...
-echo.
-
-if not exist ".env" (
-    echo Creating .env file...
-    copy .env.docker .env > nul
-    if not exist ".env" (
-        echo ERROR: Failed to create .env file.
-        pause
-        exit /b 1
-    )
-) else (
-    echo Existing .env file found.
-)
-
-echo.
-echo IMPORTANT: For security, we'll now open your .env file
-echo to add your API keys directly. This way they won't be 
-echo visible in command history or process listings.
-echo.
-echo Please enter your API keys in the editor that opens.
-echo Find these lines in the file:
-echo   ANTHROPIC_API_KEY=your-anthropic-api-key-here
-echo   OPENAI_API_KEY=your-openai-api-key-here
-echo.
-echo Press any key to open the .env file...
-pause > nul
-
-start notepad .env
-
-echo.
-echo After saving and closing the editor, press any key to continue...
-pause > nul
-
-echo.
-echo Step 3: Building and starting containers...
-echo This will take a few minutes.
-echo.
-
-echo Building and starting Docker containers...
-docker-compose down
-docker-compose build --no-cache
-docker-compose up -d
-
-if %errorlevel% neq 0 (
-    echo.
-    echo ERROR: Failed to build or start Docker containers.
-    echo See error messages above for details.
+    echo ERROR: Node.js is required but not found.
+    echo Please install Node.js and try again.
     echo.
     pause
     exit /b 1
 )
 
-echo.
-echo ========================================
-echo Setup Complete!
-echo ========================================
-echo.
-echo The Context Generator is now running at:
-echo    http://localhost:3000
-echo.
-echo IMPORTANT: If you didn't set API keys in the .env file,
-echo the application will use mock AI services. To use real 
-echo AI services, you need to:
-echo   1. Edit the .env file to add your API keys
-echo   2. Restart the containers with: docker-compose restart
-echo.
-echo To stop the application, use:
-echo    docker-compose down
+REM Parse command line arguments
+set SKIP_CHECKS=
+set SKIP_PROMPTS=
+set REBUILD=
+
+:parse_args
+if "%~1"=="" goto end_parse_args
+if /i "%~1"=="--skip-checks" set SKIP_CHECKS=--skip-checks
+if /i "%~1"=="--skip-prompts" set SKIP_PROMPTS=--skip-prompts
+if /i "%~1"=="--rebuild" set REBUILD=--rebuild
+shift
+goto parse_args
+:end_parse_args
+
+REM Make sure we're in the right directory
+cd /d "%~dp0"
+
+REM Run the Node.js setup script
+echo Running Docker setup with Node.js...
+node scripts/docker-setup.js %SKIP_CHECKS% %SKIP_PROMPTS% %REBUILD%
+
+if %errorlevel% neq 0 (
+    echo.
+    echo ERROR: Docker setup failed. See error messages above.
+    echo.
+    pause
+    exit /b 1
+)
+
 echo.
 echo Press any key to exit...
 pause > nul
