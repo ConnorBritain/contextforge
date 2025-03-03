@@ -30,14 +30,39 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo Step 2: Setting up API keys...
-echo.
-echo Please enter your API keys when prompted.
-echo (Press Enter to skip if you don't have keys yet)
+echo Step 2: Setting up environment file...
 echo.
 
-set /p anthropic_key=Anthropic API Key: 
-set /p openai_key=OpenAI API Key: 
+if not exist ".env" (
+    echo Creating .env file...
+    copy .env.docker .env > nul
+    if not exist ".env" (
+        echo ERROR: Failed to create .env file.
+        pause
+        exit /b 1
+    )
+) else (
+    echo Existing .env file found.
+)
+
+echo.
+echo IMPORTANT: For security, we'll now open your .env file
+echo to add your API keys directly. This way they won't be 
+echo visible in command history or process listings.
+echo.
+echo Please enter your API keys in the editor that opens.
+echo Find these lines in the file:
+echo   ANTHROPIC_API_KEY=your-anthropic-api-key-here
+echo   OPENAI_API_KEY=your-openai-api-key-here
+echo.
+echo Press any key to open the .env file...
+pause > nul
+
+start notepad .env
+
+echo.
+echo After saving and closing the editor, press any key to continue...
+pause > nul
 
 echo.
 echo Step 3: Building and starting containers...
@@ -65,6 +90,12 @@ echo ========================================
 echo.
 echo The Context Generator is now running at:
 echo    http://localhost:3000
+echo.
+echo IMPORTANT: If you didn't set API keys in the .env file,
+echo the application will use mock AI services. To use real 
+echo AI services, you need to:
+echo   1. Edit the .env file to add your API keys
+echo   2. Restart the containers with: docker-compose restart
 echo.
 echo To stop the application, use:
 echo    docker-compose down
