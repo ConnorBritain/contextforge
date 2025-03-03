@@ -37,23 +37,43 @@ cd /d "%~dp0"
 
 REM Install required dependencies
 echo Installing required dependencies...
-npm list js-yaml --silent || npm install --no-save js-yaml
-if %errorlevel% neq 0 (
-    echo.
-    echo Failed to install dependencies. Press any key to continue anyway...
-    pause > nul
-) else (
-    echo Dependencies installed successfully.
-)
+echo This may take a moment...
 
-echo.
-echo Press any key to continue with Docker setup...
-pause > nul
+REM Use a temporary batch file to run npm commands to avoid premature termination
+echo @echo off > temp_npm.bat
+echo cd /d "%~dp0" >> temp_npm.bat
+echo npm list js-yaml --silent 2^>nul ^|^| npm install --no-save js-yaml >> temp_npm.bat
+echo echo. >> temp_npm.bat
+echo echo Dependencies check completed. >> temp_npm.bat
+echo echo. >> temp_npm.bat
+echo echo Press any key to continue with Docker setup... >> temp_npm.bat
+echo pause ^> nul >> temp_npm.bat
+echo exit /b 0 >> temp_npm.bat
+
+REM Run the temporary batch file
+call temp_npm.bat
+del temp_npm.bat
 
 REM Run the Node.js setup script
 echo Running Docker setup with Node.js...
-node scripts/docker-setup.js %SKIP_CHECKS% %SKIP_PROMPTS% %REBUILD%
+echo This may take several minutes...
+
+REM Use a temporary batch file to run Node.js command
+echo @echo off > temp_node.bat
+echo cd /d "%~dp0" >> temp_node.bat
+echo node scripts/docker-setup.js %SKIP_CHECKS% %SKIP_PROMPTS% %REBUILD% >> temp_node.bat
+echo set NODE_EXIT_CODE=%%errorlevel%% >> temp_node.bat
+echo echo. >> temp_node.bat
+echo echo Node.js script completed with exit code %%NODE_EXIT_CODE%% >> temp_node.bat
+echo echo. >> temp_node.bat
+echo echo Press any key to continue... >> temp_node.bat
+echo pause ^> nul >> temp_node.bat
+echo exit /b %%NODE_EXIT_CODE%% >> temp_node.bat
+
+REM Run the temporary batch file and capture exit code
+call temp_node.bat
 set NODE_EXIT_CODE=%errorlevel%
+del temp_node.bat
 
 echo.
 if %NODE_EXIT_CODE% neq 0 (

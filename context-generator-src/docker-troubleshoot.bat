@@ -21,18 +21,22 @@ cd /d "%~dp0"
 
 REM Install required dependencies
 echo Installing required dependencies...
-npm list js-yaml --silent || npm install --no-save js-yaml
-if %errorlevel% neq 0 (
-    echo.
-    echo Failed to install dependencies. Press any key to continue anyway...
-    pause > nul
-) else (
-    echo Dependencies installed successfully.
-)
+echo This may take a moment...
 
-echo.
-echo Press any key to continue with troubleshooting...
-pause > nul
+REM Use a temporary batch file to run npm commands to avoid premature termination
+echo @echo off > temp_npm.bat
+echo cd /d "%~dp0" >> temp_npm.bat
+echo npm list js-yaml --silent 2^>nul ^|^| npm install --no-save js-yaml >> temp_npm.bat
+echo echo. >> temp_npm.bat
+echo echo Dependencies check completed. >> temp_npm.bat
+echo echo. >> temp_npm.bat
+echo echo Press any key to continue with troubleshooting... >> temp_npm.bat
+echo pause ^> nul >> temp_npm.bat
+echo exit /b 0 >> temp_npm.bat
+
+REM Run the temporary batch file
+call temp_npm.bat
+del temp_npm.bat
 
 REM Check if Docker is running
 echo Step 1: Checking Docker status...
@@ -60,13 +64,23 @@ if %errorlevel% neq 0 (
     if %errorlevel% equ 1 (
         echo.
         echo Running Docker setup with dynamic port allocation...
-        echo Press any key to continue...
-        pause > nul
-        node scripts/docker-setup.js --skip-prompts
-        set NODE_EXIT_CODE=%errorlevel%
-        echo.
-        echo Press any key to return to main menu...
-        pause > nul
+        echo This may take several minutes...
+        
+        REM Use a temporary batch file to run Node.js command
+        echo @echo off > temp_setup.bat
+        echo cd /d "%~dp0" >> temp_setup.bat
+        echo node scripts/docker-setup.js --skip-prompts >> temp_setup.bat
+        echo set NODE_EXIT_CODE=%%errorlevel%% >> temp_setup.bat
+        echo echo. >> temp_setup.bat
+        echo echo Setup completed with exit code %%NODE_EXIT_CODE%% >> temp_setup.bat
+        echo echo. >> temp_setup.bat
+        echo echo Press any key to return to main menu... >> temp_setup.bat
+        echo pause ^> nul >> temp_setup.bat
+        echo exit /b %%NODE_EXIT_CODE%% >> temp_setup.bat
+        
+        REM Run the temporary batch file
+        call temp_setup.bat
+        del temp_setup.bat
         goto :end
     )
 ) else (
@@ -82,12 +96,21 @@ echo.
 echo.
 echo Step 5: Checking Docker Compose configuration...
 echo Retrieving port mappings from docker-compose.yml...
-node -e "const fs=require('fs');const yaml=require('js-yaml');const config=yaml.load(fs.readFileSync('docker-compose.yml','utf8'));console.log('Current port mappings:');console.log(config.services.app.ports);"
-if %errorlevel% neq 0 (
-    echo Error retrieving port mappings. Docker Compose file may be invalid.
-    echo Press any key to continue...
-    pause > nul
-)
+
+REM Use a temporary batch file to run Node.js command
+echo @echo off > temp_check.bat
+echo cd /d "%~dp0" >> temp_check.bat
+echo node -e "const fs=require('fs');const yaml=require('js-yaml');const config=yaml.load(fs.readFileSync('docker-compose.yml','utf8'));console.log('Current port mappings:');console.log(config.services.app.ports);" >> temp_check.bat
+echo if %%errorlevel%% neq 0 ( >> temp_check.bat
+echo   echo Error retrieving port mappings. Docker Compose file may be invalid. >> temp_check.bat
+echo   echo Press any key to continue... >> temp_check.bat
+echo   pause ^> nul >> temp_check.bat
+echo ) >> temp_check.bat
+echo exit /b 0 >> temp_check.bat
+
+REM Run the temporary batch file
+call temp_check.bat
+del temp_check.bat
 echo.
 
 echo.
@@ -119,13 +142,23 @@ choice /C YN /M "Restart with dynamic ports"
 if %errorlevel% equ 1 (
     echo.
     echo Running Docker setup with dynamic port allocation...
-    echo Press any key to continue...
-    pause > nul
-    node scripts/docker-setup.js --skip-prompts
-    set NODE_EXIT_CODE=%errorlevel%
-    echo.
-    echo Press any key to continue...
-    pause > nul
+    echo This may take several minutes...
+    
+    REM Use a temporary batch file to run Node.js command
+    echo @echo off > temp_restart.bat
+    echo cd /d "%~dp0" >> temp_restart.bat
+    echo node scripts/docker-setup.js --skip-prompts >> temp_restart.bat
+    echo set NODE_EXIT_CODE=%%errorlevel%% >> temp_restart.bat
+    echo echo. >> temp_restart.bat
+    echo echo Restart completed with exit code %%NODE_EXIT_CODE%% >> temp_restart.bat
+    echo echo. >> temp_restart.bat
+    echo echo Press any key to continue... >> temp_restart.bat
+    echo pause ^> nul >> temp_restart.bat
+    echo exit /b %%NODE_EXIT_CODE%% >> temp_restart.bat
+    
+    REM Run the temporary batch file
+    call temp_restart.bat
+    del temp_restart.bat
     goto :end
 )
 
