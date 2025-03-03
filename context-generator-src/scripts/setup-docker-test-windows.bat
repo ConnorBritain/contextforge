@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 REM Windows setup script for Context Generator Docker testing
 
 echo.
@@ -15,11 +16,15 @@ if %errorLevel% neq 0 (
     exit /b 1
 )
 
-REM Set up colors for output
-set "RESET=[0m"
-set "RED=[91m"
-set "GREEN=[92m"
-set "YELLOW=[93m"
+REM Set base directory to project root
+cd /d "%~dp0\.."
+set "PROJECT_DIR=%CD%"
+echo Working directory set to: %PROJECT_DIR%
+
+REM Set up simple text indicators instead of colors
+set "ERROR_PREFIX=ERROR:"
+set "SUCCESS_PREFIX=SUCCESS:"
+set "WARNING_PREFIX=WARNING:"
 
 REM Check for prerequisites
 call :check_prerequisites
@@ -75,7 +80,7 @@ REM Check for Node.js
 node --version >nul 2>&1
 if %errorLevel% neq 0 (
     set missing=1
-    echo %RED%Node.js is not installed.%RESET%
+    echo %ERROR_PREFIX% Node.js is not installed.
     call :install_nodejs
 )
 
@@ -83,7 +88,7 @@ REM Check for npm
 npm --version >nul 2>&1
 if %errorLevel% neq 0 (
     set missing=1
-    echo %RED%npm is not installed.%RESET%
+    echo %ERROR_PREFIX% npm is not installed.
     echo This should be installed with Node.js.
 )
 
@@ -91,7 +96,7 @@ REM Check for Docker
 docker --version >nul 2>&1
 if %errorLevel% neq 0 (
     set missing=1
-    echo %RED%Docker is not installed.%RESET%
+    echo %ERROR_PREFIX% Docker is not installed.
     call :install_docker
 )
 
@@ -99,25 +104,25 @@ REM Check for Docker Compose
 docker-compose --version >nul 2>&1
 if %errorLevel% neq 0 (
     set missing=1
-    echo %RED%Docker Compose is not installed.%RESET%
+    echo %ERROR_PREFIX% Docker Compose is not installed.
     echo This should be installed with Docker Desktop.
 )
 
 if %missing% equ 1 (
     echo.
-    echo %YELLOW%Some prerequisites were missing and need to be installed.%RESET%
+    echo %WARNING_PREFIX% Some prerequisites were missing and need to be installed.
     echo Please install the missing components and run this script again.
     pause
     exit /b 1
 ) else (
-    echo %GREEN%All prerequisites are installed!%RESET%
+    echo %SUCCESS_PREFIX% All prerequisites are installed!
 )
 
 exit /b 0
 
 :install_nodejs
 echo.
-echo %YELLOW%Installing Node.js...%RESET%
+echo %WARNING_PREFIX% Installing Node.js...
 echo.
 echo This script can download the Node.js installer for you.
 set /p install_nodejs="Would you like to download and install Node.js now? (y/n): "
@@ -140,17 +145,18 @@ exit /b 0
 
 :install_docker
 echo.
-echo %YELLOW%Installing Docker Desktop...%RESET%
+echo %WARNING_PREFIX% Installing Docker Desktop...
 echo.
 echo This script can download the Docker Desktop installer for you.
 set /p install_docker="Would you like to download and install Docker Desktop now? (y/n): "
 if /i "%install_docker%"=="y" (
     echo Downloading Docker Desktop installer...
-    powershell -Command "& {Invoke-WebRequest -Uri 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe' -OutFile 'docker-installer.exe'}"
+    cd /d "%PROJECT_DIR%"
+    powershell -Command "& {Invoke-WebRequest -Uri 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe' -OutFile '%PROJECT_DIR%\docker-installer.exe'}"
     
-    if exist docker-installer.exe (
+    if exist "%PROJECT_DIR%\docker-installer.exe" (
         echo Running Docker Desktop installer...
-        start /wait docker-installer.exe
+        start /wait "%PROJECT_DIR%\docker-installer.exe"
         echo Installation started. Please complete the installation wizard.
         echo After installation is complete, you need to restart your computer and run this script again.
     ) else (
@@ -168,10 +174,16 @@ echo ===== Setting Up Environment Files =====
 echo.
 
 REM Copy .env.docker to .env if it doesn't exist
-if not exist .env (
+if not exist "%PROJECT_DIR%\.env" (
     echo Creating .env file from .env.docker...
-    copy .env.docker .env
-    echo %GREEN%Created .env file%RESET%
+    if exist "%PROJECT_DIR%\.env.docker" (
+        copy "%PROJECT_DIR%\.env.docker" "%PROJECT_DIR%\.env"
+        echo %SUCCESS_PREFIX% Created .env file
+    ) else (
+        echo %ERROR_PREFIX% .env.docker file not found!
+        pause
+        exit /b 1
+    )
 ) else (
     echo .env file already exists
 )
@@ -181,8 +193,8 @@ echo.
 echo For testing with real AI services, you need to update your API keys in the .env file.
 set /p edit_env="Would you like to edit the .env file now? (y/n): "
 if /i "%edit_env%"=="y" (
-    start notepad .env
-    echo %GREEN%.env file opened for editing%RESET%
+    start notepad "%PROJECT_DIR%\.env"
+    echo %SUCCESS_PREFIX% .env file opened for editing
 ) else (
     echo Please edit the .env file manually to add your API keys before testing.
 )
@@ -194,23 +206,23 @@ echo ===== Installing Dependencies =====
 echo.
 
 echo Installing server dependencies...
-cd server && npm install
+cd /d "%PROJECT_DIR%\server" && npm install
 if %errorLevel% neq 0 (
-    echo %RED%Failed to install server dependencies%RESET%
+    echo %ERROR_PREFIX% Failed to install server dependencies
     pause
     exit /b 1
 )
 
 echo Installing client dependencies...
-cd ../client && npm install
+cd /d "%PROJECT_DIR%\client" && npm install
 if %errorLevel% neq 0 (
-    echo %RED%Failed to install client dependencies%RESET%
+    echo %ERROR_PREFIX% Failed to install client dependencies
     pause
     exit /b 1
 )
 
-cd ..
-echo %GREEN%All dependencies installed%RESET%
+cd /d "%PROJECT_DIR%"
+echo %SUCCESS_PREFIX% All dependencies installed
 exit /b 0
 
 :build_docker
@@ -218,15 +230,21 @@ echo.
 echo ===== Building Docker Images =====
 echo.
 
-echo Building Docker images...
-docker-compose build
-if %errorLevel% neq 0 (
-    echo %RED%Failed to build Docker images%RESET%
+if not exist "%PROJECT_DIR%\docker-compose.yml" (
+    echo %ERROR_PREFIX% docker-compose.yml not found in %PROJECT_DIR%
     pause
     exit /b 1
 )
 
-echo %GREEN%Docker images built successfully%RESET%
+echo Building Docker images...
+cd /d "%PROJECT_DIR%" && docker-compose build
+if %errorLevel% neq 0 (
+    echo %ERROR_PREFIX% Failed to build Docker images
+    pause
+    exit /b 1
+)
+
+echo %SUCCESS_PREFIX% Docker images built successfully
 exit /b 0
 
 :start_docker
@@ -235,9 +253,9 @@ echo ===== Starting Docker Containers =====
 echo.
 
 echo Starting containers in detached mode...
-docker-compose up -d
+cd /d "%PROJECT_DIR%" && docker-compose up -d
 if %errorLevel% neq 0 (
-    echo %RED%Failed to start Docker containers%RESET%
+    echo %ERROR_PREFIX% Failed to start Docker containers
     pause
     exit /b 1
 )
@@ -245,7 +263,7 @@ if %errorLevel% neq 0 (
 echo Waiting for containers to be ready...
 timeout /t 10 /nobreak > nul
 
-echo %GREEN%Docker containers started successfully%RESET%
+echo %SUCCESS_PREFIX% Docker containers started successfully
 exit /b 0
 
 :run_tests
@@ -254,17 +272,17 @@ echo ===== Running Token Tracking and Subscription Tests =====
 echo.
 
 echo Installing test dependencies...
-npm install --no-save axios dotenv
+cd /d "%PROJECT_DIR%" && npm install --no-save axios dotenv
 
 echo Running test script...
-node scripts/test-token-tracking.js
+cd /d "%PROJECT_DIR%" && node "%PROJECT_DIR%\scripts\test-token-tracking.js"
 if %errorLevel% neq 0 (
-    echo %RED%Tests failed%RESET%
+    echo %ERROR_PREFIX% Tests failed
     pause
     exit /b 1
 )
 
-echo %GREEN%Tests completed successfully%RESET%
+echo %SUCCESS_PREFIX% Tests completed successfully
 exit /b 0
 
 :stop_docker
@@ -273,12 +291,12 @@ echo ===== Stopping Docker Containers =====
 echo.
 
 echo Stopping containers...
-docker-compose down
+cd /d "%PROJECT_DIR%" && docker-compose down
 if %errorLevel% neq 0 (
-    echo %RED%Failed to stop Docker containers%RESET%
+    echo %ERROR_PREFIX% Failed to stop Docker containers
     pause
     exit /b 1
 )
 
-echo %GREEN%Docker containers stopped successfully%RESET%
+echo %SUCCESS_PREFIX% Docker containers stopped successfully
 exit /b 0
