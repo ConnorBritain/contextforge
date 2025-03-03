@@ -2,17 +2,27 @@ const express = require('express');
 const router = express.Router();
 const aiController = require('../controllers/aiController');
 const documentController = require('../controllers/documentController');
-// Middleware would go here in a more complete implementation
-// const { authenticate } = require('../middleware/auth');
+// Middleware for authentication
+const auth = require('../middleware/auth');
 
+// Public routes (no authentication required)
 // Generate new context document
-router.post('/generate', aiController.generateContext);
+router.post('/generate', documentController.generateDocument);
 
-// In a more complete implementation, these would require authentication
-// router.get('/', documentController.getDocuments);
-// router.get('/:id', documentController.getDocumentById);
-// router.post('/', documentController.createDocument);
-// router.put('/:id', documentController.updateDocument);
-// router.delete('/:id', documentController.deleteDocument);
+// Export a document (works with both saved and unsaved documents)
+router.post('/export/:id', documentController.exportDocument);
+
+// Routes requiring authentication
+// Get all documents for the current user
+router.get('/', auth, documentController.getUserDocuments);
+
+// Get a specific document by ID
+router.get('/:id', auth, documentController.getDocumentById);
+
+// Delete a document
+router.delete('/:id', auth, documentController.deleteDocument);
+
+// Export a saved document by ID
+router.get('/:id/export', auth, documentController.exportDocument);
 
 module.exports = router;

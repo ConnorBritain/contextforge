@@ -1,6 +1,7 @@
 module.exports = {
     port: process.env.PORT || 5000,
-    aiProvider: process.env.AI_PROVIDER || 'openai', // 'openai' or 'anthropic'
+    aiProvider: process.env.AI_PROVIDER || 'mock', // 'openai', 'anthropic', or 'mock'
+    useRealAI: process.env.USE_REAL_AI === 'true' || false, // Set to true in production or for testing real AI
     openai: {
       apiKey: process.env.OPENAI_API_KEY,
       model: process.env.OPENAI_MODEL || 'gpt-4o',
@@ -19,5 +20,13 @@ module.exports = {
     jwt: {
       secret: process.env.JWT_SECRET || 'your-secret-key-for-development',
       expiresIn: '7d'
+    },
+    clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
+    serverUrl: process.env.SERVER_URL || 'http://localhost:5000',
+    // Document generation settings
+    documents: {
+      maxLength: 20000, // Maximum character length for generated documents
+      defaultContextType: 'targetMarketAudience',
+      exportFormats: ['markdown', 'html', 'text']
     }
   };
