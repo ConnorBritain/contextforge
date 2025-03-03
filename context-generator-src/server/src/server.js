@@ -13,6 +13,10 @@ const { errorHandler } = require('./middleware/errorHandler');
 // Initialize Express app
 const app = express();
 
+// Serve static files from the client/build directory
+const path = require('path');
+app.use(express.static(path.join(__dirname, '../../client/build')));
+
 // Configure security middleware for production
 if (process.env.NODE_ENV === 'production') {
   configureSecurityMiddleware(app);
@@ -60,7 +64,16 @@ app.use('/api/subscriptions', subscriptionRoutes);
 // Backward compatibility for previous route
 app.use('/api/contexts', documentRoutes);
 
-// 404 handler
+// Serve the React app for any non-API routes
+app.get('/*', (req, res, next) => {
+  // Only handle non-API routes with this middleware
+  if (!req.path.startsWith('/api/')) {
+    return res.sendFile(path.join(__dirname, '../../client/build/index.html'));
+  }
+  next();
+});
+
+// 404 handler for API routes
 app.use((req, res, next) => {
   res.status(404).json({
     success: false,

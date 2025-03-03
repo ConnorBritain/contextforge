@@ -36,8 +36,9 @@ COPY --from=build /app/node_modules ./node_modules
 ENV PORT=5000
 ENV NODE_ENV=production
 
-# Expose the application port
+# Expose the application ports
 EXPOSE 5000
+EXPOSE 3000
 
 # Start the application
 CMD ["node", "server/src/server.js"]
