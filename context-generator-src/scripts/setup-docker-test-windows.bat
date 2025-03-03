@@ -2,6 +2,11 @@
 setlocal enabledelayedexpansion
 REM Windows setup script for Context Generator Docker testing
 
+REM Enable error handling
+REM If any command fails, the script will jump to :error_handler
+REM Comment the next line for debugging specific issues
+if not "%1"=="--debug" set "erroractionpreference=stop"
+
 REM Add options for verbose debugging and skipping checks
 set "VERBOSE_MODE=0"
 set "SKIP_CHECKS=0"
@@ -50,18 +55,37 @@ set "ERROR_PREFIX=ERROR:"
 set "SUCCESS_PREFIX=SUCCESS:"
 set "WARNING_PREFIX=WARNING:"
 
+REM Add a main wrapper to catch and handle errors
+call :main
+goto :eof
+
+:main
+echo.
+echo ===== Starting setup process (1/6): Prerequisite checks =====
+echo.
+
 REM Check for prerequisites or skip if requested
 if "%SKIP_CHECKS%"=="1" (
     echo Skipping prerequisite checks as requested...
+    echo.
+    echo Press any key to continue...
+    pause > nul
 ) else (
-    call :check_prerequisites
+    call :check_prerequisites || goto :error_handler
 )
 
+echo.
+echo ===== Setup process (2/6): Environment configuration =====
+echo.
+
 REM Setup environment
-call :setup_environment
+call :setup_environment || goto :error_handler
+
+echo.
+echo ===== Setup process (3/6): Dependencies installation =====
+echo.
 
 REM Check if user wants to skip npm dependencies and go straight to Docker
-echo.
 echo NOTE: You can skip npm dependency installation and go straight to
 echo Docker if you're experiencing npm-related issues.
 set /p skip_npm="Would you like to skip npm dependency installation? (y/n): "
@@ -69,27 +93,41 @@ if /i "%skip_npm%"=="y" (
     echo Skipping npm dependency installation...
 ) else (
     REM Install dependencies
-    call :install_dependencies
+    call :install_dependencies || goto :error_handler
 )
+
+echo.
+echo ===== Setup process (4/6): Building Docker images =====
+echo.
 
 REM Build Docker
-call :build_docker
+call :build_docker || goto :error_handler
+
+echo.
+echo ===== Setup process (5/6): Starting Docker containers =====
+echo.
 
 REM Start Docker
-call :start_docker
+call :start_docker || goto :error_handler
+
+echo.
+echo ===== Setup process (6/6): Optional tests =====
+echo.
 
 REM Ask if user wants to run tests
-echo.
 set /p run_tests_prompt="Would you like to run the token tracking and subscription tests? (y/n): "
 if /i "%run_tests_prompt%"=="y" (
-    call :run_tests
+    call :run_tests || goto :error_handler
 )
 
-REM Ask if user wants to stop containers
 echo.
+echo ===== All steps completed successfully! =====
+echo.
+
+REM Ask if user wants to stop containers
 set /p stop_prompt="Would you like to stop the Docker containers? (y/n): "
 if /i "%stop_prompt%"=="y" (
-    call :stop_docker
+    call :stop_docker || goto :error_handler
 ) else (
     echo.
     echo The Docker containers are still running.
@@ -103,8 +141,22 @@ echo The Context Generator is now set up for testing with Docker.
 echo If you want to deploy to production, review the .env.production file
 echo and update it with your actual production values.
 echo.
-pause
-exit /b 0
+echo Press any key to exit...
+pause > nul
+goto :eof
+
+:error_handler
+echo.
+echo %ERROR_PREFIX% An error occurred during script execution!
+echo Error code: %errorlevel%
+echo.
+echo Please check the output above for error messages.
+echo You might want to try running the script with --debug flag:
+echo scripts\setup-docker-test-windows.bat --debug
+echo.
+echo Press any key to exit...
+pause > nul
+exit /b 1
 
 :run_with_timeout
 REM Usage: call :run_with_timeout "command" timeout_seconds
@@ -161,6 +213,9 @@ echo.
 REM Add bypass option for troubleshooting
 echo If the check gets stuck, press Ctrl+C and restart with --debug flag:
 echo scripts\setup-docker-test-windows.bat --debug
+echo.
+echo Press any key to start checking prerequisites...
+pause > nul
 echo.
 
 set missing=0
@@ -293,6 +348,9 @@ if %missing% equ 1 (
     echo %SUCCESS_PREFIX% All prerequisites are installed!
 )
 
+echo.
+echo Press any key to continue...
+pause > nul
 exit /b 0
 
 :install_nodejs
