@@ -8,12 +8,12 @@ services:
     container_name: context-generator
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "3000:5000"
     environment:
       - NODE_ENV=production
       - PORT=5000
-      - MONGODB_URI=${MONGODB_URI}
-      - JWT_SECRET=${JWT_SECRET}
+      - MONGODB_URI=mongodb://user:password@mongodb:27017/context-generator?authSource=admin
+      - JWT_SECRET=context-generator-secret-key-for-testing
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
@@ -26,8 +26,8 @@ services:
     container_name: context-generator-mongodb
     restart: unless-stopped
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=password
       - MONGO_INITDB_DATABASE=context-generator
     volumes:
       - mongo-data:/data/db
