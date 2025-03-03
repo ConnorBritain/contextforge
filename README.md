@@ -36,6 +36,31 @@ A full-stack application for generating professional context documents using AI.
    ```
    npm run dev
    ```
+
+## Deployment
+
+### Using Docker (Recommended)
+
+1. Configure environment variables in `.env.production`
+2. Run the deployment script:
+   ```
+   cd context-generator-src
+   ./scripts/deploy.sh
+   ```
+
+### Manual Deployment
+
+1. Build the client:
+   ```
+   cd context-generator-src/client
+   npm run build
+   ```
+2. Set up environment variables for production
+3. Start the server:
+   ```
+   cd context-generator-src
+   NODE_ENV=production npm start
+   ```
    
 ## Project Structure
 
@@ -66,6 +91,6 @@ npm test
 - [x] Database integration
 - [x] Authentication system
 - [x] Test suite
-- [ ] Error handling improvements
-- [ ] Production deployment
-- [ ] CI/CD pipeline
+- [x] Error handling improvements
+- [x] Production deployment
+- [x] CI/CD pipeline

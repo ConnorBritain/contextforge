@@ -281,22 +281,123 @@ button:disabled {
 /* Error Message */
 .error-message {
   display: flex;
-  align-items: center;
-  background-color: rgba(230, 55, 87, 0.1);
-  border: 1px solid var(--error-color);
+  flex-direction: column;
   border-radius: var(--border-radius);
   padding: 1rem;
   margin-bottom: 1.5rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Error types with different styling */
+.error-message.error-type-generic {
+  background-color: rgba(230, 55, 87, 0.1);
+  border: 1px solid var(--error-color);
+}
+
+.error-message.error-type-server {
+  background-color: rgba(230, 55, 87, 0.1);
+  border: 1px solid var(--error-color);
+}
+
+.error-message.error-type-auth {
+  background-color: rgba(110, 132, 163, 0.1);
+  border: 1px solid var(--secondary-color);
+}
+
+.error-message.error-type-validation {
+  background-color: rgba(246, 195, 67, 0.1);
+  border: 1px solid var(--warning-color);
+}
+
+.error-message.error-type-notFound {
+  background-color: rgba(110, 132, 163, 0.1);
+  border: 1px solid var(--secondary-color);
+}
+
+.error-message.error-type-rateLimit {
+  background-color: rgba(246, 195, 67, 0.1);
+  border: 1px solid var(--warning-color);
+}
+
+.error-content {
+  display: flex;
+  align-items: flex-start;
 }
 
 .error-icon {
   margin-right: 0.75rem;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
+  line-height: 1.4;
 }
 
 .error-text {
-  color: var(--error-color);
+  flex: 1;
+}
+
+.error-title {
   font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.error-type-generic .error-title,
+.error-type-server .error-title {
+  color: var(--error-color);
+}
+
+.error-type-auth .error-title,
+.error-type-notFound .error-title {
+  color: var(--secondary-color);
+}
+
+.error-type-validation .error-title,
+.error-type-rateLimit .error-title {
+  color: var(--warning-color);
+}
+
+.error-details {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+  max-height: 100px;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.03);
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.error-retry-button {
+  margin-top: 0.75rem;
+  align-self: flex-end;
+  background-color: transparent;
+  border: 1px solid currentColor;
+  border-radius: var(--border-radius);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.error-type-generic .error-retry-button,
+.error-type-server .error-retry-button {
+  color: var(--error-color);
+}
+
+.error-type-auth .error-retry-button,
+.error-type-notFound .error-retry-button {
+  color: var(--secondary-color);
+}
+
+.error-type-validation .error-retry-button,
+.error-type-rateLimit .error-retry-button {
+  color: var(--warning-color);
+}
+
+.error-retry-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Home Page */

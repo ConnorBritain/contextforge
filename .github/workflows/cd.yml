@@ -1,0 +1,60 @@
+name: Context Generator CD
+
+on:
+  workflow_run:
+    workflows: ["Context Generator CI"]
+    branches: [main]
+    types: [completed]
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Add known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Load cached Docker image
+        uses: actions/cache@v3
+        with:
+          path: /tmp/docker-image
+          key: docker-${{ github.sha }}
+      
+      - name: Load Docker image
+        run: |
+          if [ -f /tmp/docker-image/context-generator.tar ]; then
+            docker load < /tmp/docker-image/context-generator.tar
+          else
+            echo "No cached Docker image found"
+            exit 1
+          fi
+      
+      - name: Tag Docker image
+        run: |
+          docker tag context-generator:${{ github.sha }} context-generator:latest
+      
+      - name: Transfer production files
+        run: |
+          scp -r context-generator-src/.env.production context-generator-src/docker-compose.yml ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}
+      
+      - name: Deploy to production
+        run: |
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "cd ${{ secrets.DEPLOY_PATH }} && \
+          docker-compose pull && \
+          docker-compose up -d --force-recreate"
+      
+      - name: Verify deployment
+        run: |
+          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "cd ${{ secrets.DEPLOY_PATH }} && \
+          docker ps | grep context-generator"

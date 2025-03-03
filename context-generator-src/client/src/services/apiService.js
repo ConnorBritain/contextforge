@@ -1,4 +1,16 @@
 /**
+ * Custom API error class with detailed information
+ */
+class ApiError extends Error {
+  constructor(message, status, data = null) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.data = data;
+  }
+}
+
+/**
  * Base API service for making HTTP requests
  */
 class ApiService {
@@ -87,13 +99,66 @@ class ApiService {
     }
   
     /**
-     * Handle API response
+     * Handle API response with improved error handling
      */
     async _handleResponse(response) {
-      const data = await response.json();
+      let data;
+
+      try {
+        data = await response.json();
+      } catch (error) {
+        // In case response is not valid JSON
+        throw new ApiError(
+          'Invalid response from server', 
+          response.status,
+          { url: response.url }
+        );
+      }
       
       if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong');
+        // Determine error type based on status code
+        switch (response.status) {
+          case 400: // Bad Request
+            throw new ApiError(
+              data.error?.message || 'Bad request - Invalid input', 
+              400, 
+              data.error
+            );
+          case 401: // Unauthorized
+            // Clear token on auth errors
+            localStorage.removeItem('token');
+            this.setAuthToken(null);
+            throw new ApiError(
+              data.error?.message || 'Authentication required', 
+              401, 
+              data.error
+            );
+          case 403: // Forbidden
+            throw new ApiError(
+              data.error?.message || 'Access denied', 
+              403, 
+              data.error
+            );
+          case 404: // Not Found
+            throw new ApiError(
+              data.error?.message || 'Resource not found', 
+              404, 
+              data.error
+            );
+          case 429: // Rate Limited
+            throw new ApiError(
+              data.error?.message || 'Too many requests - please try again later', 
+              429, 
+              data.error
+            );
+          case 500: // Server Error
+          default:
+            throw new ApiError(
+              data.error?.message || 'Server error - please try again later', 
+              response.status, 
+              data.error
+            );
+        }
       }
       
       return data;

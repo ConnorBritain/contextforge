@@ -1,5 +1,10 @@
 const User = require('../models/User');
 const { validationResult } = require('express-validator');
+const { 
+  BadRequestError, 
+  NotFoundError, 
+  UnauthorizedError 
+} = require('../middleware/errorHandler');
 
 /**
  * Authentication controller for user registration, login, and profile management
@@ -9,12 +14,13 @@ class AuthController {
    * Register a new user
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
+   * @param {Function} next - Express next middleware function
    */
-  static async register(req, res) {
+  static async register(req, res, next) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        throw new BadRequestError('Validation failed', { errors: errors.array() });
       }
 
       const { name, email, password } = req.body;
@@ -22,7 +28,7 @@ class AuthController {
       // Check if user already exists
       let user = await User.findOne({ email });
       if (user) {
-        return res.status(400).json({ error: 'User already exists' });
+        throw new BadRequestError('User already exists', { email });
       }
 
       // Create new user
@@ -48,7 +54,7 @@ class AuthController {
       });
     } catch (error) {
       console.error('Error registering user:', error);
-      res.status(500).json({ error: 'Server error' });
+      next(error);
     }
   }
 
@@ -56,12 +62,13 @@ class AuthController {
    * Login a user
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
+   * @param {Function} next - Express next middleware function
    */
-  static async login(req, res) {
+  static async login(req, res, next) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        throw new BadRequestError('Validation failed', { errors: errors.array() });
       }
 
       const { email, password } = req.body;
@@ -69,13 +76,13 @@ class AuthController {
       // Check if user exists
       const user = await User.findOne({ email });
       if (!user) {
-        return res.status(400).json({ error: 'Invalid credentials' });
+        throw new UnauthorizedError('Invalid credentials');
       }
 
       // Verify password
       const isMatch = await user.comparePassword(password);
       if (!isMatch) {
-        return res.status(400).json({ error: 'Invalid credentials' });
+        throw new UnauthorizedError('Invalid credentials');
       }
 
       // Generate JWT token
@@ -92,7 +99,7 @@ class AuthController {
       });
     } catch (error) {
       console.error('Error logging in:', error);
-      res.status(500).json({ error: 'Server error' });
+      next(error);
     }
   }
 
@@ -100,18 +107,19 @@ class AuthController {
    * Get the current user's profile
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
+   * @param {Function} next - Express next middleware function
    */
-  static async getProfile(req, res) {
+  static async getProfile(req, res, next) {
     try {
       const user = await User.findById(req.user.id).select('-password');
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        throw new NotFoundError('User not found');
       }
 
       res.json(user);
     } catch (error) {
       console.error('Error fetching profile:', error);
-      res.status(500).json({ error: 'Server error' });
+      next(error);
     }
   }
 
@@ -119,12 +127,13 @@ class AuthController {
    * Update the current user's profile
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
+   * @param {Function} next - Express next middleware function
    */
-  static async updateProfile(req, res) {
+  static async updateProfile(req, res, next) {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        throw new BadRequestError('Validation failed', { errors: errors.array() });
       }
 
       const { name, email } = req.body;
@@ -132,7 +141,7 @@ class AuthController {
       // Find and update the user
       const user = await User.findById(req.user.id);
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        throw new NotFoundError('User not found');
       }
 
       // Update user properties
@@ -151,7 +160,7 @@ class AuthController {
       });
     } catch (error) {
       console.error('Error updating profile:', error);
-      res.status(500).json({ error: 'Server error' });
+      next(error);
     }
   }
 }

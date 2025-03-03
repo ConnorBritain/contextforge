@@ -2,6 +2,11 @@ const aiServiceFactory = require('../services/aiServiceFactory');
 const DocumentProcessor = require('../utils/documentProcessor');
 const DocumentExporter = require('../utils/documentExporter');
 const Document = require('../models/Document');
+const { 
+  BadRequestError, 
+  NotFoundError, 
+  AIServiceError 
+} = require('../middleware/errorHandler');
 
 /**
  * Document controller for handling document generation and management
@@ -12,12 +17,12 @@ class DocumentController {
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
    */
-  static async generateDocument(req, res) {
+  static async generateDocument(req, res, next) {
     try {
       const { formData, contextType, aiProvider = 'anthropic' } = req.body;
       
       if (!formData || !contextType) {
-        return res.status(400).json({ error: 'Missing required fields' });
+        throw new BadRequestError('Missing required fields', { formData: !formData, contextType: !contextType });
       }
       
       // Get the appropriate AI service
@@ -46,7 +51,13 @@ class DocumentController {
       res.json(processedDocument);
     } catch (error) {
       console.error('Error generating document:', error);
-      res.status(500).json({ error: 'Failed to generate document' });
+      
+      // Convert to appropriate error type if not already
+      if (error.name === 'AIError' || error.message.includes('AI')) {
+        next(new AIServiceError('AI service failed to generate document', { originalError: error.message }));
+      } else {
+        next(error);
+      }
     }
   }
   
@@ -55,7 +66,7 @@ class DocumentController {
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
    */
-  static async getUserDocuments(req, res) {
+  static async getUserDocuments(req, res, next) {
     try {
       const documents = await Document.find({ userId: req.user.id })
         .sort({ createdAt: -1 });
@@ -63,7 +74,7 @@ class DocumentController {
       res.json(documents);
     } catch (error) {
       console.error('Error fetching documents:', error);
-      res.status(500).json({ error: 'Failed to fetch documents' });
+      next(error);
     }
   }
   
@@ -72,7 +83,7 @@ class DocumentController {
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
    */
-  static async getDocumentById(req, res) {
+  static async getDocumentById(req, res, next) {
     try {
       const document = await Document.findOne({
         _id: req.params.id,
@@ -80,13 +91,13 @@ class DocumentController {
       });
       
       if (!document) {
-        return res.status(404).json({ error: 'Document not found' });
+        throw new NotFoundError('Document not found', { id: req.params.id });
       }
       
       res.json(document);
     } catch (error) {
       console.error('Error fetching document:', error);
-      res.status(500).json({ error: 'Failed to fetch document' });
+      next(error);
     }
   }
   
@@ -95,7 +106,7 @@ class DocumentController {
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
    */
-  static async exportDocument(req, res) {
+  static async exportDocument(req, res, next) {
     try {
       const { id } = req.params;
       const { format = 'markdown' } = req.query;
@@ -103,7 +114,7 @@ class DocumentController {
       // Validate format
       const allowedFormats = ['markdown', 'html', 'text'];
       if (!allowedFormats.includes(format)) {
-        return res.status(400).json({ error: 'Invalid export format' });
+        throw new BadRequestError('Invalid export format', { format, allowedFormats });
       }
       
       // Get document - either from DB or from request body for unsaved documents
@@ -113,7 +124,7 @@ class DocumentController {
         // For unsaved documents sent in request body
         document = req.body.document;
         if (!document) {
-          return res.status(400).json({ error: 'Document data is required for export' });
+          throw new BadRequestError('Document data is required for export');
         }
       } else {
         // For saved documents
@@ -123,7 +134,7 @@ class DocumentController {
         });
         
         if (!document) {
-          return res.status(404).json({ error: 'Document not found' });
+          throw new NotFoundError('Document not found', { id });
         }
         
         // Extract content from document model
@@ -162,7 +173,7 @@ class DocumentController {
       res.send(exportContent);
     } catch (error) {
       console.error('Error exporting document:', error);
-      res.status(500).json({ error: 'Failed to export document' });
+      next(error);
     }
   }
   
@@ -171,7 +182,7 @@ class DocumentController {
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
    */
-  static async deleteDocument(req, res) {
+  static async deleteDocument(req, res, next) {
     try {
       const result = await Document.deleteOne({
         _id: req.params.id,
@@ -179,13 +190,13 @@ class DocumentController {
       });
       
       if (result.deletedCount === 0) {
-        return res.status(404).json({ error: 'Document not found' });
+        throw new NotFoundError('Document not found or not authorized to delete', { id: req.params.id });
       }
       
       res.json({ message: 'Document deleted successfully' });
     } catch (error) {
       console.error('Error deleting document:', error);
-      res.status(500).json({ error: 'Failed to delete document' });
+      next(error);
     }
   }
 }

@@ -1,0 +1,41 @@
+# Multi-stage build for context generator application
+
+# -------- BASE STAGE --------
+FROM node:18-alpine AS base
+WORKDIR /app
+ENV NODE_ENV=production
+
+# -------- DEPENDENCIES STAGE --------
+FROM base AS dependencies
+# Copy package.json and package-lock.json files
+COPY package*.json ./
+# Install dependencies for both client and server
+RUN npm ci
+
+# -------- BUILD STAGE --------
+FROM base AS build
+# Copy dependencies
+COPY --from=dependencies /app/node_modules ./node_modules
+# Copy application code
+COPY . .
+# Build client
+RUN cd client && npm ci && npm run build
+
+# -------- PRODUCTION STAGE --------
+FROM base AS production
+# Copy only the built client and server files
+COPY --from=build /app/client/build ./client/build
+COPY --from=build /app/server ./server
+COPY --from=build /app/shared ./shared
+COPY --from=build /app/package*.json ./
+COPY --from=build /app/node_modules ./node_modules
+
+# Set environment variables
+ENV PORT=5000
+ENV NODE_ENV=production
+
+# Expose the application port
+EXPOSE 5000
+
+# Start the application
+CMD ["node", "server/src/server.js"]

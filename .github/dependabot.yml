@@ -1,0 +1,34 @@
+version: 2
+updates:
+  # Update npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/context-generator-src"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "owner"
+    labels:
+      - "dependencies"
+
+  # Update npm dependencies for client
+  - package-ecosystem: "npm"
+    directory: "/context-generator-src/client"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "owner"
+    labels:
+      - "dependencies"
+      - "frontend"
+
+  # Update GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"

@@ -1,0 +1,92 @@
+name: Context Generator CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+          
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'context-generator-src/package-lock.json'
+      
+      - name: Install dependencies
+        run: |
+          cd context-generator-src
+          npm install
+      
+      - name: Run linting
+        run: |
+          cd context-generator-src
+          npm run lint
+      
+      - name: Run tests
+        run: |
+          cd context-generator-src
+          npm test
+        env:
+          NODE_ENV: test
+          MONGODB_URI: mongodb://localhost:27017/context-generator-test
+          JWT_SECRET: test-jwt-secret
+          USE_REAL_AI: false
+          AI_PROVIDER: mock
+  
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'context-generator-src/package-lock.json'
+      
+      - name: Install dependencies
+        run: |
+          cd context-generator-src
+          npm install
+      
+      - name: Build client
+        run: |
+          cd context-generator-src/client
+          npm install
+          npm run build
+      
+      - name: Build Docker image
+        run: |
+          cd context-generator-src
+          docker build -t context-generator:${{ github.sha }} .
+      
+      - name: Cache Docker image
+        uses: actions/cache@v3
+        with:
+          path: /tmp/docker-image
+          key: docker-${{ github.sha }}
+          restore-keys: |
+            docker-
+      
+      - name: Save Docker image
+        run: docker save context-generator:${{ github.sha }} > /tmp/docker-image/context-generator.tar

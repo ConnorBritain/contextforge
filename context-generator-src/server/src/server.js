@@ -4,6 +4,7 @@ const config = require('./config/default');
 const mongoose = require('mongoose');
 const documentRoutes = require('./routes/documentRoutes');
 const authRoutes = require('./routes/authRoutes');
+const { errorHandler } = require('./middleware/errorHandler');
 
 // Initialize Express app
 const app = express();
@@ -39,13 +40,7 @@ app.get('/health', (req, res) => {
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    error: err.message || 'Something went wrong!'
-  });
-});
+app.use(errorHandler);
 
 // Start server
 const PORT = config.port;

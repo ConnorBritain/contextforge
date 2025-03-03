@@ -18,7 +18,7 @@ export const DocumentProvider = ({ children }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Error state
+  // Error state - now stores more detailed error information
   const [error, setError] = useState(null);
   
   // Initialize - load user documents if authenticated
@@ -35,7 +35,10 @@ export const DocumentProvider = ({ children }) => {
         }
       } catch (err) {
         console.error('Error loading documents:', err);
-        setError('Failed to load your documents');
+        setError({
+          message: 'Failed to load your documents',
+          error: err
+        });
       } finally {
         setIsLoading(false);
       }
@@ -59,7 +62,11 @@ export const DocumentProvider = ({ children }) => {
       return newDocument;
     } catch (err) {
       console.error('Error generating document:', err);
-      setError('Failed to generate document. Please try again.');
+      setError({
+        message: 'Failed to generate document. Please try again.',
+        error: err,
+        canRetry: true
+      });
       return null;
     } finally {
       setIsGenerating(false);
@@ -71,7 +78,10 @@ export const DocumentProvider = ({ children }) => {
    */
   const saveDocument = async () => {
     if (!currentDocument) {
-      setError('No document to save');
+      setError({
+        message: 'No document to save',
+        error: new Error('No document available')
+      });
       return null;
     }
     
@@ -97,7 +107,11 @@ export const DocumentProvider = ({ children }) => {
       return savedDoc;
     } catch (err) {
       console.error('Error saving document:', err);
-      setError('Failed to save document');
+      setError({
+        message: 'Failed to save document',
+        error: err,
+        canRetry: true
+      });
       return null;
     } finally {
       setIsLoading(false);
@@ -118,7 +132,11 @@ export const DocumentProvider = ({ children }) => {
       return doc;
     } catch (err) {
       console.error('Error loading document:', err);
-      setError('Failed to load document');
+      setError({
+        message: 'Failed to load document',
+        error: err,
+        canRetry: true
+      });
       return null;
     } finally {
       setIsLoading(false);
@@ -147,7 +165,10 @@ export const DocumentProvider = ({ children }) => {
       return true;
     } catch (err) {
       console.error('Error deleting document:', err);
-      setError('Failed to delete document');
+      setError({
+        message: 'Failed to delete document',
+        error: err
+      });
       return false;
     } finally {
       setIsLoading(false);
@@ -163,7 +184,10 @@ export const DocumentProvider = ({ children }) => {
     const docToExport = document || currentDocument;
     
     if (!docToExport) {
-      setError('No document to export');
+      setError({
+        message: 'No document to export',
+        error: new Error('No document available')
+      });
       return false;
     }
     
@@ -172,9 +196,25 @@ export const DocumentProvider = ({ children }) => {
       return true;
     } catch (err) {
       console.error('Error exporting document:', err);
-      setError('Failed to export document');
+      setError({
+        message: 'Failed to export document',
+        error: err,
+        canRetry: true
+      });
       return false;
     }
+  };
+  
+  /**
+   * Retry the last failed operation
+   */
+  const retryOperation = () => {
+    // Clear the error first
+    setError(null);
+    
+    // The component using this context should implement the retry logic
+    // based on the operation that failed
+    return true;
   };
   
   /**
@@ -186,10 +226,14 @@ export const DocumentProvider = ({ children }) => {
   };
   
   /**
-   * Set an error message
+   * Set an error message with additional details
    */
-  const setErrorMessage = (message) => {
-    setError(message);
+  const setErrorMessage = (message, errorObj = null, canRetry = false) => {
+    setError({
+      message,
+      error: errorObj || new Error(message),
+      canRetry
+    });
   };
   
   // Context value
@@ -207,7 +251,8 @@ export const DocumentProvider = ({ children }) => {
     deleteDocument,
     exportDocument,
     clearDocument,
-    setErrorMessage
+    setErrorMessage,
+    retryOperation
   };
   
   return (
