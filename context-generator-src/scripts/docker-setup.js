@@ -6,6 +6,15 @@
  * shell scripts (Windows batch, Linux/Mac bash).
  */
 
+// Ensure js-yaml is installed
+try {
+  require('js-yaml');
+} catch (error) {
+  console.error('Required dependency js-yaml is not installed.');
+  console.error('Please run: npm install --no-save js-yaml');
+  process.exit(1);
+}
+
 const dockerUtils = require('./docker-utils');
 const { exec } = require('child_process');
 const readline = require('readline');

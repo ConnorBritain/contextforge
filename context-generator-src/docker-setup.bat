@@ -35,6 +35,10 @@ goto parse_args
 REM Make sure we're in the right directory
 cd /d "%~dp0"
 
+REM Install required dependencies
+echo Installing required dependencies...
+npm list js-yaml --silent || npm install --no-save js-yaml
+
 REM Run the Node.js setup script
 echo Running Docker setup with Node.js...
 node scripts/docker-setup.js %SKIP_CHECKS% %SKIP_PROMPTS% %REBUILD%

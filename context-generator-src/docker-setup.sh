@@ -43,6 +43,10 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Change to the script directory
 cd "$SCRIPT_DIR" || exit 1
 
+# Install required dependencies
+echo "Installing required dependencies..."
+npm list js-yaml --silent || npm install --no-save js-yaml
+
 # Run the Node.js setup script
 echo "Running Docker setup with Node.js..."
 node scripts/docker-setup.js $SKIP_CHECKS $SKIP_PROMPTS $REBUILD

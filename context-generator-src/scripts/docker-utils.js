@@ -8,8 +8,17 @@
 const fs = require('fs');
 const net = require('net');
 const path = require('path');
-const yaml = require('js-yaml');
 const os = require('os');
+
+// Ensure js-yaml is installed
+let yaml;
+try {
+  yaml = require('js-yaml');
+} catch (error) {
+  console.error('Required dependency js-yaml is not installed.');
+  console.error('Please run: npm install --no-save js-yaml');
+  process.exit(1);
+}
 
 // Project root directory
 const PROJECT_ROOT = path.resolve(__dirname, '..');

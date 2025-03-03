@@ -19,6 +19,10 @@ if %errorlevel% neq 0 (
 REM Make sure we're in the right directory
 cd /d "%~dp0"
 
+REM Install required dependencies
+echo Installing required dependencies...
+npm list js-yaml --silent || npm install --no-save js-yaml
+
 REM Check if Docker is running
 echo Step 1: Checking Docker status...
 docker info > nul 2>&1
