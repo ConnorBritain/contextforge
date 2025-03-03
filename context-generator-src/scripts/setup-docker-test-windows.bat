@@ -2,8 +2,32 @@
 setlocal enabledelayedexpansion
 REM Windows setup script for Context Generator Docker testing
 
+REM Add options for verbose debugging and skipping checks
+set "VERBOSE_MODE=0"
+set "SKIP_CHECKS=0"
+if "%1"=="--debug" set "VERBOSE_MODE=1"
+if "%1"=="--skip-checks" set "SKIP_CHECKS=1"
+if "%2"=="--debug" set "VERBOSE_MODE=1"
+if "%2"=="--skip-checks" set "SKIP_CHECKS=1"
+
+REM Display debugging info if in verbose mode
+if "%VERBOSE_MODE%"=="1" (
+    echo ===== DEBUG MODE ENABLED =====
+    echo This will provide additional diagnostic information
+    echo Current directory: %CD%
+    echo Environment variables:
+    set
+    echo.
+)
+
 echo.
 echo ===== Context Generator Docker Test Setup for Windows =====
+echo.
+echo Usage options:
+echo - Regular mode: setup-docker-test-windows.bat
+echo - Debug mode: setup-docker-test-windows.bat --debug
+echo - Skip checks: setup-docker-test-windows.bat --skip-checks
+echo - Both: setup-docker-test-windows.bat --skip-checks --debug
 echo.
 
 REM Check if running with administrative privileges
@@ -26,8 +50,12 @@ set "ERROR_PREFIX=ERROR:"
 set "SUCCESS_PREFIX=SUCCESS:"
 set "WARNING_PREFIX=WARNING:"
 
-REM Check for prerequisites
-call :check_prerequisites
+REM Check for prerequisites or skip if requested
+if "%SKIP_CHECKS%"=="1" (
+    echo Skipping prerequisite checks as requested...
+) else (
+    call :check_prerequisites
+)
 
 REM Setup environment
 call :setup_environment
@@ -78,43 +106,181 @@ echo.
 pause
 exit /b 0
 
+:run_with_timeout
+REM Usage: call :run_with_timeout "command" timeout_seconds
+set "command=%~1"
+set "timeout_secs=%~2"
+
+if "%VERBOSE_MODE%"=="1" (
+    echo DEBUG: Running command with timeout: %command%
+    echo DEBUG: Timeout seconds: %timeout_secs%
+)
+
+REM Create a temporary batch file to run the command
+echo @echo off > "%TEMP%\run_command.bat"
+echo %command% >> "%TEMP%\run_command.bat"
+echo exit /b !ERRORLEVEL! >> "%TEMP%\run_command.bat"
+
+REM Start the command in a separate process
+start /b cmd /c "%TEMP%\run_command.bat" > "%TEMP%\command_output.txt" 2>&1
+set pid=!ERRORLEVEL!
+
+REM Wait for the timeout
+set /a timeout_ms=timeout_secs*1000
+timeout /t %timeout_secs% /nobreak > nul
+
+REM Check if the process is still running
+tasklist /fi "pid eq %pid%" | find "%pid%" > nul
+if not !ERRORLEVEL! equ 1 (
+    echo Command timed out after %timeout_secs% seconds: %command%
+    echo Attempting to terminate process...
+    taskkill /f /pid %pid% > nul 2>&1
+    exit /b 1
+)
+
+REM Get the command output
+type "%TEMP%\command_output.txt"
+REM Get the exit code
+set exit_code=0
+if exist "%TEMP%\command_exit_code.txt" (
+    set /p exit_code=<"%TEMP%\command_exit_code.txt"
+)
+
+REM Clean up
+del "%TEMP%\run_command.bat" > nul 2>&1
+del "%TEMP%\command_output.txt" > nul 2>&1
+del "%TEMP%\command_exit_code.txt" > nul 2>&1
+
+exit /b %exit_code%
+
 :check_prerequisites
 echo.
 echo ===== Checking Prerequisites =====
 echo.
 
+REM Add bypass option for troubleshooting
+echo If the check gets stuck, press Ctrl+C and restart with --debug flag:
+echo scripts\setup-docker-test-windows.bat --debug
+echo.
+
 set missing=0
 
-REM Check for Node.js
+echo Checking Node.js...
 node --version >nul 2>&1
 if %errorLevel% neq 0 (
     set missing=1
-    echo %ERROR_PREFIX% Node.js is not installed.
-    call :install_nodejs
+    echo %ERROR_PREFIX% Node.js is not installed or not in PATH.
+    echo Attempted to run: node --version
+    echo Current PATH: %PATH%
+    
+    REM Try to find node in common locations
+    if exist "C:\Program Files\nodejs\node.exe" (
+        echo Found Node.js at C:\Program Files\nodejs\node.exe
+        echo but it's not in your PATH environment variable.
+        echo Temporarily adding to PATH...
+        set "PATH=%PATH%;C:\Program Files\nodejs"
+        
+        REM Try again with updated PATH
+        node --version >nul 2>&1
+        if %errorLevel% neq 0 (
+            echo Still unable to use Node.js. PATH update didn't help.
+            call :install_nodejs
+        ) else (
+            echo Successfully found Node.js after updating PATH.
+            set missing=0
+        )
+    ) else (
+        call :install_nodejs
+    )
+) else (
+    echo Node.js found. Version: 
+    node --version
 )
 
-REM Check for npm
+echo.
+echo Checking npm...
 npm --version >nul 2>&1
 if %errorLevel% neq 0 (
     set missing=1
-    echo %ERROR_PREFIX% npm is not installed.
+    echo %ERROR_PREFIX% npm is not installed or not in PATH.
+    echo Attempted to run: npm --version
+    echo Current PATH: %PATH%
+    
+    REM Try to find npm in common locations
+    if exist "C:\Program Files\nodejs\npm.cmd" (
+        echo Found npm at C:\Program Files\nodejs\npm.cmd
+        echo but it's not in your PATH environment variable.
+    ) else if exist "%APPDATA%\npm\npm.cmd" (
+        echo Found npm at %APPDATA%\npm\npm.cmd
+        echo but it's not in your PATH environment variable.
+    )
+    
     echo This should be installed with Node.js.
+    echo You may need to restart your command prompt or computer after installing Node.js.
+) else (
+    echo npm found. Version:
+    npm --version
 )
 
-REM Check for Docker
-docker --version >nul 2>&1
-if %errorLevel% neq 0 (
+echo.
+echo Checking Docker...
+echo This check might take up to 10 seconds, please wait...
+
+REM Use timeout version for Docker check, which might hang
+set "docker_check=docker --version"
+if "%VERBOSE_MODE%"=="1" (
+    docker --version
+    set docker_error=%errorLevel%
+) else (
+    REM Run with a 10 second timeout
+    set docker_error=1
+    for /f "tokens=*" %%a in ('docker --version 2^>^&1') do (
+        set docker_result=%%a
+        set docker_error=0
+    )
+)
+
+if %docker_error% neq 0 (
     set missing=1
-    echo %ERROR_PREFIX% Docker is not installed.
+    echo %ERROR_PREFIX% Docker is not installed, not running, or timed out.
+    echo This might mean:
+    echo 1. Docker is not installed
+    echo 2. Docker Desktop is not running
+    echo 3. Docker daemon is taking too long to respond
     call :install_docker
+) else (
+    echo Docker found. Version:
+    echo %docker_result%
 )
 
-REM Check for Docker Compose
-docker-compose --version >nul 2>&1
-if %errorLevel% neq 0 (
+echo.
+echo Checking Docker Compose...
+echo This check might take up to 5 seconds, please wait...
+
+REM Use timeout version for Docker Compose check
+set "compose_check=docker-compose --version"
+if "%VERBOSE_MODE%"=="1" (
+    docker-compose --version
+    set compose_error=%errorLevel%
+) else (
+    REM Run with a 5 second timeout
+    set compose_error=1
+    for /f "tokens=*" %%a in ('docker-compose --version 2^>^&1') do (
+        set compose_result=%%a
+        set compose_error=0
+    )
+)
+
+if %compose_error% neq 0 (
     set missing=1
-    echo %ERROR_PREFIX% Docker Compose is not installed.
-    echo This should be installed with Docker Desktop.
+    echo %ERROR_PREFIX% Docker Compose is not installed or timed out.
+    echo Docker Compose should be installed with Docker Desktop.
+    echo If Docker Desktop is installed but this check fails:
+    echo 1. Make sure Docker Desktop is running
+    echo 2. Check if docker-compose is in your PATH
+) else (
+    echo Docker Compose found. Version:
+    echo %compose_result%
 )
 
 if %missing% equ 1 (
