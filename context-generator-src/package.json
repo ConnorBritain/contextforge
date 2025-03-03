@@ -12,6 +12,7 @@
     "test": "jest",
     "install-all": "node scripts/install-helper.js && npm install && cd client && npm install",
     "postinstall": "node scripts/install-helper.js",
+    "setup-react": "node scripts/setup-react-app.js",
     "docker-setup": "node scripts/docker-setup.js",
     "docker-rebuild": "node scripts/docker-setup.js --rebuild"
   },
@@ -31,8 +32,7 @@
     "markdown-it": "^14.0.0",
     "mongoose": "^8.0.3",
     "morgan": "^1.10.0",
-    "openai": "^4.24.1",
-    "xss-clean": "^0.1.4"
+    "openai": "^4.24.1"
   },
   "devDependencies": {
     "eslint": "^8.56.0",

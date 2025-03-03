@@ -65,6 +65,15 @@ if (!fs.existsSync(clientBabelConfigPath)) {
   fs.writeFileSync(clientBabelConfigPath, JSON.stringify(babelConfig, null, 2));
 }
 
+// Install xss-clean directly
+try {
+  console.log('Installing xss-clean dependency...');
+  execSync('npm install xss-clean@0.1.4 --save-exact', { stdio: 'inherit' });
+} catch (error) {
+  console.log('Warning: Unable to install xss-clean dependency.');
+  console.log('You may need to install it manually with: npm install xss-clean@0.1.4 --save-exact');
+}
+
 // Update package-lock.json to resolve vulnerabilities where possible
 try {
   console.log('Running npm audit fix in client directory...');
