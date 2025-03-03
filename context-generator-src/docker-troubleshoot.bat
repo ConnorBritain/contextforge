@@ -22,6 +22,17 @@ cd /d "%~dp0"
 REM Install required dependencies
 echo Installing required dependencies...
 npm list js-yaml --silent || npm install --no-save js-yaml
+if %errorlevel% neq 0 (
+    echo.
+    echo Failed to install dependencies. Press any key to continue anyway...
+    pause > nul
+) else (
+    echo Dependencies installed successfully.
+)
+
+echo.
+echo Press any key to continue with troubleshooting...
+pause > nul
 
 REM Check if Docker is running
 echo Step 1: Checking Docker status...
@@ -49,7 +60,13 @@ if %errorlevel% neq 0 (
     if %errorlevel% equ 1 (
         echo.
         echo Running Docker setup with dynamic port allocation...
+        echo Press any key to continue...
+        pause > nul
         node scripts/docker-setup.js --skip-prompts
+        set NODE_EXIT_CODE=%errorlevel%
+        echo.
+        echo Press any key to return to main menu...
+        pause > nul
         goto :end
     )
 ) else (
@@ -66,6 +83,11 @@ echo.
 echo Step 5: Checking Docker Compose configuration...
 echo Retrieving port mappings from docker-compose.yml...
 node -e "const fs=require('fs');const yaml=require('js-yaml');const config=yaml.load(fs.readFileSync('docker-compose.yml','utf8'));console.log('Current port mappings:');console.log(config.services.app.ports);"
+if %errorlevel% neq 0 (
+    echo Error retrieving port mappings. Docker Compose file may be invalid.
+    echo Press any key to continue...
+    pause > nul
+)
 echo.
 
 echo.
@@ -97,7 +119,13 @@ choice /C YN /M "Restart with dynamic ports"
 if %errorlevel% equ 1 (
     echo.
     echo Running Docker setup with dynamic port allocation...
+    echo Press any key to continue...
+    pause > nul
     node scripts/docker-setup.js --skip-prompts
+    set NODE_EXIT_CODE=%errorlevel%
+    echo.
+    echo Press any key to continue...
+    pause > nul
     goto :end
 )
 

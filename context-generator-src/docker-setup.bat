@@ -38,19 +38,35 @@ cd /d "%~dp0"
 REM Install required dependencies
 echo Installing required dependencies...
 npm list js-yaml --silent || npm install --no-save js-yaml
+if %errorlevel% neq 0 (
+    echo.
+    echo Failed to install dependencies. Press any key to continue anyway...
+    pause > nul
+) else (
+    echo Dependencies installed successfully.
+)
+
+echo.
+echo Press any key to continue with Docker setup...
+pause > nul
 
 REM Run the Node.js setup script
 echo Running Docker setup with Node.js...
 node scripts/docker-setup.js %SKIP_CHECKS% %SKIP_PROMPTS% %REBUILD%
-
-if %errorlevel% neq 0 (
-    echo.
-    echo ERROR: Docker setup failed. See error messages above.
-    echo.
-    pause
-    exit /b 1
-)
+set NODE_EXIT_CODE=%errorlevel%
 
 echo.
+if %NODE_EXIT_CODE% neq 0 (
+    echo ERROR: Docker setup failed. See error messages above.
+    echo.
+) else (
+    echo Docker setup completed. Check the messages above for details.
+    echo.
+)
+
 echo Press any key to exit...
 pause > nul
+
+if %NODE_EXIT_CODE% neq 0 (
+    exit /b 1
+)
