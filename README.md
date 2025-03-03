@@ -49,18 +49,40 @@ A full-stack application for generating professional context documents using AI.
 
 ### Using Docker (Recommended)
 
-We provide a convenient script to set up and test the application with Docker:
+We provide platform-specific scripts to set up and test the application with Docker:
 
-1. Make sure Docker and Docker Compose are installed
-2. Run the setup script:
+1. Navigate to the project directory:
    ```
    cd context-generator-src
+   ```
+
+2. Run the appropriate setup script for your platform:
+
+   **Auto-detect OS and run the appropriate script:**
+   ```
+   ./scripts/setup.sh
+   ```
+
+   **Windows:**
+   ```
+   Right-click scripts/setup-docker-test-windows.bat and select "Run as administrator"
+   ```
+
+   **macOS:**
+   ```
+   ./scripts/setup-docker-test-mac.sh
+   ```
+
+   **Linux:**
+   ```
    ./scripts/setup-docker-test.sh
    ```
-3. Test token tracking and subscription management:
-   ```
-   node scripts/test-token-tracking.js
-   ```
+
+3. Follow the prompts to:
+   - Install any missing prerequisites (Node.js, Docker, etc.)
+   - Configure your environment variables
+   - Build and start Docker containers
+   - Run token tracking and subscription tests
 
 ### Manual Testing
 

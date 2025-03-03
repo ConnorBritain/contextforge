@@ -24,31 +24,282 @@ print_error() {
   exit 1
 }
 
-# Function to check for required tools
+# Function to check for required tools and offer to install them
 check_prerequisites() {
   print_header "Checking Prerequisites"
+  local missing_tools=()
+  local os_type="$(uname -s)"
   
   # Check for Docker
   if ! command -v docker &> /dev/null; then
-    print_error "Docker is not installed. Please install Docker and try again."
+    missing_tools+=("Docker")
   fi
   
   # Check for Docker Compose
   if ! command -v docker-compose &> /dev/null; then
-    print_error "Docker Compose is not installed. Please install Docker Compose and try again."
+    missing_tools+=("Docker Compose")
   fi
   
   # Check for Node.js
   if ! command -v node &> /dev/null; then
-    print_error "Node.js is not installed. Please install Node.js and try again."
+    missing_tools+=("Node.js")
   fi
   
   # Check for npm
   if ! command -v npm &> /dev/null; then
-    print_error "npm is not installed. Please install npm and try again."
+    missing_tools+=("npm")
   fi
   
-  echo "✅ All prerequisites are installed"
+  # If all tools are installed, proceed
+  if [ ${#missing_tools[@]} -eq 0 ]; then
+    echo "✅ All prerequisites are installed"
+    return 0
+  fi
+  
+  # Otherwise, offer to install missing tools
+  echo -e "${YELLOW}The following tools are missing and required:${NC}"
+  for tool in "${missing_tools[@]}"; do
+    echo "  - $tool"
+  done
+  
+  echo ""
+  read -p "Would you like to attempt to install the missing prerequisites? (y/n): " install_prereqs
+  
+  if [[ $install_prereqs != "y" && $install_prereqs != "Y" ]]; then
+    echo -e "${RED}Please install the missing prerequisites manually and run this script again.${NC}"
+    exit 1
+  fi
+  
+  # Install missing tools based on OS
+  case "$os_type" in
+    Linux*)
+      install_prerequisites_linux "${missing_tools[@]}"
+      ;;
+    Darwin*)
+      install_prerequisites_mac "${missing_tools[@]}"
+      ;;
+    MINGW*|MSYS*|CYGWIN*)
+      install_prerequisites_windows "${missing_tools[@]}"
+      ;;
+    *)
+      echo -e "${RED}Unsupported operating system: $os_type${NC}"
+      echo "Please install the following tools manually:"
+      for tool in "${missing_tools[@]}"; do
+        echo "  - $tool"
+      done
+      exit 1
+      ;;
+  esac
+  
+  # Check again to make sure everything is installed
+  check_prerequisites_silent
+}
+
+# Function to check prerequisites without offering to install
+check_prerequisites_silent() {
+  local missing=false
+  
+  if ! command -v docker &> /dev/null; then
+    missing=true
+  fi
+  
+  if ! command -v docker-compose &> /dev/null; then
+    missing=true
+  fi
+  
+  if ! command -v node &> /dev/null; then
+    missing=true
+  fi
+  
+  if ! command -v npm &> /dev/null; then
+    missing=true
+  fi
+  
+  if [ "$missing" = true ]; then
+    echo -e "${RED}Some prerequisites are still missing after installation attempts.${NC}"
+    echo "You may need to restart your terminal or computer for changes to take effect."
+    echo "Alternatively, you can install the missing prerequisites manually."
+    exit 1
+  fi
+  
+  echo "✅ All prerequisites are now installed"
+}
+
+# Function to install prerequisites on Linux
+install_prerequisites_linux() {
+  local tools=("$@")
+  local distro=""
+  
+  # Detect Linux distribution
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    distro="$ID"
+  elif type lsb_release >/dev/null 2>&1; then
+    distro=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
+  elif [ -f /etc/lsb-release ]; then
+    . /etc/lsb-release
+    distro="$DISTRIB_ID"
+  elif [ -f /etc/debian_version ]; then
+    distro="debian"
+  elif [ -f /etc/fedora-release ]; then
+    distro="fedora"
+  elif [ -f /etc/centos-release ]; then
+    distro="centos"
+  else
+    distro="unknown"
+  fi
+  
+  echo -e "${YELLOW}Detected Linux distribution: $distro${NC}"
+  
+  for tool in "${tools[@]}"; do
+    echo -e "${YELLOW}Installing $tool...${NC}"
+    
+    case "$tool" in
+      "Docker")
+        case "$distro" in
+          ubuntu|debian)
+            sudo apt-get update
+            sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/$distro $(lsb_release -cs) stable"
+            sudo apt-get update
+            sudo apt-get install -y docker-ce
+            sudo systemctl enable docker
+            sudo systemctl start docker
+            sudo usermod -aG docker "$USER"
+            ;;
+          fedora)
+            sudo dnf -y install dnf-plugins-core
+            sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+            sudo dnf install -y docker-ce docker-ce-cli containerd.io
+            sudo systemctl enable docker
+            sudo systemctl start docker
+            sudo usermod -aG docker "$USER"
+            ;;
+          centos)
+            sudo yum install -y yum-utils
+            sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+            sudo yum install -y docker-ce docker-ce-cli containerd.io
+            sudo systemctl enable docker
+            sudo systemctl start docker
+            sudo usermod -aG docker "$USER"
+            ;;
+          *)
+            echo -e "${RED}Unsupported Linux distribution for automatic Docker installation.${NC}"
+            echo "Please install Docker manually: https://docs.docker.com/engine/install/"
+            ;;
+        esac
+        ;;
+      
+      "Docker Compose")
+        sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        ;;
+      
+      "Node.js"|"npm")
+        case "$distro" in
+          ubuntu|debian)
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+            ;;
+          fedora|centos)
+            curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+            if [ "$distro" = "fedora" ]; then
+              sudo dnf install -y nodejs
+            else
+              sudo yum install -y nodejs
+            fi
+            ;;
+          *)
+            echo -e "${RED}Unsupported Linux distribution for automatic Node.js installation.${NC}"
+            echo "Please install Node.js manually: https://nodejs.org/en/download/package-manager/"
+            ;;
+        esac
+        ;;
+    esac
+  done
+  
+  echo -e "${GREEN}Installation attempts completed. You may need to log out and log back in for some changes to take effect.${NC}"
+}
+
+# Function to install prerequisites on macOS
+install_prerequisites_mac() {
+  local tools=("$@")
+  
+  # Check if Homebrew is installed
+  if ! command -v brew &> /dev/null; then
+    echo -e "${YELLOW}Installing Homebrew...${NC}"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+    # Add Homebrew to PATH
+    if [ -d "/opt/homebrew/bin" ]; then
+      echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [ -d "/usr/local/bin" ]; then
+      echo 'eval "$(/usr/local/bin/brew shellenv)"' >> "$HOME/.zprofile"
+      eval "$(/usr/local/bin/brew shellenv)"
+    fi
+  fi
+  
+  for tool in "${tools[@]}"; do
+    echo -e "${YELLOW}Installing $tool...${NC}"
+    
+    case "$tool" in
+      "Docker")
+        echo "Docker for Mac needs to be installed manually."
+        echo "Please download from: https://docs.docker.com/desktop/install/mac-install/"
+        echo "After installation, run this script again."
+        exit 1
+        ;;
+      
+      "Docker Compose")
+        # Docker Compose comes with Docker Desktop for Mac
+        echo "Docker Compose is included with Docker Desktop for Mac."
+        echo "Please install Docker Desktop first."
+        ;;
+      
+      "Node.js"|"npm")
+        brew install node
+        ;;
+    esac
+  done
+  
+  echo -e "${GREEN}Installation attempts completed.${NC}"
+}
+
+# Function to install prerequisites on Windows
+install_prerequisites_windows() {
+  local tools=("$@")
+  
+  echo -e "${YELLOW}Running in Windows environment.${NC}"
+  
+  for tool in "${tools[@]}"; do
+    echo -e "${YELLOW}Installation instructions for $tool:${NC}"
+    
+    case "$tool" in
+      "Docker")
+        echo "1. Download Docker Desktop for Windows: https://docs.docker.com/desktop/install/windows-install/"
+        echo "2. Run the installer and follow the instructions"
+        echo "3. Make sure to enable WSL 2 integration when prompted"
+        echo "4. After installation, start Docker Desktop and run this script again"
+        ;;
+      
+      "Docker Compose")
+        echo "Docker Compose is included with Docker Desktop for Windows."
+        echo "Please install Docker Desktop first."
+        ;;
+      
+      "Node.js"|"npm")
+        echo "1. Download Node.js installer: https://nodejs.org/en/download/"
+        echo "2. Run the installer and follow the instructions"
+        echo "3. npm will be installed automatically with Node.js"
+        echo "4. After installation, open a new terminal and run this script again"
+        ;;
+    esac
+  done
+  
+  echo -e "${RED}Please install the required tools manually and run this script again.${NC}"
+  exit 1
 }
 
 # Function to setup environment files
