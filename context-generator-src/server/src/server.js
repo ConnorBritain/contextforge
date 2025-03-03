@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const config = require('./config/default');
+const mongoose = require('mongoose');
 const documentRoutes = require('./routes/documentRoutes');
-// Mongoose connection would go here in a more complete implementation
-// const mongoose = require('mongoose');
+const authRoutes = require('./routes/authRoutes');
 
 // Initialize Express app
 const app = express();
@@ -21,7 +21,16 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
+// Connect to MongoDB
+mongoose.connect(config.mongodb.uri)
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
+
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/contexts', documentRoutes);
 
 // Health check endpoint

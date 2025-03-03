@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { AuthProvider } from '../context/AuthContext';
 import { DocumentProvider } from '../context/DocumentContext';
 import Header from './common/Header';
 import Footer from './common/Footer';
@@ -12,15 +13,17 @@ import '../styles/global.css';
 const App = () => {
   return (
     <Router>
-      <DocumentProvider>
-        <div className="app-container">
-          <Header />
-          <main className="main-content">
-            <Routes />
-          </main>
-          <Footer />
-        </div>
-      </DocumentProvider>
+      <AuthProvider>
+        <DocumentProvider>
+          <div className="app-container">
+            <Header />
+            <main className="main-content">
+              <Routes />
+            </main>
+            <Footer />
+          </div>
+        </DocumentProvider>
+      </AuthProvider>
     </Router>
   );
 };

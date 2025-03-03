@@ -7,6 +7,19 @@ class ApiService {
       this.defaultHeaders = {
         'Content-Type': 'application/json'
       };
+      
+      // Initialize token from localStorage if present
+      this._initializeToken();
+    }
+    
+    /**
+     * Initialize token from localStorage if available
+     */
+    _initializeToken() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        this.setAuthToken(token);
+      }
     }
   
     /**
@@ -14,9 +27,9 @@ class ApiService {
      */
     setAuthToken(token) {
       if (token) {
-        this.defaultHeaders['Authorization'] = `Bearer ${token}`;
+        this.defaultHeaders['x-auth-token'] = token;
       } else {
-        delete this.defaultHeaders['Authorization'];
+        delete this.defaultHeaders['x-auth-token'];
       }
     }
   
