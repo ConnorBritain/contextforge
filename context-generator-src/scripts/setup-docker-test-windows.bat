@@ -32,8 +32,17 @@ call :check_prerequisites
 REM Setup environment
 call :setup_environment
 
-REM Install dependencies
-call :install_dependencies
+REM Check if user wants to skip npm dependencies and go straight to Docker
+echo.
+echo NOTE: You can skip npm dependency installation and go straight to
+echo Docker if you're experiencing npm-related issues.
+set /p skip_npm="Would you like to skip npm dependency installation? (y/n): "
+if /i "%skip_npm%"=="y" (
+    echo Skipping npm dependency installation...
+) else (
+    REM Install dependencies
+    call :install_dependencies
+)
 
 REM Build Docker
 call :build_docker
@@ -128,12 +137,18 @@ echo This script can download the Node.js installer for you.
 set /p install_nodejs="Would you like to download and install Node.js now? (y/n): "
 if /i "%install_nodejs%"=="y" (
     echo Downloading Node.js installer...
-    powershell -Command "& {Invoke-WebRequest -Uri 'https://nodejs.org/dist/v18.17.1/node-v18.17.1-x64.msi' -OutFile 'node-installer.msi'}"
+    cd /d "%PROJECT_DIR%"
+    powershell -Command "& {Invoke-WebRequest -Uri 'https://nodejs.org/dist/v18.17.1/node-v18.17.1-x64.msi' -OutFile '%PROJECT_DIR%\node-installer.msi'}"
     
-    if exist node-installer.msi (
+    if exist "%PROJECT_DIR%\node-installer.msi" (
         echo Running Node.js installer...
-        start /wait msiexec /i node-installer.msi /quiet
-        echo Installation complete. You will need to restart this script after installation.
+        start /wait msiexec /i "%PROJECT_DIR%\node-installer.msi" /quiet
+        echo.
+        echo Installation complete. You need to restart this script after installation.
+        echo IMPORTANT: You may need to restart your computer or open a new command prompt
+        echo to have access to the 'npm' and 'node' commands.
+        pause
+        exit /b 1
     ) else (
         echo Failed to download Node.js installer.
         echo Please download and install Node.js manually from: https://nodejs.org/en/download/
@@ -152,16 +167,43 @@ set /p install_docker="Would you like to download and install Docker Desktop now
 if /i "%install_docker%"=="y" (
     echo Downloading Docker Desktop installer...
     cd /d "%PROJECT_DIR%"
+    echo Attempting to download with PowerShell...
     powershell -Command "& {Invoke-WebRequest -Uri 'https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe' -OutFile '%PROJECT_DIR%\docker-installer.exe'}"
     
     if exist "%PROJECT_DIR%\docker-installer.exe" (
         echo Running Docker Desktop installer...
-        start /wait "%PROJECT_DIR%\docker-installer.exe"
-        echo Installation started. Please complete the installation wizard.
-        echo After installation is complete, you need to restart your computer and run this script again.
+        echo.
+        echo IMPORTANT NOTES FOR DOCKER INSTALLATION:
+        echo 1. You will see the installation wizard - follow the prompts
+        echo 2. When asked, select "Use WSL 2 instead of Hyper-V" (recommended)
+        echo 3. Docker Desktop will require a system restart
+        echo.
+        echo Press any key to start the installer...
+        pause > nul
+        
+        REM Run the installer and wait for it to complete
+        start /wait "" "%PROJECT_DIR%\docker-installer.exe"
+        
+        echo.
+        echo Docker Desktop installer has completed.
+        echo.
+        echo IMPORTANT: You MUST restart your computer before using Docker.
+        echo After restarting, you need to:
+        echo 1. Start Docker Desktop from the Start menu
+        echo 2. Wait for Docker to fully initialize (the whale icon in system tray)
+        echo 3. Run this script again
+        echo.
+        pause
+        exit /b 1
     ) else (
         echo Failed to download Docker Desktop installer.
-        echo Please download and install Docker Desktop manually from: https://www.docker.com/products/docker-desktop/
+        echo.
+        echo Please download and install Docker Desktop manually:
+        echo 1. Visit: https://www.docker.com/products/docker-desktop/
+        echo 2. Download the Windows installer
+        echo 3. Run the installer and follow the prompts
+        echo 4. Restart your computer
+        echo 5. Run this script again
     )
 ) else (
     echo Please download and install Docker Desktop manually from: https://www.docker.com/products/docker-desktop/
@@ -205,20 +247,52 @@ echo.
 echo ===== Installing Dependencies =====
 echo.
 
+REM Try refreshing the PATH to get npm if it was just installed
+set "PATH=%PATH%;C:\Program Files\nodejs\;%APPDATA%\npm"
+
+REM Verify npm is available
+where npm >nul 2>&1
+if %errorLevel% neq 0 (
+    echo %ERROR_PREFIX% npm command not found even after checking common locations.
+    echo Node.js may not be installed correctly or not in your PATH.
+    echo.
+    echo Options to fix this issue:
+    echo 1. If you just installed Node.js, restart your computer and try again
+    echo 2. Install Node.js manually from https://nodejs.org/en/download/
+    echo 3. Try running this script in a new command prompt after installation
+    echo.
+    echo IMPORTANT: The setup cannot continue without npm available.
+    pause
+    exit /b 1
+)
+
+echo Found npm: 
+where npm
+
 echo Installing server dependencies...
 cd /d "%PROJECT_DIR%\server" && npm install
 if %errorLevel% neq 0 (
     echo %ERROR_PREFIX% Failed to install server dependencies
-    pause
-    exit /b 1
+    echo Trying to install with --no-optional flag...
+    npm install --no-optional
+    if %errorLevel% neq 0 (
+        echo %ERROR_PREFIX% Server dependencies installation failed completely.
+        pause
+        exit /b 1
+    )
 )
 
 echo Installing client dependencies...
 cd /d "%PROJECT_DIR%\client" && npm install
 if %errorLevel% neq 0 (
     echo %ERROR_PREFIX% Failed to install client dependencies
-    pause
-    exit /b 1
+    echo Trying to install with --no-optional flag...
+    npm install --no-optional
+    if %errorLevel% neq 0 (
+        echo %ERROR_PREFIX% Client dependencies installation failed completely.
+        pause
+        exit /b 1
+    )
 )
 
 cd /d "%PROJECT_DIR%"
@@ -271,10 +345,38 @@ echo.
 echo ===== Running Token Tracking and Subscription Tests =====
 echo.
 
+REM Verify npm is available before trying to install test dependencies
+where npm >nul 2>&1
+if %errorLevel% neq 0 (
+    echo %ERROR_PREFIX% npm command not found. Cannot install test dependencies.
+    echo Skipping tests due to missing npm.
+    pause
+    exit /b 0
+)
+
 echo Installing test dependencies...
 cd /d "%PROJECT_DIR%" && npm install --no-save axios dotenv
+if %errorLevel% neq 0 (
+    echo %WARNING_PREFIX% Failed to install test dependencies.
+    echo Trying to proceed with the test anyway...
+)
+
+REM Verify node is available
+where node >nul 2>&1
+if %errorLevel% neq 0 (
+    echo %ERROR_PREFIX% node command not found. Cannot run tests.
+    echo Skipping tests due to missing node.
+    pause
+    exit /b 0
+)
 
 echo Running test script...
+if not exist "%PROJECT_DIR%\scripts\test-token-tracking.js" (
+    echo %ERROR_PREFIX% Test script not found at: %PROJECT_DIR%\scripts\test-token-tracking.js
+    pause
+    exit /b 1
+)
+
 cd /d "%PROJECT_DIR%" && node "%PROJECT_DIR%\scripts\test-token-tracking.js"
 if %errorLevel% neq 0 (
     echo %ERROR_PREFIX% Tests failed
