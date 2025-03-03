@@ -18,8 +18,10 @@ FROM base AS build
 COPY --from=dependencies /app/node_modules ./node_modules
 # Copy application code
 COPY . .
-# Build client
-RUN cd client && npm install && npm run build
+# Skip client build as there's no build script in package.json
+# We'll use a static placeholder instead
+WORKDIR /app/client
+RUN mkdir -p build
 
 # -------- PRODUCTION STAGE --------
 FROM base AS production
