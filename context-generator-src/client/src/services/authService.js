@@ -2,6 +2,21 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
+// Auth endpoints
+const AUTH_ENDPOINTS = {
+  register: '/auth/register',
+  login: '/auth/login',
+  profile: '/auth/profile'
+};
+
+// Subscription endpoints
+const SUBSCRIPTION_ENDPOINTS = {
+  plans: '/subscriptions/plans',
+  current: '/subscriptions/current',
+  update: '/subscriptions/update',
+  cancel: '/subscriptions/cancel'
+};
+
 /**
  * Authentication service for user registration, login, and session management
  */
@@ -124,6 +139,92 @@ const authService = {
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: 'Failed to update profile' };
+    }
+  },
+
+  /**
+   * Get all available subscription plans
+   * @returns {Promise} - Response with subscription plans
+   */
+  getSubscriptionPlans: async () => {
+    try {
+      const response = await axios.get(`${API_URL}${SUBSCRIPTION_ENDPOINTS.plans}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: 'Failed to fetch subscription plans' };
+    }
+  },
+
+  /**
+   * Get user's current subscription and usage
+   * @returns {Promise} - Response with subscription and usage details
+   */
+  getCurrentSubscription: async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
+      const response = await axios.get(`${API_URL}${SUBSCRIPTION_ENDPOINTS.current}`, {
+        headers: {
+          'x-auth-token': token
+        }
+      });
+      
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: 'Failed to fetch subscription details' };
+    }
+  },
+
+  /**
+   * Update user's subscription plan
+   * @param {string} plan - The plan to upgrade/downgrade to
+   * @returns {Promise} - Response with updated subscription details
+   */
+  updateSubscription: async (plan) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
+      const response = await axios.post(`${API_URL}${SUBSCRIPTION_ENDPOINTS.update}`, 
+        { plan },
+        {
+          headers: {
+            'x-auth-token': token
+          }
+        }
+      );
+      
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: 'Failed to update subscription' };
+    }
+  },
+
+  /**
+   * Cancel user's subscription
+   * @returns {Promise} - Response with cancellation confirmation
+   */
+  cancelSubscription: async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
+      const response = await axios.post(`${API_URL}${SUBSCRIPTION_ENDPOINTS.cancel}`, {}, {
+        headers: {
+          'x-auth-token': token
+        }
+      });
+      
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: 'Failed to cancel subscription' };
     }
   }
 };

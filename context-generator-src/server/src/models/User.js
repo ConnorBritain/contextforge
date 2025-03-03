@@ -31,6 +31,65 @@ const UserSchema = new Schema({
     enum: ['user', 'admin'],
     default: 'user'
   },
+  subscription: {
+    plan: {
+      type: String,
+      enum: ['free', 'basic', 'professional', 'enterprise'],
+      default: 'free'
+    },
+    startDate: {
+      type: Date,
+      default: Date.now
+    },
+    endDate: {
+      type: Date,
+      default: function() {
+        // Default to one month from now
+        const date = new Date();
+        date.setMonth(date.getMonth() + 1);
+        return date;
+      }
+    },
+    active: {
+      type: Boolean,
+      default: true
+    }
+  },
+  usage: {
+    tokenCount: {
+      type: Number,
+      default: 0
+    },
+    monthlyAllowance: {
+      type: Number,
+      default: 50000  // Default token limit for free tier
+    },
+    resetDate: {
+      type: Date,
+      default: function() {
+        // Default to first day of next month
+        const date = new Date();
+        date.setMonth(date.getMonth() + 1);
+        date.setDate(1);
+        date.setHours(0, 0, 0, 0);
+        return date;
+      }
+    },
+    documents: {
+      generated: {
+        type: Number,
+        default: 0
+      },
+      limit: {
+        type: Number,
+        default: 5  // Default document limit for free tier
+      }
+    }
+  },
+  lastActive: {
+    type: Date,
+    default: Date.now
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -69,10 +128,61 @@ UserSchema.methods.comparePassword = async function(candidatePassword) {
 // Method to generate JWT token
 UserSchema.methods.generateAuthToken = function() {
   return jwt.sign(
-    { id: this._id, email: this.email, role: this.role },
+    { 
+      id: this._id, 
+      email: this.email, 
+      role: this.role,
+      subscription: this.subscription.plan
+    },
     config.jwt.secret,
     { expiresIn: config.jwt.expiresIn }
   );
+};
+
+// Method to check if user has reached token limit
+UserSchema.methods.hasReachedTokenLimit = function() {
+  return this.usage.tokenCount >= this.usage.monthlyAllowance;
+};
+
+// Method to check if user has reached document limit
+UserSchema.methods.hasReachedDocumentLimit = function() {
+  return this.usage.documents.generated >= this.usage.documents.limit;
+};
+
+// Method to update token usage
+UserSchema.methods.updateTokenUsage = async function(tokenCount) {
+  this.usage.tokenCount += tokenCount;
+  this.lastActive = Date.now();
+  await this.save();
+  return this.usage.tokenCount;
+};
+
+// Method to increment document count
+UserSchema.methods.incrementDocumentCount = async function() {
+  this.usage.documents.generated += 1;
+  await this.save();
+  return this.usage.documents.generated;
+};
+
+// Method to reset usage if past reset date
+UserSchema.methods.checkAndResetUsage = async function() {
+  const now = new Date();
+  
+  if (now >= this.usage.resetDate) {
+    // Create new reset date for first day of next month
+    const nextMonth = new Date(now);
+    nextMonth.setMonth(now.getMonth() + 1);
+    nextMonth.setDate(1);
+    nextMonth.setHours(0, 0, 0, 0);
+    
+    this.usage.tokenCount = 0;
+    this.usage.documents.generated = 0;
+    this.usage.resetDate = nextMonth;
+    await this.save();
+    return true;
+  }
+  
+  return false;
 };
 
 module.exports = mongoose.model('User', UserSchema);

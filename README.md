@@ -13,6 +13,8 @@ A full-stack application for generating professional context documents using AI.
 - Document preview and editing
 - Export to multiple formats (Markdown, HTML, Text)
 - User authentication and document management
+- Token usage tracking and subscription management
+- Usage dashboards with visual metrics
 - Responsive design for desktop and mobile
 
 ## Technology Stack
@@ -22,6 +24,8 @@ A full-stack application for generating professional context documents using AI.
 - **Database**: MongoDB
 - **AI Integration**: Anthropic Claude and OpenAI
 - **Authentication**: JWT-based auth
+- **Subscription**: Tiered plans with usage limits
+- **Containerization**: Docker for deployment
 
 ## Getting Started
 
@@ -94,3 +98,6 @@ npm test
 - [x] Error handling improvements
 - [x] Production deployment
 - [x] CI/CD pipeline
+- [x] Token usage tracking
+- [x] Subscription management system
+- [x] Usage dashboards

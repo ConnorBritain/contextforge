@@ -4,6 +4,7 @@ const config = require('./config/default');
 const mongoose = require('mongoose');
 const documentRoutes = require('./routes/documentRoutes');
 const authRoutes = require('./routes/authRoutes');
+const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
 
 // Initialize Express app
@@ -33,6 +34,7 @@ mongoose.connect(config.mongodb.uri)
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/contexts', documentRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

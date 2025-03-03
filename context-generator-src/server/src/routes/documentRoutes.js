@@ -2,15 +2,16 @@ const express = require('express');
 const router = express.Router();
 const aiController = require('../controllers/aiController');
 const documentController = require('../controllers/documentController');
-// Middleware for authentication
+// Middleware
 const auth = require('../middleware/auth');
+const checkUsageLimit = require('../middleware/usageLimit');
 
-// Public routes (no authentication required)
+// Public routes (authentication optional but tracked if provided)
 // Generate new context document
-router.post('/generate', documentController.generateDocument);
+router.post('/generate', auth, checkUsageLimit, documentController.generateDocument);
 
 // Export a document (works with both saved and unsaved documents)
-router.post('/export/:id', documentController.exportDocument);
+router.post('/export/:id', auth, documentController.exportDocument);
 
 // Routes requiring authentication
 // Get all documents for the current user
