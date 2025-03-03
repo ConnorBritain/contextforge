@@ -16,6 +16,8 @@ A full-stack application for generating professional context documents using AI.
 - Token usage tracking and subscription management
 - Usage dashboards with visual metrics
 - Responsive design for desktop and mobile
+- Comprehensive error handling
+- Production-ready security measures
 
 ## Technology Stack
 
@@ -26,6 +28,8 @@ A full-stack application for generating professional context documents using AI.
 - **Authentication**: JWT-based auth
 - **Subscription**: Tiered plans with usage limits
 - **Containerization**: Docker for deployment
+- **Security**: Helmet, rate limiting, XSS protection
+- **Monitoring**: Health checks, logging, error tracking
 
 ## Getting Started
 
@@ -41,16 +45,56 @@ A full-stack application for generating professional context documents using AI.
    npm run dev
    ```
 
-## Deployment
+## Testing the Application
 
 ### Using Docker (Recommended)
 
-1. Configure environment variables in `.env.production`
-2. Run the deployment script:
+We provide a convenient script to set up and test the application with Docker:
+
+1. Make sure Docker and Docker Compose are installed
+2. Run the setup script:
    ```
    cd context-generator-src
-   ./scripts/deploy.sh
+   ./scripts/setup-docker-test.sh
    ```
+3. Test token tracking and subscription management:
+   ```
+   node scripts/test-token-tracking.js
+   ```
+
+### Manual Testing
+
+To test specific components:
+
+1. Start the application in development mode:
+   ```
+   npm run dev
+   ```
+2. Run unit tests:
+   ```
+   npm test
+   ```
+3. Test API endpoints:
+   ```
+   cd server
+   npm test
+   ```
+
+## Deployment
+
+### Docker Deployment (Recommended)
+
+1. Configure environment variables for production:
+   ```
+   cp .env.production .env
+   ```
+2. Edit the .env file with your actual production credentials
+3. Build and start containers:
+   ```
+   docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+   ```
+
+For detailed deployment instructions, see [DEPLOYMENT.md](./context-generator-src/DEPLOYMENT.md).
 
 ### Manual Deployment
 
@@ -68,36 +112,31 @@ A full-stack application for generating professional context documents using AI.
    
 ## Project Structure
 
-- `/client`: React frontend
-- `/server`: Node.js backend
-- `/shared`: Shared code between client and server
+- `/client`: React frontend application
+- `/server`: Node.js backend API
+- `/shared`: Shared code and types
+- `/scripts`: Deployment and testing scripts
 
-## Test Implementation
+## Security Features
 
-The project includes comprehensive test coverage:
-
-- Unit tests for models and controllers
-- Integration tests for API endpoints
-- Authentication tests
-- Document generation and processing tests
-
-Run tests with:
-```
-npm test
-```
+- HTTPS enforcement in production
+- Rate limiting to prevent abuse
+- JWT authentication with secure settings
+- Input validation and sanitization
+- Protection against XSS and NoSQL injection
+- Secure HTTP headers with Helmet
 
 ## Development Status
 
 - [x] Basic application structure
 - [x] AI integration (Claude and OpenAI)
-- [x] Document generation
-- [x] Document processing and formatting
-- [x] Database integration
-- [x] Authentication system
-- [x] Test suite
-- [x] Error handling improvements
-- [x] Production deployment
+- [x] Document generation and processing
+- [x] Database integration and authentication
+- [x] Error handling and deployment configuration
 - [x] CI/CD pipeline
 - [x] Token usage tracking
 - [x] Subscription management system
 - [x] Usage dashboards
+- [x] Production security measures
+- [x] Health monitoring endpoints
+- [x] Token usage testing scripts
