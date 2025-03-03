@@ -2,6 +2,8 @@
 
 # -------- BASE STAGE --------
 FROM node:18-alpine AS base
+# Install wget for healthchecks
+RUN apk --no-cache add wget
 WORKDIR /app
 ENV NODE_ENV=production
 
@@ -11,6 +13,8 @@ FROM base AS dependencies
 COPY package.json ./
 # Install dependencies for both client and server
 RUN npm install
+# Explicitly install security-related dependencies to ensure they're available
+RUN npm install --no-save helmet express-rate-limit express-mongo-sanitize xss-clean morgan
 
 # -------- BUILD STAGE --------
 FROM base AS build
@@ -39,6 +43,10 @@ ENV NODE_ENV=production
 # Expose the application ports
 EXPOSE 5000
 EXPOSE 3000
+
+# Add a healthcheck to monitor the container
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:5000/api/health || exit 1
 
 # Start the application
 CMD ["node", "server/src/server.js"]
