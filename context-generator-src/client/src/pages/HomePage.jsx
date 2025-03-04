@@ -2,13 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 /**
- * Home page component
+ * Home page component with G2L branding
  */
 const HomePage = () => {
   return (
     <div className="page-container">
       <div className="hero-section">
-        <h1>Context Generator</h1>
+        <h1>
+          <span className="text-black">G2L</span> Context Generator
+        </h1>
         <p className="subtitle">Create powerful context documents that semantically calibrate AI systems for your specific business needs</p>
         
         <div className="hero-description">
@@ -16,16 +18,12 @@ const HomePage = () => {
         </div>
         
         <div className="cta-buttons">
-          <Link to="/create" className="primary-button">
+          <Link to="/create" className="primary-button" style={{ fontWeight: 'var(--font-weight-medium)' }}>
             Create New Document
           </Link>
           
-          <Link to="/saved" className="secondary-button">
+          <Link to="/saved" className="secondary-button" style={{ fontWeight: 'var(--font-weight-medium)' }}>
             View Saved Documents
-          </Link>
-          
-          <Link to="/about" className="text-button">
-            Learn More
           </Link>
         </div>
       </div>
@@ -35,19 +33,38 @@ const HomePage = () => {
         
         <div className="feature-cards">
           <div className="feature-card">
-            <div className="feature-icon">📈</div>
+            <div className="feature-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 21H3V3H12V5H5V19H19V12H21V21Z" fill="#dc97ff"/>
+                <path d="M21 9L19 7L15 11L13 9L11 11L15 15L21 9Z" fill="#ff7d45"/>
+                <path d="M14 3V5H17.59L7.76 14.83L9.17 16.24L19 6.41V10H21V3H14Z" fill="#dc97ff"/>
+              </svg>
+            </div>
             <h3>Business Dimensional Profile</h3>
             <p>Detailed business context document that enables AI systems to generate outputs precisely aligned with your unique business model, market position, offerings, and strategic objectives.</p>
           </div>
           
           <div className="feature-card">
-            <div className="feature-icon">📊</div>
+            <div className="feature-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 6C8.68 6 6 8.68 6 12C6 15.32 8.68 18 12 18C15.32 18 18 15.32 18 12C18 8.68 15.32 6 12 6ZM12 16C9.79 16 8 14.21 8 12C8 9.79 9.79 8 12 8C14.21 8 16 9.79 16 12C16 14.21 14.21 16 12 16Z" fill="#6fe4c6"/>
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#ff7d45"/>
+              </svg>
+            </div>
             <h3>Target Market Audience Profile</h3>
             <p>Comprehensive analysis of your ideal customer segments for semantically calibrating AI systems to accurately understand and target your specific audience demographics, psychographics, behaviors, and needs.</p>
           </div>
           
           <div className="feature-card">
-            <div className="feature-icon">📝</div>
+            <div className="feature-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" fill="#75c3e8" fillOpacity="0.5"/>
+                <path d="M14 2V8H20L14 2Z" fill="#dc97ff"/>
+                <path d="M16 12H8V14H16V12Z" fill="#ff7d45"/>
+                <path d="M16 16H8V18H16V16Z" fill="#ff7d45"/>
+                <path d="M10 8H8V10H10V8Z" fill="#dc97ff"/>
+              </svg>
+            </div>
             <h3>AI Style Guide</h3>
             <p>Advanced AI calibration document for consistently aligning AI-generated content with your brand voice, terminology preferences, and communication standards across all platforms.</p>
           </div>
@@ -92,7 +109,7 @@ const HomePage = () => {
         </div>
         
         <div className="cta-center">
-          <Link to="/create" className="primary-button">
+          <Link to="/create" className="primary-button" style={{ fontWeight: 'var(--font-weight-medium)' }}>
             Get Started
           </Link>
         </div>

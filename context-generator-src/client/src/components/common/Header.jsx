@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
 
 /**
- * Header component for the application
+ * Header component for the application with G2L branding
  */
 const Header = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const Header = () => {
     <header className="app-header">
       <div className="header-container">
         <Link to="/" className="logo">
-          Context Generator
+          <span className="text-purple">G2L</span> <span className="text-orange">Context</span>
         </Link>
         
         <nav className="main-nav">
@@ -42,7 +42,20 @@ const Header = () => {
                   <Link to="/usage">Usage Dashboard</Link>
                 </li>
                 <li>
-                  <button onClick={handleLogout} className="nav-button">Logout</button>
+                  <button 
+                    onClick={handleLogout} 
+                    className="nav-button"
+                    style={{ 
+                      background: 'transparent', 
+                      border: 'none', 
+                      color: 'var(--color-white)',
+                      fontFamily: 'var(--font-family)',
+                      fontWeight: 'var(--font-weight-medium)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Logout
+                  </button>
                 </li>
               </>
             ) : (
