@@ -6,7 +6,7 @@
 :root {
   /* Primary Colors */
   --color-black: #000000;
-  --color-dark-bg: #2c2c29;
+  --color-dark-bg: #282c33;
   --color-purple-accent: #dc97ff;
   --color-orange-accent: #ff7d45;
   
@@ -59,16 +59,36 @@ body {
   line-height: 1.6;
 }
 
+/* Brand title styling with gradient */
+.brand-title {
+  font-family: var(--font-family);
+  display: inline-flex;
+  align-items: center;
+}
+
+.brand-title-context {
+  color: var(--color-white);
+  font-weight: var(--font-weight-regular);
+}
+
+.brand-title-forge {
+  background: linear-gradient(to right, var(--color-orange-accent), var(--color-purple-accent), var(--color-white));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: var(--font-weight-medium);
+}
+
 /* Typography */
 h1, h2, h3 {
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-medium);
   color: var(--color-white);
   margin-bottom: var(--spacing-md);
   line-height: 1.2;
 }
 
 h4, h5, h6 {
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-regular);
   color: var(--color-white);
   margin-bottom: var(--spacing-sm);
   line-height: 1.2;
@@ -84,6 +104,8 @@ h6 { font-size: 1rem; }
 p, ul, ol {
   font-weight: var(--font-weight-light);
   margin-bottom: var(--spacing-md);
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 a {
@@ -140,9 +162,10 @@ ul {
 
 .logo {
   font-size: 1.5rem;
-  font-weight: var(--font-weight-bold);
-  color: var(--color-purple-accent);
+  font-weight: var(--font-weight-medium);
   text-decoration: none;
+  display: flex;
+  align-items: center;
 }
 
 .main-nav ul {
@@ -152,7 +175,7 @@ ul {
 
 .main-nav a {
   color: var(--color-white);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-regular);
   transition: color 0.2s;
 }
 
@@ -400,7 +423,8 @@ button:disabled {
   font-size: 1.5rem;
   color: var(--color-white);
   margin-bottom: 2rem;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-regular);
+  opacity: 0.9;
 }
 
 .hero-description {
@@ -457,6 +481,18 @@ button:disabled {
   padding: 2rem;
   text-align: center;
   transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, var(--color-orange-accent), var(--color-purple-accent));
 }
 
 .feature-card:hover {
@@ -828,4 +864,112 @@ label {
   .how-it-works-section {
     padding: 5rem 0;
   }
+}
+
+/* About Page Styles */
+.document-type {
+  background-color: var(--color-dark-bg);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.document-type:nth-child(3n+1)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, var(--color-orange-accent), var(--color-purple-accent));
+}
+
+.document-type:nth-child(3n+2)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, var(--color-tertiary-blue), var(--color-tertiary-mint));
+}
+
+.document-type:nth-child(3n+3)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, var(--color-tertiary-mint), var(--color-tertiary-green));
+}
+
+.document-type h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--color-white);
+  font-weight: var(--font-weight-medium);
+}
+
+/* About Page Benefit Cards */
+.benefit-card {
+  background-color: var(--color-dark-bg);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.benefit-card:nth-child(3n+1)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, var(--color-orange-accent), var(--color-purple-accent));
+}
+
+.benefit-card:nth-child(3n+2)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, var(--color-tertiary-blue), var(--color-tertiary-mint));
+}
+
+.benefit-card:nth-child(3n+3)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, var(--color-tertiary-mint), var(--color-tertiary-green));
+}
+
+.benefit-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.benefit-card h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--color-white);
+  font-weight: var(--font-weight-medium);
+}
+
+.benefit-card p {
+  margin-bottom: 0;
+  color: var(--color-white);
+  opacity: 0.8;
+  font-weight: var(--font-weight-light);
 }

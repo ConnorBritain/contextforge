@@ -8,8 +8,8 @@ const HomePage = () => {
   return (
     <div className="page-container">
       <div className="hero-section">
-        <h1>
-          <span className="text-purple">Context</span><span className="text-orange">Forge</span>
+        <h1 className="brand-title">
+          <span className="brand-title-context">Context</span><span className="brand-title-forge">Forge</span>
         </h1>
         <p className="subtitle">Create powerful context documents that semantically calibrate AI systems for your specific business needs</p>
         

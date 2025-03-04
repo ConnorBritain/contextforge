@@ -9,14 +9,16 @@ const AboutPage = () => {
   return (
     <div className="page-container about-page">
       <div className="about-header">
-        <h1>About Context Generator</h1>
+        <h1>About <span className="brand-title">
+          <span className="brand-title-context">Context</span><span className="brand-title-forge">Forge</span>
+        </span></h1>
         <p className="subtitle">Enhancing AI interactions through semantic calibration</p>
       </div>
 
       <div className="about-section">
-        <h2>What is Context Generator?</h2>
+        <h2>What is <span className="text-orange">ContextForge</span>?</h2>
         <p>
-          Context Generator is a specialized tool designed to create comprehensive context documents that semantically calibrate AI language models (like ChatGPT, Claude, Gemini) to your specific business needs, audience, and communication style.
+          ContextForge is a specialized tool designed to create comprehensive context documents that semantically calibrate AI language models (like ChatGPT, Claude, Gemini) to your specific business needs, audience, and communication style.
         </p>
         <p>
           Unlike traditional documentation that's primarily meant for human consumption, these context documents are specifically optimized to help AI systems better understand your unique business context and generate more accurate, relevant, and precisely aligned outputs.

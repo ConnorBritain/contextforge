@@ -18,8 +18,8 @@ const Header = () => {
   return (
     <header className="app-header">
       <div className="header-container">
-        <Link to="/" className="logo">
-          <span className="text-purple">Context</span><span className="text-orange">Forge</span>
+        <Link to="/" className="logo brand-title">
+          <span className="brand-title-context">Context</span><span className="brand-title-forge">Forge</span>
         </Link>
         
         <nav className="main-nav">
