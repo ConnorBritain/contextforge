@@ -29,18 +29,18 @@ const DOCUMENT_TYPE_ICONS = {
  * Descriptions for document types
  */
 const DOCUMENT_TYPE_DESCRIPTIONS = {
-  [DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE]: 'Comprehensive analysis of your ideal customer segments, including demographics, psychographics, behaviors, and needs.',
-  [DOCUMENT_TYPES.BUSINESS_PROFILE]: 'Detailed business strategy document covering market analysis, offerings, business model, operations, and growth projections.',
-  [DOCUMENT_TYPES.STYLE_GUIDE]: 'Comprehensive guide for ensuring consistent AI communications that align with your brand voice, audience, and business objectives.'
+  [DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE]: 'Comprehensive analysis of your ideal customer segments for semantically calibrating AI systems to accurately understand and target your specific audience demographics, psychographics, behaviors, and needs.',
+  [DOCUMENT_TYPES.BUSINESS_PROFILE]: 'Detailed business context document that enables AI systems to generate outputs precisely aligned with your unique business model, market position, offerings, and strategic objectives.',
+  [DOCUMENT_TYPES.STYLE_GUIDE]: 'Advanced AI calibration document for consistently aligning AI-generated content with your brand voice, terminology preferences, and communication standards across all platforms.'
 };
 
 /**
  * Recommended users for document types
  */
 const DOCUMENT_TYPE_RECOMMENDED_FOR = {
-  [DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE]: 'Marketing teams, startup founders, product managers',
-  [DOCUMENT_TYPES.BUSINESS_PROFILE]: 'Business strategists, consultants, entrepreneurs',
-  [DOCUMENT_TYPES.STYLE_GUIDE]: 'Brand managers, content teams, AI implementation specialists'
+  [DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE]: 'Marketing teams working with AI, digital marketers using LLMs, customer insight specialists',
+  [DOCUMENT_TYPES.BUSINESS_PROFILE]: 'AI implementation teams, business strategists leveraging AI tools, consultants optimizing AI workflows',
+  [DOCUMENT_TYPES.STYLE_GUIDE]: 'Content teams using generative AI, brand managers implementing AI assistants, AI prompt engineers'
 };
 
 module.exports = {

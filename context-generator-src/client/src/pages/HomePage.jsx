@@ -9,7 +9,11 @@ const HomePage = () => {
     <div className="page-container">
       <div className="hero-section">
         <h1>Context Generator</h1>
-        <p className="subtitle">Transform your business inputs into comprehensive, professional documents</p>
+        <p className="subtitle">Create powerful context documents that semantically calibrate AI systems for your specific business needs</p>
+        
+        <div className="hero-description">
+          <p>Our AI-optimized context documents help you get more precise, tailored responses from ChatGPT, Claude, and other AI systems by providing them with detailed contextual information about your business, audience, and communication style.</p>
+        </div>
         
         <div className="cta-buttons">
           <Link to="/create" className="primary-button">
@@ -18,6 +22,10 @@ const HomePage = () => {
           
           <Link to="/saved" className="secondary-button">
             View Saved Documents
+          </Link>
+          
+          <Link to="/about" className="text-button">
+            Learn More
           </Link>
         </div>
       </div>
@@ -29,19 +37,19 @@ const HomePage = () => {
           <div className="feature-card">
             <div className="feature-icon">📈</div>
             <h3>Business Dimensional Profile</h3>
-            <p>Detailed business strategy document covering market analysis, offerings, business model, operations, and growth projections.</p>
+            <p>Detailed business context document that enables AI systems to generate outputs precisely aligned with your unique business model, market position, offerings, and strategic objectives.</p>
           </div>
           
           <div className="feature-card">
             <div className="feature-icon">📊</div>
             <h3>Target Market Audience Profile</h3>
-            <p>Comprehensive analysis of your ideal customer segments, including demographics, psychographics, behaviors, and needs.</p>
+            <p>Comprehensive analysis of your ideal customer segments for semantically calibrating AI systems to accurately understand and target your specific audience demographics, psychographics, behaviors, and needs.</p>
           </div>
           
           <div className="feature-card">
             <div className="feature-icon">📝</div>
             <h3>AI Style Guide</h3>
-            <p>Comprehensive guide for ensuring consistent AI communications that align with your brand voice, audience, and business objectives.</p>
+            <p>Advanced AI calibration document for consistently aligning AI-generated content with your brand voice, terminology preferences, and communication standards across all platforms.</p>
           </div>
         </div>
       </div>
@@ -54,7 +62,7 @@ const HomePage = () => {
             <div className="step-number">1</div>
             <div className="step-content">
               <h3>Choose Document Type</h3>
-              <p>Select the type of document that best suits your business needs.</p>
+              <p>Select the AI context document that best suits your specific calibration needs.</p>
             </div>
           </div>
           
@@ -62,7 +70,7 @@ const HomePage = () => {
             <div className="step-number">2</div>
             <div className="step-content">
               <h3>Input Your Information</h3>
-              <p>Fill out the forms with details about your business, audience, and goals.</p>
+              <p>Provide details about your business, audience, or communication style through our guided forms.</p>
             </div>
           </div>
           
@@ -70,15 +78,15 @@ const HomePage = () => {
             <div className="step-number">3</div>
             <div className="step-content">
               <h3>Generate Document</h3>
-              <p>Our AI transforms your inputs into a comprehensive, professional document.</p>
+              <p>Our system creates a semantically optimized context document specifically designed for AI calibration.</p>
             </div>
           </div>
           
           <div className="step">
             <div className="step-number">4</div>
             <div className="step-content">
-              <h3>Export & Use</h3>
-              <p>Download your document in multiple formats and put it to work.</p>
+              <h3>Use with AI Systems</h3>
+              <p>Attach to AI conversations, use as embeddings, integrate with APIs, or reference in prompts for enhanced AI responses.</p>
             </div>
           </div>
         </div>

@@ -5,6 +5,7 @@ import FormWizardPage from '../pages/FormWizardPage';
 import DocumentResultPage from '../pages/DocumentResultPage';
 import SavedDocumentsPage from '../pages/SavedDocumentsPage';
 import UsageDashboardPage from '../pages/UsageDashboardPage';
+import AboutPage from '../pages/AboutPage';
 
 /**
  * Application routing configuration
@@ -17,6 +18,7 @@ const Routes = () => {
       <Route path="/document-result" element={<DocumentResultPage />} />
       <Route path="/saved" element={<SavedDocumentsPage />} />
       <Route path="/usage" element={<UsageDashboardPage />} />
+      <Route path="/about" element={<AboutPage />} />
       
       {/* Redirect all other routes to home */}
       <Route path="*" element={<Navigate to="/" replace />} />

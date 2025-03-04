@@ -30,6 +30,9 @@ const Header = () => {
             <li>
               <Link to="/create">Create Document</Link>
             </li>
+            <li>
+              <Link to="/about">About</Link>
+            </li>
             {isAuthenticated ? (
               <>
                 <li>

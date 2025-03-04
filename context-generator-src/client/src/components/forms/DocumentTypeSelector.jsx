@@ -9,23 +9,23 @@ const DocumentTypeSelector = ({ selectedType, onSelectType, onNext }) => {
     {
       id: 'businessProfile',
       title: 'Business Dimensional Profile',
-      description: 'A detailed business strategy document covering market analysis, offerings, business model, operations, and growth projections.',
+      description: 'A detailed business context document that enables AI systems to generate outputs precisely aligned with your unique business model, market position, offerings, and strategic objectives.',
       icon: '📈',
-      recommendedFor: 'Business strategists, consultants, entrepreneurs'
+      recommendedFor: 'AI implementation teams, business strategists leveraging AI tools, consultants optimizing AI workflows'
     },
     {
       id: 'targetMarketAudience',
       title: 'Target Market Audience Profile',
-      description: 'A comprehensive analysis of your ideal customer segments, including demographics, psychographics, behaviors, and needs.',
+      description: 'A comprehensive analysis of your ideal customer segments for semantically calibrating AI systems to accurately understand and target your specific audience demographics, psychographics, behaviors, and needs.',
       icon: '📊',
-      recommendedFor: 'Marketing teams, startup founders, product managers'
+      recommendedFor: 'Marketing teams working with AI, digital marketers using LLMs, customer insight specialists'
     },
     {
       id: 'styleGuide',
       title: 'AI Style Guide',
-      description: 'A comprehensive guide for ensuring consistent AI communications that align with your brand voice, audience, and business objectives.',
+      description: 'Advanced AI calibration document for consistently aligning AI-generated content with your brand voice, terminology preferences, and communication standards across all platforms.',
       icon: '📝',
-      recommendedFor: 'Brand managers, content teams, AI implementation specialists'
+      recommendedFor: 'Content teams using generative AI, brand managers implementing AI assistants, AI prompt engineers'
     }
   ];
   
