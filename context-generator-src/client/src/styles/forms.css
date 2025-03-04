@@ -336,6 +336,16 @@
   align-items: center;
   width: 33.33%;
   color: var(--text-secondary);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.progress-step:hover .step-number {
+  transform: scale(1.05);
+}
+
+.progress-step:hover .step-label {
+  text-decoration: underline;
 }
 
 .progress-step.active {

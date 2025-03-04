@@ -142,11 +142,19 @@ const FormWizardPage = () => {
       <div className="wizard-container">
         <div className="wizard-progress">
           <div className="progress-steps">
-            <div className={`progress-step ${currentStep >= 1 ? 'active' : ''}`}>
+            <div 
+              className={`progress-step ${currentStep >= 1 ? 'active' : ''}`}
+              onClick={() => documentType && setCurrentStep(1)}
+              style={{ cursor: documentType ? 'pointer' : 'default' }}
+            >
               <div className="step-number">1</div>
               <div className="step-label">Document Type</div>
             </div>
-            <div className={`progress-step ${currentStep >= 2 ? 'active' : ''}`}>
+            <div 
+              className={`progress-step ${currentStep >= 2 ? 'active' : ''}`}
+              onClick={() => documentType && setCurrentStep(2)}
+              style={{ cursor: documentType ? 'pointer' : 'default' }}
+            >
               <div className="step-number">2</div>
               <div className="step-label">
                 {documentType === DOCUMENT_TYPES.BUSINESS_PROFILE && 'Business Profile'}
@@ -156,7 +164,11 @@ const FormWizardPage = () => {
                 {!documentType && 'Document Details'}
               </div>
             </div>
-            <div className={`progress-step ${currentStep >= 3 ? 'active' : ''}`}>
+            <div 
+              className={`progress-step ${currentStep >= 3 ? 'active' : ''}`}
+              onClick={() => Object.keys(formData).length > 0 && documentType && setCurrentStep(3)}
+              style={{ cursor: Object.keys(formData).length > 0 && documentType ? 'pointer' : 'default' }}
+            >
               <div className="step-number">3</div>
               <div className="step-label">Review</div>
             </div>

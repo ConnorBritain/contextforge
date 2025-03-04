@@ -59,8 +59,6 @@ const DocumentTypeSelector = ({ selectedType, onSelectType, onNext }) => {
             className={`document-type-card ${selectedType === type.id ? 'selected' : ''}`}
             onClick={() => {
               onSelectType(type.id);
-              // Auto-proceed after a short delay to show selection
-              setTimeout(() => onNext(type.id), 300);
             }}
           >
             <div className="document-type-icon">{type.icon}</div>
@@ -79,11 +77,19 @@ const DocumentTypeSelector = ({ selectedType, onSelectType, onNext }) => {
                 checked={selectedType === type.id}
                 onChange={() => {
                   onSelectType(type.id);
-                  // Auto-proceed after a short delay to show selection
-                  setTimeout(() => onNext(type.id), 300);
                 }}
+                onClick={(e) => e.stopPropagation()} // Prevent bubbling
               />
-              <label htmlFor={type.id}>Select</label>
+              <label 
+                htmlFor={type.id}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent card click event
+                  onSelectType(type.id);
+                  onNext(type.id); // Only navigate on explicit "Select" click
+                }}
+              >
+                Select
+              </label>
             </div>
           </div>
         ))}
