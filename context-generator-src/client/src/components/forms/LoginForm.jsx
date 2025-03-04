@@ -12,7 +12,7 @@ const LoginForm = ({ onSignupClick }) => {
     password: ''
   });
   const [formError, setFormError] = useState('');
-  const { login, loading, error } = useAuth();
+  const { login, loginWithGoogle, loading, error } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handle form input changes
@@ -46,7 +46,6 @@ const LoginForm = ({ onSignupClick }) => {
 
   // Handle Google OAuth login
   const handleGoogleLogin = () => {
-    const { loginWithGoogle } = useAuth();
     loginWithGoogle();
   };
 

@@ -14,7 +14,7 @@ const RegisterForm = ({ onLoginClick }) => {
     confirmPassword: ''
   });
   const [formError, setFormError] = useState('');
-  const { register, loading, error } = useAuth();
+  const { register, loginWithGoogle, loading, error } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handle form input changes
@@ -62,7 +62,6 @@ const RegisterForm = ({ onLoginClick }) => {
 
   // Handle Google OAuth registration
   const handleGoogleLogin = () => {
-    const { loginWithGoogle } = useAuth();
     loginWithGoogle();
   };
 
