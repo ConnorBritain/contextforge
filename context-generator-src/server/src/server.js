@@ -64,6 +64,14 @@ app.use('/api/subscriptions', subscriptionRoutes);
 // Backward compatibility for previous route
 app.use('/api/contexts', documentRoutes);
 
+// Add server info endpoint for dynamic port discovery
+app.get('/api/server-info', (req, res) => {
+  res.json({ 
+    port: config.port,
+    serverUrl: config.serverUrl 
+  });
+});
+
 // Serve the React app for any non-API routes
 app.get('/*', (req, res, next) => {
   // Only handle non-API routes with this middleware
@@ -84,11 +92,49 @@ app.use((req, res, next) => {
 // Error handling middleware
 app.use(errorHandler);
 
-// Start server with improved error handling
-const PORT = config.port;
-const server = app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
+// Start server with port fallback
+const startServer = (port) => {
+  const server = app.listen(port);
+  
+  server.on('listening', () => {
+    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${port}`);
+    
+    // Update the config if we're using a different port than originally configured
+    if (port !== parseInt(config.port)) {
+      console.log(`Note: Using port ${port} instead of configured port ${config.port} (which was busy)`);
+      
+      // Update the server URL in the config to reflect the new port
+      config.serverUrl = config.serverUrl.replace(`:${config.port}`, `:${port}`);
+      config.port = port;
+      
+      console.log(`Server URL updated to: ${config.serverUrl}`);
+      
+      // Add an endpoint to let the client know what port the server is running on
+      app.get('/api/server-info', (req, res) => {
+        res.json({ 
+          port: port,
+          serverUrl: config.serverUrl 
+        });
+      });
+    }
+  });
+  
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`Port ${port} is busy, trying port ${parseInt(port) + 1}`);
+      server.close();
+      return startServer(parseInt(port) + 1);
+    } else {
+      console.error('Server error:', err);
+      process.exit(1);
+    }
+  });
+  
+  return server;
+};
+
+const PORT = parseInt(config.port);
+const server = startServer(PORT);
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {

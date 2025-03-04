@@ -15,13 +15,46 @@ class ApiError extends Error {
  */
 class ApiService {
     constructor() {
+      // Default server port is 5000, but it could be different if that port is busy
       this.baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
       this.defaultHeaders = {
         'Content-Type': 'application/json'
       };
       
+      // Try to detect if the server is using a different port
+      this._detectServerPort();
+      
       // Initialize token from localStorage if present
       this._initializeToken();
+    }
+    
+    /**
+     * Try to detect if the server is running on a different port
+     */
+    async _detectServerPort() {
+      // Test ports in sequence starting with the default
+      const testPorts = [5000, 5001, 5002, 5003, 5004, 5005];
+      
+      for (const port of testPorts) {
+        try {
+          // Try to fetch server info from this port
+          const response = await fetch(`http://localhost:${port}/api/server-info`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            // Update baseUrl with the correct port
+            this.baseUrl = `http://localhost:${data.port}/api`;
+            console.log(`API Service: Connected to server at ${this.baseUrl}`);
+            break;
+          }
+        } catch (error) {
+          // Continue trying other ports
+          console.log(`API Service: Port ${port} not available, trying next...`);
+        }
+      }
     }
     
     /**
@@ -105,7 +138,14 @@ class ApiService {
       let data;
 
       try {
-        data = await response.json();
+        // Check if the response has a JSON content type
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          data = await response.json();
+        } else {
+          // For non-JSON responses (like file downloads), return the raw response
+          return response;
+        }
       } catch (error) {
         // In case response is not valid JSON
         throw new ApiError(
