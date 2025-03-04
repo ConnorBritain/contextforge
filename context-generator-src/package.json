@@ -1,5 +1,5 @@
 {
-  "name": "context-generator",
+  "name": "contextforge",
   "version": "1.0.0",
   "description": "Application to generate professional context documents",
   "main": "server/src/server.js",

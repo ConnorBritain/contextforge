@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: context-generator
+    container_name: contextforge
     restart: unless-stopped
     ports:
       - "3000:5000"
@@ -21,8 +21,8 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=5000
-      - MONGODB_URI=mongodb://user:password@mongodb:27017/context-generator?authSource=admin
-      - JWT_SECRET=context-generator-secret-key-for-testing
+      - MONGODB_URI=mongodb://user:password@mongodb:27017/contextforge?authSource=admin
+      - JWT_SECRET=contextforge-secret-key-for-testing
       - AI_PROVIDER=mock
       - USE_REAL_AI=false
       - CLIENT_URL=http://localhost:3000
@@ -30,26 +30,26 @@ services:
     depends_on:
       - mongodb
     networks:
-      - context-generator-network
+      - contextforge-network
 
   mongodb:
     image: mongo:6.0
-    container_name: context-generator-mongodb
+    container_name: contextforge-mongodb
     restart: unless-stopped
     environment:
       - MONGO_INITDB_ROOT_USERNAME=user
       - MONGO_INITDB_ROOT_PASSWORD=password
-      - MONGO_INITDB_DATABASE=context-generator
+      - MONGO_INITDB_DATABASE=contextforge
     volumes:
       - mongo-data:/data/db
     ports:
       - "27017:27017"
     command: --wiredTigerCacheSizeGB 1.5
     networks:
-      - context-generator-network
+      - contextforge-network
 
 networks:
-  context-generator-network:
+  contextforge-network:
     driver: bridge
 
 volumes:

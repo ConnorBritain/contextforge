@@ -1,5 +1,5 @@
 {
-  "name": "context-generator-client",
+  "name": "contextforge-client",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
