@@ -16,7 +16,9 @@ const Routes = () => {
   return (
     <RouterRoutes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/create" element={<FormWizardPage />} />
+      <Route path="/forge" element={<FormWizardPage />} />
+      {/* Keep the old route temporarily for backwards compatibility */}
+      <Route path="/create" element={<Navigate to="/forge" replace />} />
       <Route path="/document-result" element={<DocumentResultPage />} />
       <Route path="/saved" element={<SavedDocumentsPage />} />
       <Route path="/usage" element={<UsageDashboardPage />} />

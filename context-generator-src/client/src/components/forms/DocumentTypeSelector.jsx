@@ -89,15 +89,7 @@ const DocumentTypeSelector = ({ selectedType, onSelectType, onNext }) => {
         ))}
       </div>
       
-      <div className="form-navigation">
-        <button 
-          type="submit" 
-          className="next-button"
-          disabled={!selectedType}
-        >
-          Next
-        </button>
-      </div>
+      {/* Next button removed as clicking on document type advances the page */}
     </form>
   );
 };

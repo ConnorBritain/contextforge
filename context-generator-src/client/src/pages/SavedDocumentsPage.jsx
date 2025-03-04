@@ -60,6 +60,8 @@ const SavedDocumentsPage = () => {
         return 'Business Dimensional Profile';
       case 'styleGuide':
         return 'AI Style Guide';
+      case 'personalBio':
+        return 'Personal Bio Document';
       default:
         return 'Document';
     }
@@ -71,9 +73,9 @@ const SavedDocumentsPage = () => {
         <h1>Saved Documents</h1>
         <button 
           className="primary-button"
-          onClick={() => navigate('/create')}
+          onClick={() => navigate('/forge')}
         >
-          Create New Document
+          Forge New Document
         </button>
       </div>
       
@@ -89,12 +91,12 @@ const SavedDocumentsPage = () => {
         {documents.length === 0 ? (
           <div className="empty-state">
             <h2>No Saved Documents</h2>
-            <p>You haven't saved any documents yet. Create your first document to get started.</p>
+            <p>You haven't saved any documents yet. Forge your first document to get started.</p>
             <button 
               className="primary-button"
-              onClick={() => navigate('/create')}
+              onClick={() => navigate('/forge')}
             >
-              Create Document
+              Forge Document
             </button>
           </div>
         ) : (

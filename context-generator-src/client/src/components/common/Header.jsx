@@ -28,10 +28,10 @@ const Header = () => {
               <Link to="/">Home</Link>
             </li>
             <li>
-              <Link to="/create" onClick={() => {
+              <Link to="/forge" onClick={() => {
                 // Reset any form wizard state by forcing a reload of the component
                 localStorage.removeItem('formWizardState');
-                window.location.href = "/create";
+                window.location.href = "/forge";
               }}>Forge</Link>
             </li>
             <li>
