@@ -173,7 +173,7 @@ const FormWizardPage = () => {
           <div className="loading-overlay">
             <LoadingSpinner />
             <div className="loading-message">
-              Generating your document. This may take a minute...
+              Forging your document. This may take a minute...
             </div>
           </div>
         )}

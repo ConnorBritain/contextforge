@@ -15,6 +15,8 @@ const ReviewForm = ({ formData, documentType, onBack, onSubmit, isSubmitting }) 
         return 'Business Dimensional Profile';
       case 'styleGuide':
         return 'AI Style Guide';
+      case 'personalBio':
+        return 'Personal Bio Document';
       default:
         return 'Document';
     }
@@ -71,7 +73,7 @@ const ReviewForm = ({ formData, documentType, onBack, onSubmit, isSubmitting }) 
     <form className="form-container" onSubmit={handleSubmit}>
       <div className="form-header">
         <h2>Review Your Information</h2>
-        <p>Please review the information you've provided before generating your {getDocumentTypeDisplay()}.</p>
+        <p>Please review the information you've provided before forging your {getDocumentTypeDisplay()}.</p>
       </div>
       
       {sections.map((section, sectionIndex) => (
@@ -119,7 +121,7 @@ const ReviewForm = ({ formData, documentType, onBack, onSubmit, isSubmitting }) 
           className="generate-button"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Generating...' : 'Generate Document'}
+          {isSubmitting ? 'Forging...' : 'Forge Document'}
         </button>
       </div>
     </form>

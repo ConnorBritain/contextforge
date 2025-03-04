@@ -48,8 +48,8 @@ const DocumentTypeSelector = ({ selectedType, onSelectType, onNext }) => {
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <div className="form-header">
-        <h2>Select Document Type</h2>
-        <p>Choose the type of document you want to generate.</p>
+        <h2>Select Forge Type</h2>
+        <p>Choose the type of document you want to forge.</p>
       </div>
       
       <div className="document-type-grid">

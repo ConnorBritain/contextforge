@@ -32,7 +32,7 @@ const Header = () => {
                 // Reset any form wizard state by forcing a reload of the component
                 localStorage.removeItem('formWizardState');
                 window.location.href = "/create";
-              }}>Create Document</Link>
+              }}>Forge</Link>
             </li>
             <li>
               <Link to="/about">About</Link>

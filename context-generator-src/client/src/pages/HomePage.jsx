@@ -21,7 +21,7 @@ const HomePage = () => {
         
         <div className="cta-buttons">
           <Link to="/create" className="primary-button" style={{ fontWeight: 'var(--font-weight-medium)' }}>
-            Create New Document
+            Forge New Document
           </Link>
           
           <Link to="/saved" className="secondary-button" style={{ fontWeight: 'var(--font-weight-medium)' }}>
@@ -123,7 +123,7 @@ const HomePage = () => {
         
         <div className="cta-center">
           <Link to="/create" className="primary-button" style={{ fontWeight: 'var(--font-weight-medium)' }}>
-            Get Started
+            Start Forging
           </Link>
         </div>
       </div>

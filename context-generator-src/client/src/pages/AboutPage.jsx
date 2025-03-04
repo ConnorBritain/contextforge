@@ -136,9 +136,9 @@ const AboutPage = () => {
 
       <div className="cta-section">
         <h2>Ready to enhance your AI interactions?</h2>
-        <p>Create your first context document and experience the difference in AI output quality.</p>
+        <p>Forge your first context document and experience the difference in AI output quality.</p>
         <div className="cta-buttons">
-          <Link to="/create" className="primary-button">Get Started</Link>
+          <Link to="/create" className="primary-button">Start Forging</Link>
         </div>
       </div>
     </div>
