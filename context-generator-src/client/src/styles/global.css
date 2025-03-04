@@ -416,8 +416,23 @@ button:disabled {
   color: var(--color-white);
 }
 
-.hero-section h1 span {
-  color: var(--color-purple-accent);
+/* Override any h1 span coloring in hero section with brand-title classes */
+.hero-section h1 .brand-title {
+  display: inline-flex;
+  align-items: center;
+}
+
+.hero-section h1 .brand-title .brand-title-context {
+  color: #ffffff;
+  font-weight: var(--font-weight-regular);
+}
+
+.hero-section h1 .brand-title .brand-title-forge {
+  background: linear-gradient(to right, var(--color-orange-accent), var(--color-purple-accent), var(--color-white));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: var(--font-weight-medium);
 }
 
 .subtitle {
