@@ -50,7 +50,11 @@ const DocumentTypeSelector = ({ selectedType, onSelectType, onNext }) => {
           <div 
             key={type.id}
             className={`document-type-card ${selectedType === type.id ? 'selected' : ''}`}
-            onClick={() => onSelectType(type.id)}
+            onClick={() => {
+              onSelectType(type.id);
+              // Auto-proceed after a short delay to show selection
+              setTimeout(() => onNext(type.id), 300);
+            }}
           >
             <div className="document-type-icon">{type.icon}</div>
             <h3>{type.title}</h3>
@@ -66,7 +70,11 @@ const DocumentTypeSelector = ({ selectedType, onSelectType, onNext }) => {
                 name="documentType"
                 value={type.id}
                 checked={selectedType === type.id}
-                onChange={() => onSelectType(type.id)}
+                onChange={() => {
+                  onSelectType(type.id);
+                  // Auto-proceed after a short delay to show selection
+                  setTimeout(() => onNext(type.id), 300);
+                }}
               />
               <label htmlFor={type.id}>Select</label>
             </div>
