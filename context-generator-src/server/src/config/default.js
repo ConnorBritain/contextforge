@@ -21,6 +21,13 @@ module.exports = {
       secret: process.env.JWT_SECRET || 'your-secret-key-for-development',
       expiresIn: '7d'
     },
+    auth: {
+      google: {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback'
+      }
+    },
     clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
     serverUrl: process.env.SERVER_URL || 'http://localhost:5000',
     // Document generation settings

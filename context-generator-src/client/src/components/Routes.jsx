@@ -6,6 +6,8 @@ import DocumentResultPage from '../pages/DocumentResultPage';
 import SavedDocumentsPage from '../pages/SavedDocumentsPage';
 import UsageDashboardPage from '../pages/UsageDashboardPage';
 import AboutPage from '../pages/AboutPage';
+import LoginPage from '../pages/LoginPage';
+import AuthCallbackPage from '../pages/AuthCallbackPage';
 
 /**
  * Application routing configuration
@@ -19,6 +21,8 @@ const Routes = () => {
       <Route path="/saved" element={<SavedDocumentsPage />} />
       <Route path="/usage" element={<UsageDashboardPage />} />
       <Route path="/about" element={<AboutPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/auth/callback" element={<AuthCallbackPage />} />
       
       {/* Redirect all other routes to home */}
       <Route path="*" element={<Navigate to="/" replace />} />

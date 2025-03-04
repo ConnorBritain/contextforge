@@ -20,6 +20,37 @@ if (process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 't
  */
 class AuthController {
   /**
+   * Handle Google OAuth callback
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @param {Function} next - Express next middleware function
+   */
+  static async googleAuthCallback(req, res, next) {
+    try {
+      // User is already authenticated by Passport
+      const user = req.user;
+      
+      if (!user) {
+        throw new UnauthorizedError('Google authentication failed');
+      }
+      
+      // Generate JWT token
+      let token;
+      
+      if (process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true') {
+        token = user.generateAuthToken();
+      } else {
+        token = "mock-auth-token-for-development-google";
+      }
+      
+      // Redirect to client with token and user info
+      res.redirect(`${config.clientUrl}/auth/callback?token=${token}&id=${user.id || user._id}&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}`);
+    } catch (error) {
+      console.error('Error in Google auth callback:', error);
+      res.redirect(`${config.clientUrl}/login?error=google-auth-failed`);
+    }
+  }
+  /**
    * Register a new user
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object

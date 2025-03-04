@@ -127,6 +127,13 @@ export const AuthProvider = ({ children }) => {
     return !!currentUser;
   };
 
+  /**
+   * Initiate Google OAuth login
+   */
+  const loginWithGoogle = () => {
+    authService.loginWithGoogle();
+  };
+
   // Create auth context value object
   const contextValue = {
     currentUser,
@@ -134,6 +141,7 @@ export const AuthProvider = ({ children }) => {
     error,
     register,
     login,
+    loginWithGoogle,
     logout,
     getProfile,
     updateProfile,

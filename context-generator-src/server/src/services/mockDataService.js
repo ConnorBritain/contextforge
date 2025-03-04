@@ -103,6 +103,7 @@ class MockDataService {
         id: 'mock-user-1',
         name: 'Demo User',
         email: 'demo@example.com',
+        role: 'user',
         subscription: {
           plan: 'professional',
           tokensRemaining: 100000,
@@ -115,6 +116,22 @@ class MockDataService {
           { date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 1).toISOString(), tokens: 8927 }
         ],
         createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString() // 30 days ago
+      },
+      {
+        id: 'mock-google-user',
+        name: 'Google Demo User',
+        email: 'google-demo@example.com',
+        googleId: 'mock-google-id-123',
+        role: 'user',
+        avatar: 'https://lh3.googleusercontent.com/a-dummy-avatar-url',
+        subscription: {
+          plan: 'professional',
+          tokensRemaining: 200000,
+          tokenLimit: 500000,
+          renewalDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString() // 30 days from now
+        },
+        usageHistory: [],
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString() // 2 days ago
       }
     ];
   }
@@ -213,6 +230,43 @@ class MockDataService {
   authenticate(email, password) {
     // In development mode, always return the demo user
     return Promise.resolve(this.users[0]);
+  }
+
+  /**
+   * Find user by email
+   */
+  findUserByEmail(email) {
+    const user = this.users.find(user => user.email.toLowerCase() === email.toLowerCase());
+    return Promise.resolve(user || null);
+  }
+
+  /**
+   * Find user by Google ID
+   */
+  findUserByGoogleId(googleId) {
+    const user = this.users.find(user => user.googleId === googleId);
+    return Promise.resolve(user || null);
+  }
+
+  /**
+   * Create a new user
+   */
+  createUser(userData) {
+    const newUser = {
+      ...userData,
+      id: `mock-user-${this.users.length + 1}`,
+      subscription: {
+        plan: 'free',
+        tokensRemaining: 50000,
+        tokenLimit: 50000,
+        renewalDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString() // 30 days from now
+      },
+      usageHistory: [],
+      createdAt: new Date().toISOString()
+    };
+    
+    this.users.push(newUser);
+    return Promise.resolve(newUser);
   }
 }
 

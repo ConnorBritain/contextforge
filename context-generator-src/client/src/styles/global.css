@@ -700,3 +700,134 @@ button:disabled {
   background-color: rgba(52, 152, 219, 0.1);
   text-decoration: underline;
 }
+
+/* Authentication styles */
+.auth-form-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background-color: white;
+}
+
+.auth-form-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.auth-form .form-group {
+  margin-bottom: 1.2rem;
+}
+
+.auth-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.btn-google {
+  background-color: white;
+  color: #444;
+  border: 1px solid #ddd;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.btn-google:hover {
+  background-color: #f8f8f8;
+}
+
+.btn-google:disabled {
+  color: #999;
+  cursor: not-allowed;
+}
+
+.btn-google svg {
+  margin-right: 0.8rem;
+}
+
+.auth-divider {
+  margin: 1.5rem 0;
+  text-align: center;
+  position: relative;
+}
+
+.auth-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #eee;
+  z-index: 1;
+}
+
+.auth-divider span {
+  position: relative;
+  z-index: 2;
+  background-color: white;
+  padding: 0 1rem;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.auth-switch {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: #666;
+}
+
+.text-link {
+  background: none;
+  border: none;
+  color: #4a90e2;
+  cursor: pointer;
+  font-weight: 500;
+  padding: 0;
+  font-size: inherit;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
+.auth-callback-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  text-align: center;
+}
+
+.login-page {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}

@@ -3,12 +3,14 @@ const cors = require('cors');
 const morgan = require('morgan');
 const config = require('./config/default');
 const mongoose = require('mongoose');
+const passport = require('passport');
 const documentRoutes = require('./routes/documentRoutes');
 const authRoutes = require('./routes/authRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 const configureSecurityMiddleware = require('./middleware/security');
 const { errorHandler } = require('./middleware/errorHandler');
+const configurePassport = require('./config/passport');
 
 // Initialize Express app
 const app = express();
@@ -37,6 +39,11 @@ if (process.env.NODE_ENV === 'production') {
   // Use more verbose 'dev' format for development
   app.use(morgan('dev'));
 }
+
+// Initialize Passport
+app.use(passport.initialize());
+// Configure passport strategies
+configurePassport();
 
 // Connect to MongoDB with improved options for production
 const mongoOptions = {

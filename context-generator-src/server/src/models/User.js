@@ -26,6 +26,14 @@ const UserSchema = new Schema({
     required: true,
     minlength: 6
   },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true // Allows multiple null values (for users without Google auth)
+  },
+  avatar: {
+    type: String
+  },
   role: {
     type: String,
     enum: ['user', 'admin'],

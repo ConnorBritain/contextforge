@@ -22,6 +22,17 @@ const SUBSCRIPTION_ENDPOINTS = {
  */
 const authService = {
   /**
+   * Initiate Google OAuth login
+   * Redirects the user to the Google authentication page
+   */
+  loginWithGoogle: () => {
+    const googleAuthUrl = `${API_URL}/auth/google`;
+    // Store the current location to redirect back after login
+    localStorage.setItem('redirectAfterLogin', window.location.pathname);
+    // Redirect to Google auth page
+    window.location.href = googleAuthUrl;
+  },
+  /**
    * Register a new user
    * @param {Object} userData - User registration data
    * @returns {Promise} - Response with token and user data

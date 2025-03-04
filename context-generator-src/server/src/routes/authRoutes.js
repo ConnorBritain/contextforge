@@ -1,7 +1,9 @@
 const express = require('express');
 const { check } = require('express-validator');
+const passport = require('passport');
 const AuthController = require('../controllers/authController');
 const auth = require('../middleware/auth');
+const config = require('../config/default');
 
 const router = express.Router();
 
@@ -43,5 +45,27 @@ router.put('/profile', [
   check('name', 'Name is required').optional(),
   check('email', 'Please include a valid email').optional().isEmail()
 ], AuthController.updateProfile);
+
+/**
+ * @route   GET /api/auth/google
+ * @desc    Authenticate with Google OAuth
+ * @access  Public
+ */
+router.get('/google', 
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+/**
+ * @route   GET /api/auth/google/callback
+ * @desc    Google OAuth callback
+ * @access  Public
+ */
+router.get('/google/callback', 
+  passport.authenticate('google', { 
+    session: false,
+    failureRedirect: `${config.clientUrl}/login?error=google-auth-failed` 
+  }),
+  AuthController.googleAuthCallback
+);
 
 module.exports = router;
