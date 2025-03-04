@@ -130,7 +130,8 @@ const RegisterForm = ({ onLoginClick }) => {
         
         <button 
           type="submit" 
-          className="btn btn-primary btn-block"
+          className="primary-button"
+          style={{ width: '100%', marginTop: '1rem' }}
           disabled={isSubmitting || loading}
         >
           {isSubmitting || loading ? <LoadingSpinner size="small" /> : 'Sign Up'}

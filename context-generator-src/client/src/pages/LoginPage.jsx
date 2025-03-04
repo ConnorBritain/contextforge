@@ -38,8 +38,8 @@ const LoginPage = () => {
   
   return (
     <div className="login-page">
-      <div className="container">
-        <div className="auth-container">
+      <div className="container" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+        <div className="auth-container" style={{ width: '100%', maxWidth: '450px' }}>
           {showLogin ? (
             <LoginForm onSignupClick={toggleForm} />
           ) : (
