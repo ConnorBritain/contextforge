@@ -22,9 +22,9 @@ module.exports = {
     expiresIn: '7d' 
   },
   
-  // URLs
-  clientUrl: process.env.CLIENT_URL || 'https://contextgenerator.com',
-  serverUrl: process.env.SERVER_URL || 'https://api.contextgenerator.com',
+  // URLs - TODO: Update with final domain name before production deployment
+  clientUrl: process.env.CLIENT_URL || 'https://contextgenerator.com', // Needs to be updated
+  serverUrl: process.env.SERVER_URL || 'https://api.contextgenerator.com', // Needs to be updated
   
   // Logging
   logging: {
@@ -42,8 +42,8 @@ module.exports = {
   security: {
     cors: {
       allowedOrigins: [
-        'https://contextgenerator.com', 
-        'https://www.contextgenerator.com'
+        'https://contextgenerator.com', // TODO: Update with final domain before production
+        'https://www.contextgenerator.com' // TODO: Update with final domain before production
       ]
     }
   }
