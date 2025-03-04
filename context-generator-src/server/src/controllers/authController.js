@@ -1,10 +1,19 @@
-const User = require('../models/User');
 const { validationResult } = require('express-validator');
 const { 
   BadRequestError, 
   NotFoundError, 
   UnauthorizedError 
 } = require('../middleware/errorHandler');
+
+// Use mockDataService for development or User model for production
+let dataService;
+if (process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true') {
+  const User = require('../models/User');
+  dataService = User;
+} else {
+  // Use the mock data service for development without MongoDB
+  dataService = require('../services/mockDataService');
+}
 
 /**
  * Authentication controller for user registration, login, and profile management
@@ -72,29 +81,41 @@ class AuthController {
       }
 
       const { email, password } = req.body;
+      
+      let user;
+      let token = "mock-auth-token-for-development";
+      
+      if (process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true') {
+        // Production mode with MongoDB
+        // Check if user exists
+        user = await dataService.findOne({ email });
+        if (!user) {
+          throw new UnauthorizedError('Invalid credentials');
+        }
 
-      // Check if user exists
-      const user = await User.findOne({ email });
-      if (!user) {
-        throw new UnauthorizedError('Invalid credentials');
+        // Verify password
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+          throw new UnauthorizedError('Invalid credentials');
+        }
+        
+        // Generate JWT token
+        token = user.generateAuthToken();
+      } else {
+        // Development mode with mock data
+        user = await dataService.authenticate(email, password);
+        if (!user) {
+          throw new UnauthorizedError('Invalid credentials');
+        }
       }
-
-      // Verify password
-      const isMatch = await user.comparePassword(password);
-      if (!isMatch) {
-        throw new UnauthorizedError('Invalid credentials');
-      }
-
-      // Generate JWT token
-      const token = user.generateAuthToken();
 
       res.json({
         token,
         user: {
-          id: user._id,
+          id: user.id || user._id,
           name: user.name,
           email: user.email,
-          role: user.role
+          role: user.role || 'user'
         }
       });
     } catch (error) {
@@ -111,7 +132,14 @@ class AuthController {
    */
   static async getProfile(req, res, next) {
     try {
-      const user = await User.findById(req.user.id).select('-password');
+      let user;
+      
+      if (process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true') {
+        user = await dataService.findById(req.user.id).select('-password');
+      } else {
+        user = await dataService.getUserById(req.user.id);
+      }
+      
       if (!user) {
         throw new NotFoundError('User not found');
       }
@@ -138,24 +166,38 @@ class AuthController {
 
       const { name, email } = req.body;
       
-      // Find and update the user
-      const user = await User.findById(req.user.id);
-      if (!user) {
-        throw new NotFoundError('User not found');
+      let user;
+      
+      if (process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true') {
+        // Find and update the user using MongoDB
+        user = await dataService.findById(req.user.id);
+        if (!user) {
+          throw new NotFoundError('User not found');
+        }
+
+        // Update user properties
+        if (name) user.name = name;
+        if (email) user.email = email;
+
+        await user.save();
+      } else {
+        // Update user in mock service
+        const updates = {};
+        if (name) updates.name = name;
+        if (email) updates.email = email;
+        
+        user = await dataService.updateUser(req.user.id, updates);
+        if (!user) {
+          throw new NotFoundError('User not found');
+        }
       }
-
-      // Update user properties
-      if (name) user.name = name;
-      if (email) user.email = email;
-
-      await user.save();
 
       res.json({
         user: {
-          id: user._id,
+          id: user.id || user._id,
           name: user.name,
           email: user.email,
-          role: user.role
+          role: user.role || 'user'
         }
       });
     } catch (error) {

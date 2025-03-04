@@ -1,12 +1,21 @@
 const aiServiceFactory = require('../services/aiServiceFactory');
 const DocumentProcessor = require('../utils/documentProcessor');
 const DocumentExporter = require('../utils/documentExporter');
-const Document = require('../models/Document');
 const { 
   BadRequestError, 
   NotFoundError, 
   AIServiceError 
 } = require('../middleware/errorHandler');
+
+// Use mockDataService for development or Document model for production
+let dataService;
+if (process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true') {
+  const Document = require('../models/Document');
+  dataService = Document;
+} else {
+  // Use the mock data service for development without MongoDB
+  dataService = require('../services/mockDataService');
+}
 
 /**
  * Document controller for handling document generation and management
@@ -34,9 +43,9 @@ class DocumentController {
       // Process the raw response
       const processedDocument = DocumentProcessor.processResponse(response, contextType);
       
-      // If user is authenticated, save the document
-      if (req.user) {
-        const newDocument = new Document({
+      // If MongoDB is enabled, save using the Document model
+      if ((process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true') && req.user) {
+        const newDocument = new dataService({
           userId: req.user.id,
           title: processedDocument.title || `${contextType} Document`,
           type: contextType,
@@ -46,6 +55,21 @@ class DocumentController {
         
         await newDocument.save();
         processedDocument.id = newDocument._id;
+      } 
+      // If in development with mock data service, save using that
+      else if (!(process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true')) {
+        const newDocument = {
+          userId: req.user?.id || 'mock-user-1',
+          title: processedDocument.title || `${contextType} Document`,
+          type: contextType,
+          documentType: processedDocument.documentType || processedDocument.type,
+          sections: processedDocument.sections,
+          createdAt: new Date(),
+          tokensUsed: Math.floor(Math.random() * 5000) + 3000 // Random token count for mock data
+        };
+        
+        const savedDoc = await dataService.saveDocument(newDocument);
+        processedDocument.id = savedDoc.id;
       }
       
       res.json(processedDocument);
@@ -68,8 +92,16 @@ class DocumentController {
    */
   static async getUserDocuments(req, res, next) {
     try {
-      const documents = await Document.find({ userId: req.user.id })
-        .sort({ createdAt: -1 });
+      let documents;
+      
+      if (process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true') {
+        // Use MongoDB in production
+        documents = await dataService.find({ userId: req.user.id })
+          .sort({ createdAt: -1 });
+      } else {
+        // Use mock data service in development
+        documents = await dataService.getDocuments(req.user?.id || 'mock-user-1');
+      }
       
       res.json(documents);
     } catch (error) {
@@ -85,10 +117,18 @@ class DocumentController {
    */
   static async getDocumentById(req, res, next) {
     try {
-      const document = await Document.findOne({
-        _id: req.params.id,
-        userId: req.user.id
-      });
+      let document;
+      
+      if (process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true') {
+        // Use MongoDB in production
+        document = await dataService.findOne({
+          _id: req.params.id,
+          userId: req.user.id
+        });
+      } else {
+        // Use mock data service in development
+        document = await dataService.getDocumentById(req.params.id);
+      }
       
       if (!document) {
         throw new NotFoundError('Document not found', { id: req.params.id });
@@ -184,13 +224,26 @@ class DocumentController {
    */
   static async deleteDocument(req, res, next) {
     try {
-      const result = await Document.deleteOne({
-        _id: req.params.id,
-        userId: req.user.id
-      });
+      let result;
       
-      if (result.deletedCount === 0) {
-        throw new NotFoundError('Document not found or not authorized to delete', { id: req.params.id });
+      if (process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true') {
+        // Use MongoDB in production
+        result = await dataService.deleteOne({
+          _id: req.params.id,
+          userId: req.user.id
+        });
+        
+        if (result.deletedCount === 0) {
+          throw new NotFoundError('Document not found or not authorized to delete', { id: req.params.id });
+        }
+      } else {
+        // Use mock data service in development
+        try {
+          await dataService.deleteDocument(req.params.id);
+          result = { success: true };
+        } catch (error) {
+          throw new NotFoundError('Document not found or not authorized to delete', { id: req.params.id });
+        }
       }
       
       res.json({ message: 'Document deleted successfully' });

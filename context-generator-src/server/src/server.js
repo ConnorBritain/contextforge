@@ -46,12 +46,19 @@ const mongoOptions = {
   socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
 };
 
-mongoose.connect(config.mongodb.uri, mongoOptions)
-  .then(() => console.log('MongoDB connected successfully'))
-  .catch(err => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
-  });
+// Only attempt MongoDB connection in production or if MONGODB_REQUIRED is set
+if (process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true') {
+  mongoose.connect(config.mongodb.uri, mongoOptions)
+    .then(() => console.log('MongoDB connected successfully'))
+    .catch(err => {
+      console.error('MongoDB connection error:', err);
+      process.exit(1);
+    });
+} else {
+  console.log('MongoDB connection skipped in development mode.');
+  console.log('Note: Document saving and user authentication features will be unavailable.');
+  console.log('To enable MongoDB, set MONGODB_REQUIRED=true or install MongoDB locally.');
+}
 
 // Health check routes (must be before auth middleware)
 app.use('/api/health', healthRoutes);
