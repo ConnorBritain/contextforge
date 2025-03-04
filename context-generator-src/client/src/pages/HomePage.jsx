@@ -27,19 +27,19 @@ const HomePage = () => {
         
         <div className="feature-cards">
           <div className="feature-card">
-            <div className="feature-icon">=e</div>
+            <div className="feature-icon">ğŸ“Š</div>
             <h3>Target Market Audience Profile</h3>
             <p>Comprehensive analysis of your ideal customer segments, including demographics, psychographics, behaviors, and needs.</p>
           </div>
           
           <div className="feature-card">
-            <div className="feature-icon">=Ê</div>
+            <div className="feature-icon">ğŸ“ˆ</div>
             <h3>Business Dimensional Profile</h3>
             <p>Detailed business strategy document covering market analysis, offerings, business model, operations, and growth projections.</p>
           </div>
           
           <div className="feature-card">
-            <div className="feature-icon"><¨</div>
+            <div className="feature-icon">ğŸ“</div>
             <h3>AI Style Guide</h3>
             <p>Comprehensive guide for ensuring consistent AI communications that align with your brand voice, audience, and business objectives.</p>
           </div>

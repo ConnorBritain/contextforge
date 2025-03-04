@@ -20,9 +20,9 @@ const DOCUMENT_TYPE_NAMES = {
  * Icons for document types (can be replaced with actual icon components)
  */
 const DOCUMENT_TYPE_ICONS = {
-  [DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE]: '=e',
-  [DOCUMENT_TYPES.BUSINESS_PROFILE]: '<â',
-  [DOCUMENT_TYPES.STYLE_GUIDE]: '=Ý'
+  [DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE]: 'ðŸ“Š',
+  [DOCUMENT_TYPES.BUSINESS_PROFILE]: 'ðŸ“ˆ',
+  [DOCUMENT_TYPES.STYLE_GUIDE]: 'ðŸ“'
 };
 
 /**
