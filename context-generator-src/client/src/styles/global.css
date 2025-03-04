@@ -211,8 +211,8 @@ button {
 }
 
 .primary-button, .next-button, .generate-button {
-  background-color: var(--color-orange-accent);
-  color: var(--color-white);
+  background: linear-gradient(90deg, hsla(18, 100%, 78%, 1) 0%, hsla(280, 90%, 92%, 1) 100%);
+  color: var(--color-black);
   border: none;
   border-radius: var(--border-radius);
   padding: 0.75rem 1.5rem;
@@ -222,14 +222,14 @@ button {
 }
 
 .primary-button:hover, .next-button:hover, .generate-button:hover {
-  background-color: var(--color-purple-accent);
+  background: linear-gradient(90deg, hsla(280, 90%, 92%, 1) 0%, hsla(18, 100%, 78%, 1) 100%);
   color: var(--color-black);
 }
 
 .secondary-button, .back-button {
   background-color: transparent;
-  color: var(--color-purple-accent);
-  border: 1px solid var(--color-purple-accent);
+  color: var(--color-white);
+  border: 1px solid hsla(280, 90%, 92%, 1);
   border-radius: var(--border-radius);
   padding: 0.75rem 1.5rem;
   font-weight: var(--font-weight-medium);
@@ -238,8 +238,9 @@ button {
 }
 
 .secondary-button:hover, .back-button:hover {
-  background-color: var(--color-purple-accent);
+  background: linear-gradient(90deg, hsla(280, 90%, 92%, 1) 0%, hsla(189, 75%, 75%, 1) 100%);
   color: var(--color-black);
+  border-color: transparent;
 }
 
 button:disabled {
@@ -492,7 +493,7 @@ button:disabled {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(to right, var(--color-orange-accent), var(--color-purple-accent));
+  background: linear-gradient(90deg, hsla(18, 100%, 78%, 1) 0%, hsla(280, 90%, 92%, 1) 100%);
 }
 
 .feature-card:hover {
@@ -520,8 +521,8 @@ button:disabled {
 }
 
 .step-number {
-  background-color: var(--color-orange-accent);
-  color: var(--color-white);
+  background: linear-gradient(90deg, hsla(18, 100%, 78%, 1) 0%, hsla(280, 90%, 92%, 1) 100%);
+  color: var(--color-black);
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -782,7 +783,7 @@ label {
 }
 
 .bg-gradient {
-  background: linear-gradient(to right, var(--color-orange-accent), var(--color-purple-accent), var(--color-white)) !important;
+  background: linear-gradient(90deg, hsla(18, 100%, 78%, 1) 0%, hsla(280, 90%, 92%, 1) 100%) !important;
 }
 
 /* Responsive Design */
@@ -884,7 +885,7 @@ label {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(to right, var(--color-orange-accent), var(--color-purple-accent));
+  background: linear-gradient(90deg, hsla(18, 100%, 78%, 1) 0%, hsla(280, 90%, 92%, 1) 100%);
 }
 
 .document-type:nth-child(3n+2)::before {
@@ -894,7 +895,7 @@ label {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(to right, var(--color-tertiary-blue), var(--color-tertiary-mint));
+  background: linear-gradient(90deg, hsla(280, 90%, 92%, 1) 0%, hsla(189, 75%, 75%, 1) 100%);
 }
 
 .document-type:nth-child(3n+3)::before {
@@ -904,7 +905,7 @@ label {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(to right, var(--color-tertiary-mint), var(--color-tertiary-green));
+  background: linear-gradient(90deg, hsla(189, 75%, 75%, 1) 0%, hsla(153, 67%, 82%, 1) 100%);
 }
 
 .document-type h3 {
@@ -932,7 +933,7 @@ label {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(to right, var(--color-orange-accent), var(--color-purple-accent));
+  background: linear-gradient(90deg, hsla(18, 100%, 78%, 1) 0%, hsla(280, 90%, 92%, 1) 100%);
 }
 
 .benefit-card:nth-child(3n+2)::before {
@@ -942,7 +943,7 @@ label {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(to right, var(--color-tertiary-blue), var(--color-tertiary-mint));
+  background: linear-gradient(90deg, hsla(280, 90%, 92%, 1) 0%, hsla(189, 75%, 75%, 1) 100%);
 }
 
 .benefit-card:nth-child(3n+3)::before {
@@ -952,7 +953,7 @@ label {
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(to right, var(--color-tertiary-mint), var(--color-tertiary-green));
+  background: linear-gradient(90deg, hsla(189, 75%, 75%, 1) 0%, hsla(153, 67%, 82%, 1) 100%);
 }
 
 .benefit-card:hover {
