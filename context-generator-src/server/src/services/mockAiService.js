@@ -1,6 +1,7 @@
 const businessProfilePrompts = require('../prompts/businessProfilePrompts');
 const marketAudiencePrompts = require('../prompts/marketAudiencePrompts');
 const styleGuidePrompts = require('../prompts/styleGuidePrompts');
+const personalBioPrompts = require('../prompts/personalBioPrompts');
 
 /**
  * Mock AI service for development and testing
@@ -25,6 +26,8 @@ class MockAiService {
         return this._generateBusinessProfile(formData);
       case 'styleGuide':
         return this._generateStyleGuide(formData);
+      case 'personalBio':
+        return this._generatePersonalBio(formData);
       default:
         throw new Error(`Unknown context type: ${contextType}`);
     }
@@ -1459,6 +1462,147 @@ The design emphasizes intuitive interaction while providing powerful customizati
 
 This AI Style Guide establishes clear direction for all systems representing ${formData.businessName}, ensuring communications consistently reflect our distinctive voice while adapting appropriately to context. Following these guidelines creates coherent brand experiences that build trust, demonstrate expertise, and reinforce our unique market position.`;
   }
-}
+  
+  /**
+   * Generate mock personal bio document
+   * @param {Object} formData - User form data
+   * @returns {string} - Mock document content
+   */
+  _generatePersonalBio(formData) {
+    // Access the prompts to understand expected structure
+    const systemPrompt = personalBioPrompts.PERSONAL_BIO_SYSTEM_PROMPT;
+    
+    const fullName = formData.fullName || "Jane Doe";
+    const industry = formData.industryRole || "Technology";
+    
+    return `# Personal Bio Document: ${fullName}
+
+## 1. Personal Overview
+
+${fullName} is an experienced professional in the ${industry} sector with a proven track record of delivering results and driving innovation. Leveraging a unique combination of technical expertise and strategic vision, they have consistently demonstrated the ability to navigate complex challenges while maintaining a focus on measurable outcomes and sustainable growth.
+
+### Background & Experience
+- **Current Role:** ${formData.industryRole || "Senior Consultant"}
+- **Location:** ${formData.location || "San Francisco, CA"}
+- **Years of Experience:** ${formData.yearsExperience || "12+"} 
+- **Pronouns:** ${formData.pronouns || "They/Them"}
+
+### Expertise & Specialization
+${formData.expertise || "Core areas of expertise include strategic planning, process optimization, and cross-functional team leadership. Technical proficiencies encompass data analytics, system architecture, and implementation methodologies that bridge theoretical frameworks with practical applications."}
+
+### Education & Credentials
+${formData.education || "MBA with specialization in Technology Management, Certified Project Management Professional (PMP), and several industry-specific certifications that validate technical proficiency and domain knowledge."}
+
+## 2. Mission & Vision
+
+### Professional Purpose
+${formData.professionalDrive || "Driven by a commitment to creating meaningful impact through innovative solutions that address fundamental challenges. Motivated by opportunities to transform complex problems into streamlined systems that deliver measurable value while empowering teams to achieve their highest potential."}
+
+### Impact Objectives
+${formData.desiredImpact || "Focused on creating sustainable transformation that extends beyond immediate objectives to establish new capabilities and perspectives. Aims to leave organizations and teams better equipped to navigate future challenges through enhanced processes, strategic clarity, and collaborative frameworks."}
+
+### Long-term Vision
+${formData.longTermVision || "Building toward a future where technological advancement and human potential converge to create more effective, equitable, and purposeful systems. Envisions a career trajectory that balances deepening expertise with broadening influence across increasingly complex domains."}
+
+## 3. Professional Experience & Achievements
+
+### Career Trajectory
+${formData.careerSummary || "Began in technical implementation roles before progressing to strategic advisory positions with increasing scope and impact. Has successfully navigated multiple industry transitions and organizational transformations, consistently applying core principles while adapting methodologies to specific contexts."}
+
+### Key Projects & Initiatives
+${formData.notableProjects || "• Led cross-functional team that delivered enterprise-wide digital transformation initiative 20% under budget\n• Designed and implemented customer experience framework that increased retention by 35%\n• Developed strategic roadmap that guided organization through significant market disruption while maintaining growth trajectory"}
+
+### Recognition & Accomplishments
+${formData.awards || "• Industry award for innovation in process methodology\n• Published author of articles on strategic implementation frameworks\n• Regular speaker at industry conferences on transformation leadership\n• Patent holder for system architecture optimization methodology"}
+
+## 4. Skills & Expertise
+
+### Technical Capabilities
+${formData.technicalSkills || "• Advanced data analysis and pattern recognition\n• Systems thinking and architectural design\n• Implementation methodology development\n• Process optimization and workflow engineering\n• Technology stack integration and optimization"}
+
+### Leadership Competencies
+${formData.leadershipSkills || "• Strategic vision development and articulation\n• Cross-functional team leadership\n• Change management and organizational alignment\n• Stakeholder relationship management\n• Resource allocation and prioritization"}
+
+### Communication Strengths
+${formData.communicationStrengths || "• Translating complex concepts for diverse audiences\n• Facilitating productive discussions among disparate perspectives\n• Creating compelling narratives that drive action\n• Active listening and insight extraction\n• Precise and impactful documentation"}
+
+## 5. Personal Brand & Voice
+
+### Professional Voice Characteristics
+${formData.professionalVoice || "Communication style balances analytical precision with accessible explanations, emphasizing clarity and purpose. Presents information in structured frameworks that highlight key insights while maintaining necessary detail and nuance."}
+
+### Tone & Delivery Preferences
+${formData.preferredTone || "Typically adopts a measured, thoughtful tone that conveys confidence without arrogance. Adapts delivery based on context—more direct and concise in operational settings, more exploratory and nuanced in strategic discussions."}
+
+### Recurring Themes & Messages
+${formData.keyMessaging || "• Integration of theory and practice for sustainable results\n• Systematic approaches that accommodate complexity\n• Human factors as essential components of technical success\n• Measurable outcomes as validation of strategic choices\n• Continuous learning as a driver of long-term excellence"}
+
+## 6. Core Values & Ethical Principles
+
+### Guiding Values
+${formData.coreValues || "• Integrity: Unwavering commitment to honesty and ethical conduct\n• Excellence: Pursuing the highest standards in all endeavors\n• Collaboration: Valuing diverse perspectives and collective wisdom\n• Innovation: Challenging assumptions and exploring new possibilities\n• Responsibility: Accepting accountability for actions and outcomes"}
+
+### Ethical Considerations
+${formData.ethicalConsiderations || "Particularly attentive to data privacy implications, equitable access to technology benefits, and the long-term societal impact of technological implementation. Advocates for transparent decision-making processes and thoughtful consideration of unintended consequences."}
+
+## 7. Target Audience & Influence
+
+### Primary Stakeholders
+${formData.primaryAudience || "• Executive leadership seeking strategic transformation\n• Cross-functional teams implementing complex initiatives\n• Technical specialists requiring strategic context\n• External partners and clients navigating change\n• Industry peers exploring methodological innovation"}
+
+### Audience Challenges
+${formData.audienceChallenges || "• Navigating increasing complexity and interconnection\n• Balancing immediate demands with long-term objectives\n• Aligning diverse perspectives around common goals\n• Translating strategic vision into executable plans\n• Demonstrating measurable value from transformative initiatives"}
+
+### Communication Channels
+${formData.contentPlatforms || "• Professional speaking engagements\n• Industry publication contributions\n• Selective social media presence\n• Direct advisory relationships\n• Professional community leadership"}
+
+## 8. Work & Productivity Preferences
+
+### Work Structure
+${formData.workPreferences || "Performs best in an environment that balances focused deep work with collaborative engagement. Prefers organizing work around outcomes rather than activities, with flexibility to adjust approaches based on emerging insights and changing conditions."}
+
+### Productivity Systems
+${formData.productivityTools || "• Strategic planning frameworks for initiative development\n• Project management systems for execution tracking\n• Knowledge management tools for insight capture\n• Collaborative platforms for team coordination\n• Analytic tools for data-driven decision making"}
+
+### Interaction Preferences
+${formData.communicationPreferences || "Values clear, purposeful communication with appropriate context. Prefers structured meetings with defined objectives, comprehensive but concise documentation, and communication channels matched to message complexity and urgency."}
+
+## 9. Learning & Knowledge Management
+
+### Learning Approach
+${formData.learningPreferences || "Embraces a multi-faceted learning style that combines theoretical frameworks with practical application. Actively seeks diverse perspectives through cross-disciplinary exploration while maintaining depth in core domains. Regularly applies new concepts in controlled environments to validate understanding."}
+
+### Influence Sources
+${formData.thoughtLeaders || "Draws inspiration and insight from thought leaders across multiple disciplines, particularly those bridging theoretical foundations with practical applications. Values perspectives that challenge conventional thinking while maintaining rigorous analytical standards."}
+
+## 10. Personal Interests & Lifestyle
+
+### Non-Professional Pursuits
+${formData.hobbies || "• Active participant in mentorship programs for early-career professionals\n• Supporter of educational initiatives promoting technological literacy\n• Enthusiast of architectural design and urban planning\n• Practitioner of mindfulness and contemplative disciplines\n• Avid explorer of wilderness environments"}
+
+### Personal Wellness Approach
+${formData.travelWellness || "Maintains balance through regular physical activity, mindfulness practices, and deliberate disconnection from technology. Approaches travel as an opportunity for perspective-shifting and renewal, with particular appreciation for experiences that combine cultural immersion with natural environments."}
+
+## 11. Future Goals & Aspirations
+
+### Near-Term Objectives
+${formData.shortTermGoals || "• Deepen expertise in emerging methodologies for complex system transformation\n• Expand influence through strategic advisory relationships\n• Contribute to industry dialogue through publication and speaking\n• Develop framework for measuring transformation effectiveness\n• Build selective collaborative partnerships with complementary experts"}
+
+### Long-Term Direction
+${formData.longTermGoals || "• Establish recognized methodological approach for sustainable transformation\n• Create platform for disseminating proven implementation frameworks\n• Build community of practitioners advancing the discipline\n• Influence industry standards for measurement and validation\n• Mentor next generation of transformation leaders"}
+
+### Legacy Aspiration
+${formData.legacyGoal || "To be remembered as someone who fundamentally advanced how organizations approach complex change, creating methodologies that consistently deliver measurable value while respecting and enhancing human potential. To leave behind not just tools and frameworks but a mindset that balances analytical rigor with human understanding."}
+
+## 12. AI Calibration Guidance
+
+### Content & Topic Preferences
+${formData.aiTopics || "• Emphasize: Evidence-based approaches, practical applications, systematic methodologies\n• Appropriate balance: Strategic concepts and tactical implementation\n• Avoid: Oversimplification of complex topics, generic business jargon, technology-centered rather than purpose-centered framing"}
+
+### Communication Format Preferences
+${formData.responseFormats || "• Structured frameworks with clear organizing principles\n• Balanced visual and textual information\n• Explicit connection between concepts and applications\n• Appropriate technical depth based on context\n• Clear delineation between established fact and speculative projection"}
+
+This Personal Bio Document serves as a comprehensive reference for AI systems to understand professional background, expertise, communication preferences, and objectives. It should be used to calibrate AI interactions to align with the individual's unique attributes and requirements.`;
+  }
 
 module.exports = MockAiService;

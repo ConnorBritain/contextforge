@@ -6,6 +6,7 @@ import DocumentTypeSelector from '../components/forms/DocumentTypeSelector';
 import BusinessProfileForm from '../components/forms/BusinessProfileForm';
 import TargetMarketAudienceForm from '../components/forms/TargetMarketAudienceForm';
 import StyleGuideForm from '../components/forms/StyleGuideForm';
+import PersonalBioForm from '../components/forms/PersonalBioForm';
 import ReviewForm from '../components/forms/ReviewForm';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
@@ -120,6 +121,14 @@ const FormWizardPage = () => {
               onBack={handleBack}
             />
           );
+        case DOCUMENT_TYPES.PERSONAL_BIO:
+          return (
+            <PersonalBioForm 
+              initialData={formData}
+              onSubmit={handleNext}
+              onBack={handleBack}
+            />
+          );
         default:
           return <div>Please select a document type first</div>;
       }
@@ -143,6 +152,7 @@ const FormWizardPage = () => {
                 {documentType === DOCUMENT_TYPES.BUSINESS_PROFILE && 'Business Profile'}
                 {documentType === DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE && 'Audience Profile'}
                 {documentType === DOCUMENT_TYPES.STYLE_GUIDE && 'Style Guide'}
+                {documentType === DOCUMENT_TYPES.PERSONAL_BIO && 'Personal Bio'}
                 {!documentType && 'Document Details'}
               </div>
             </div>

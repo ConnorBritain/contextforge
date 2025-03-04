@@ -4,7 +4,8 @@
 const DOCUMENT_TYPES = {
   TARGET_MARKET_AUDIENCE: 'targetMarketAudience',
   BUSINESS_PROFILE: 'businessProfile',
-  STYLE_GUIDE: 'styleGuide'
+  STYLE_GUIDE: 'styleGuide',
+  PERSONAL_BIO: 'personalBio'
 };
 
 /**
@@ -13,7 +14,8 @@ const DOCUMENT_TYPES = {
 const DOCUMENT_TYPE_NAMES = {
   [DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE]: 'Target Market Audience Profile',
   [DOCUMENT_TYPES.BUSINESS_PROFILE]: 'Business Dimensional Profile',
-  [DOCUMENT_TYPES.STYLE_GUIDE]: 'AI Style Guide'
+  [DOCUMENT_TYPES.STYLE_GUIDE]: 'AI Style Guide',
+  [DOCUMENT_TYPES.PERSONAL_BIO]: 'Personal Bio Document'
 };
 
 /**
@@ -22,7 +24,8 @@ const DOCUMENT_TYPE_NAMES = {
 const DOCUMENT_TYPE_ICONS = {
   [DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE]: '📊',
   [DOCUMENT_TYPES.BUSINESS_PROFILE]: '📈',
-  [DOCUMENT_TYPES.STYLE_GUIDE]: '📝'
+  [DOCUMENT_TYPES.STYLE_GUIDE]: '📝',
+  [DOCUMENT_TYPES.PERSONAL_BIO]: '👤'
 };
 
 /**
@@ -31,7 +34,8 @@ const DOCUMENT_TYPE_ICONS = {
 const DOCUMENT_TYPE_DESCRIPTIONS = {
   [DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE]: 'Comprehensive analysis of your ideal customer segments for semantically calibrating AI systems to accurately understand and target your specific audience demographics, psychographics, behaviors, and needs.',
   [DOCUMENT_TYPES.BUSINESS_PROFILE]: 'Detailed business context document that enables AI systems to generate outputs precisely aligned with your unique business model, market position, offerings, and strategic objectives.',
-  [DOCUMENT_TYPES.STYLE_GUIDE]: 'Advanced AI calibration document for consistently aligning AI-generated content with your brand voice, terminology preferences, and communication standards across all platforms.'
+  [DOCUMENT_TYPES.STYLE_GUIDE]: 'Advanced AI calibration document for consistently aligning AI-generated content with your brand voice, terminology preferences, and communication standards across all platforms.',
+  [DOCUMENT_TYPES.PERSONAL_BIO]: 'Comprehensive personal profile that helps AI systems understand your professional background, expertise, communication style, and preferences to generate more personalized and contextually relevant outputs.'
 };
 
 /**
@@ -40,7 +44,8 @@ const DOCUMENT_TYPE_DESCRIPTIONS = {
 const DOCUMENT_TYPE_RECOMMENDED_FOR = {
   [DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE]: 'Marketing teams working with AI, digital marketers using LLMs, customer insight specialists',
   [DOCUMENT_TYPES.BUSINESS_PROFILE]: 'AI implementation teams, business strategists leveraging AI tools, consultants optimizing AI workflows',
-  [DOCUMENT_TYPES.STYLE_GUIDE]: 'Content teams using generative AI, brand managers implementing AI assistants, AI prompt engineers'
+  [DOCUMENT_TYPES.STYLE_GUIDE]: 'Content teams using generative AI, brand managers implementing AI assistants, AI prompt engineers',
+  [DOCUMENT_TYPES.PERSONAL_BIO]: 'Professionals using AI assistants, freelancers leveraging AI tools, executives with AI support, content creators working with LLMs'
 };
 
 module.exports = {
