@@ -84,6 +84,18 @@ const AboutPage = () => {
           </ul>
           <p>This document ensures that all AI-generated content maintains consistent brand standards and communication style, regardless of who's prompting the AI system.</p>
         </div>
+
+        <div className="document-type">
+          <h3>👤 Personal Bio Document</h3>
+          <p>A comprehensive personal profile that helps AI systems understand your unique professional identity:</p>
+          <ul>
+            <li>Professional background, experience, and expertise areas</li>
+            <li>Communication style, voice preferences, and personal brand</li>
+            <li>Goals, values, and priorities that influence your work</li>
+            <li>Learning preferences and decision-making approaches</li>
+          </ul>
+          <p>This document enables AI systems to provide highly personalized responses that align with your individual preferences, professional expertise, and communication style, creating a more tailored experience.</p>
+        </div>
       </div>
 
       <div className="about-section">
