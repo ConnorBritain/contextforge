@@ -9,10 +9,12 @@ ENV NODE_ENV=production
 
 # -------- DEPENDENCIES STAGE --------
 FROM base AS dependencies
-# Copy package.json file
+# Copy package.json files
 COPY package.json ./
-# Install dependencies for both client and server
-RUN npm install
+COPY package-lock.json ./
+# Install dependencies with increased network timeout and without audit
+RUN npm config set registry https://registry.npmjs.org/
+RUN npm install --no-audit --no-fund --prefer-offline --network-timeout 300000
 # Explicitly install security-related dependencies to ensure they're available
 RUN npm install --no-save helmet express-rate-limit express-mongo-sanitize xss-clean morgan
 
@@ -22,10 +24,12 @@ FROM base AS build
 COPY --from=dependencies /app/node_modules ./node_modules
 # Copy application code
 COPY . .
-# Skip client build as there's no build script in package.json
-# We'll use a static placeholder instead
+# Install client dependencies and create build directory
 WORKDIR /app/client
 RUN mkdir -p build
+COPY client/package.json client/package-lock.json ./
+RUN npm install --no-audit --no-fund --prefer-offline --network-timeout 300000
+WORKDIR /app
 
 # -------- PRODUCTION STAGE --------
 FROM base AS production

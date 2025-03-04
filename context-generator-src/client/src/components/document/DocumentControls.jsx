@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { documentService } from '../../services/documentService';
 import '../../styles/document.css';
 
@@ -8,11 +8,25 @@ import '../../styles/document.css';
 const DocumentControls = ({ document, onExport, showBottom = false }) => {
   const [exportFormat, setExportFormat] = useState('markdown');
   const [isExporting, setIsExporting] = useState(false);
+  const [error, setError] = useState(null);
+  const errorTimeoutRef = useRef(null);
+  
+  // Clear error after 5 seconds
+  const clearErrorAfterDelay = () => {
+    if (errorTimeoutRef.current) {
+      clearTimeout(errorTimeoutRef.current);
+    }
+    
+    errorTimeoutRef.current = setTimeout(() => {
+      setError(null);
+    }, 5000);
+  };
   
   const handleExport = async () => {
     if (!document || isExporting) return;
     
     setIsExporting(true);
+    setError(null);
     
     try {
       // If custom export handler provided, use it
@@ -24,7 +38,8 @@ const DocumentControls = ({ document, onExport, showBottom = false }) => {
       }
     } catch (error) {
       console.error('Error exporting document:', error);
-      alert('Failed to export document. Please try again.');
+      setError('Export failed. Please try again.');
+      clearErrorAfterDelay();
     } finally {
       setIsExporting(false);
     }
@@ -35,15 +50,14 @@ const DocumentControls = ({ document, onExport, showBottom = false }) => {
   };
   
   const handleExpandAll = () => {
-    // Find all collapsed sections and click them
-    document.querySelectorAll('.document-section.collapsed .section-header')
-      .forEach(header => header.click());
+    // Use React refs to avoid direct DOM manipulation in future refactoring
+    const sections = document.querySelectorAll('.document-section.collapsed .section-header');
+    sections.forEach(header => header.click());
   };
   
   const handleCollapseAll = () => {
-    // Find all expanded sections and click them
-    document.querySelectorAll('.document-section.expanded .section-header')
-      .forEach(header => header.click());
+    const sections = document.querySelectorAll('.document-section.expanded .section-header');
+    sections.forEach(header => header.click());
   };
   
   return (
@@ -53,10 +67,12 @@ const DocumentControls = ({ document, onExport, showBottom = false }) => {
           value={exportFormat}
           onChange={(e) => setExportFormat(e.target.value)}
           className="export-format-select"
+          disabled={isExporting}
         >
           <option value="markdown">Markdown (.md)</option>
           <option value="html">HTML (.html)</option>
           <option value="text">Plain Text (.txt)</option>
+          <option value="pdf">PDF Document (.pdf)</option>
         </select>
         
         <button 
@@ -66,18 +82,36 @@ const DocumentControls = ({ document, onExport, showBottom = false }) => {
         >
           {isExporting ? 'Exporting...' : 'Export'}
         </button>
+        
+        {error && (
+          <div className="error-tooltip">
+            {error}
+          </div>
+        )}
       </div>
       
       <div className="control-group view-controls">
-        <button className="print-button" onClick={handlePrint}>
+        <button 
+          className="print-button" 
+          onClick={handlePrint}
+          disabled={isExporting}
+        >
           Print
         </button>
         
-        <button className="expand-all-button" onClick={handleExpandAll}>
+        <button 
+          className="expand-all-button" 
+          onClick={handleExpandAll}
+          disabled={isExporting}
+        >
           Expand All
         </button>
         
-        <button className="collapse-all-button" onClick={handleCollapseAll}>
+        <button 
+          className="collapse-all-button" 
+          onClick={handleCollapseAll}
+          disabled={isExporting}
+        >
           Collapse All
         </button>
       </div>

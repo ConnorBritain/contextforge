@@ -1,72 +1,192 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { markdownToHtml } from '../../utils/documentFormatter';
 import '../../styles/document.css';
 
 /**
- * Component for previewing a document section
+ * Component for previewing and editing a document section
  */
-const SectionPreview = ({ section, index }) => {
+const SectionPreview = ({ 
+  section, 
+  index, 
+  onSectionUpdate = null,
+  onMoveSection = null,
+  isFirst = false,
+  isLast = false
+}) => {
   const [expanded, setExpanded] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState('');
+  const [editTitle, setEditTitle] = useState('');
+  const textareaRef = useRef(null);
   
-  // Convert markdown syntax in content to HTML
-  const formatContent = (content) => {
-    if (!content) return '';
-    
-    // Replace markdown with HTML
-    return content
-      // Format headings
-      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+  // Initialize edit content when entering edit mode
+  useEffect(() => {
+    if (isEditing) {
+      setEditContent(section.content || '');
+      setEditTitle(section.title || '');
       
-      // Format bold and italic
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      
-      // Format unordered lists
-      .replace(/^- (.+)$/gm, '<li>$1</li>')
-      .replace(/(<li>.+<\/li>\n)+/g, (match) => {
-        return `<ul>${match}</ul>`;
-      })
-      
-      // Format ordered lists
-      .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
-      .replace(/(<li>.+<\/li>\n)+/g, (match) => {
-        return match.includes('" ') || match.includes('- ') 
-          ? match 
-          : `<ol>${match}</ol>`;
-      })
-      
-      // Format paragraphs
-      .replace(/^(?!<h|<ul|<ol|<li)(.+)$/gm, '<p>$1</p>')
-      
-      // Handle line breaks
-      .replace(/\n\n/g, '<br/><br/>');
+      // Focus and set cursor at end of textarea
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        textareaRef.current.setSelectionRange(
+          editContent.length,
+          editContent.length
+        );
+      }
+    }
+  }, [isEditing, section]);
+  
+  // Handle toggling edit mode
+  const toggleEditMode = (e) => {
+    e.stopPropagation(); // Prevent toggling expansion
+    if (isEditing) {
+      // If exiting edit mode without saving, reset to original content
+      setIsEditing(false);
+    } else {
+      setIsEditing(true);
+    }
   };
   
+  // Handle saving edits
+  const handleSaveEdit = (e) => {
+    e.stopPropagation(); // Prevent toggling expansion
+    
+    if (onSectionUpdate) {
+      onSectionUpdate({
+        ...section,
+        title: editTitle,
+        content: editContent
+      }, index);
+    }
+    
+    setIsEditing(false);
+  };
+  
+  // Auto-resize textarea as content grows
+  const handleTextareaChange = (e) => {
+    setEditContent(e.target.value);
+    
+    // Auto-resize
+    e.target.style.height = 'auto';
+    e.target.style.height = `${e.target.scrollHeight}px`;
+  };
+  
+  // Render HTML content from markdown
   const renderContent = () => {
-    const formattedContent = formatContent(section.content);
-    return { __html: formattedContent };
+    return { __html: markdownToHtml(section.content) };
   };
   
   // Determine the heading level based on section.level (default to h2)
   const HeadingTag = `h${Math.min(Math.max(section.level || 2, 1), 6)}`;
   
   return (
-    <div className={`document-section ${expanded ? 'expanded' : 'collapsed'}`} id={section.id || `section-${index}`}>
-      <div 
-        className="section-header" 
-        onClick={() => setExpanded(!expanded)}
-      >
-        <HeadingTag className="section-title">
-          {section.title}
-        </HeadingTag>
-        <button className="toggle-section">
-          {expanded ? '¼' : 'º'}
-        </button>
+    <div className={`document-section ${expanded ? 'expanded' : 'collapsed'} ${isEditing ? 'editing' : ''}`} id={section.id || `section-${index}`}>
+      <div className="section-header">
+        <div 
+          className="section-header-title"
+          onClick={() => !isEditing && setExpanded(!expanded)}
+        >
+          {isEditing ? (
+            <input
+              type="text"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              className="section-title-input"
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <HeadingTag className="section-title">
+              {section.title}
+            </HeadingTag>
+          )}
+        </div>
+        
+        <div className="section-controls">
+          {/* Edit controls */}
+          {onSectionUpdate && !isEditing && (
+            <button 
+              className="edit-section"
+              onClick={toggleEditMode}
+              title="Edit section"
+            >
+              Edit
+            </button>
+          )}
+          
+          {/* Save/Cancel controls */}
+          {isEditing && (
+            <>
+              <button 
+                className="save-edit"
+                onClick={handleSaveEdit}
+                title="Save changes"
+              >
+                Save
+              </button>
+              <button 
+                className="cancel-edit"
+                onClick={toggleEditMode}
+                title="Cancel editing"
+              >
+                Cancel
+              </button>
+            </>
+          )}
+          
+          {/* Move controls */}
+          {onMoveSection && !isEditing && (
+            <div className="move-controls">
+              <button 
+                className="move-up"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMoveSection(index, 'up');
+                }}
+                disabled={isFirst}
+                title="Move section up"
+              >
+                â†‘
+              </button>
+              <button 
+                className="move-down"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMoveSection(index, 'down');
+                }}
+                disabled={isLast}
+                title="Move section down"
+              >
+                â†“
+              </button>
+            </div>
+          )}
+          
+          {/* Expand/collapse control */}
+          <button 
+            className="toggle-section"
+            onClick={() => !isEditing && setExpanded(!expanded)}
+            title={expanded ? "Collapse section" : "Expand section"}
+          >
+            {expanded ? 'âˆ’' : '+'}
+          </button>
+        </div>
       </div>
       
       {expanded && (
-        <div className="section-content" dangerouslySetInnerHTML={renderContent()} />
+        <div className="section-content">
+          {isEditing ? (
+            <textarea
+              ref={textareaRef}
+              value={editContent}
+              onChange={handleTextareaChange}
+              className="section-editor"
+              rows={10}
+              placeholder="Enter section content using Markdown formatting..."
+            />
+          ) : (
+            <div dangerouslySetInnerHTML={renderContent()} />
+          )}
+        </div>
       )}
     </div>
   );
