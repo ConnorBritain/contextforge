@@ -37,13 +37,14 @@ module.exports = function() {
     }
   });
 
-  // Configure Google Strategy
-  passport.use(new GoogleStrategy({
-    clientID: config.auth.google.clientID,
-    clientSecret: config.auth.google.clientSecret,
-    callbackURL: `${config.serverUrl}${config.auth.google.callbackURL}`,
-    scope: ['profile', 'email']
-  }, async (accessToken, refreshToken, profile, done) => {
+  // Only configure Google Strategy if client ID is provided
+  if (config.auth.google.clientID) {
+    passport.use(new GoogleStrategy({
+      clientID: config.auth.google.clientID,
+      clientSecret: config.auth.google.clientSecret,
+      callbackURL: `${config.serverUrl}${config.auth.google.callbackURL}`,
+      scope: ['profile', 'email']
+    }, async (accessToken, refreshToken, profile, done) => {
     try {
       // Check if user exists with this Google ID
       let user;
@@ -106,4 +107,7 @@ module.exports = function() {
       return done(err, null);
     }
   }));
+  } else {
+    console.log('Google OAuth not configured - skipping Google strategy setup');
+  }
 };

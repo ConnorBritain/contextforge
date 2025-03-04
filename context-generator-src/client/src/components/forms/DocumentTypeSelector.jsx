@@ -1,4 +1,5 @@
 import React from 'react';
+import { DOCUMENT_TYPES, DOCUMENT_TYPE_NAMES, DOCUMENT_TYPE_ICONS, DOCUMENT_TYPE_DESCRIPTIONS, DOCUMENT_TYPE_RECOMMENDED_FOR } from '../../constants/documentTypes';
 import '../../styles/forms.css';
 
 /**
@@ -7,25 +8,25 @@ import '../../styles/forms.css';
 const DocumentTypeSelector = ({ selectedType, onSelectType, onNext }) => {
   const documentTypes = [
     {
-      id: 'businessProfile',
-      title: 'Business Dimensional Profile',
-      description: 'A detailed business context document that enables AI systems to generate outputs precisely aligned with your unique business model, market position, offerings, and strategic objectives.',
-      icon: '📈',
-      recommendedFor: 'AI implementation teams, business strategists leveraging AI tools, consultants optimizing AI workflows'
+      id: DOCUMENT_TYPES.BUSINESS_PROFILE,
+      title: DOCUMENT_TYPE_NAMES[DOCUMENT_TYPES.BUSINESS_PROFILE],
+      description: DOCUMENT_TYPE_DESCRIPTIONS[DOCUMENT_TYPES.BUSINESS_PROFILE],
+      icon: DOCUMENT_TYPE_ICONS[DOCUMENT_TYPES.BUSINESS_PROFILE],
+      recommendedFor: DOCUMENT_TYPE_RECOMMENDED_FOR[DOCUMENT_TYPES.BUSINESS_PROFILE]
     },
     {
-      id: 'targetMarketAudience',
-      title: 'Target Market Audience Profile',
-      description: 'A comprehensive analysis of your ideal customer segments for semantically calibrating AI systems to accurately understand and target your specific audience demographics, psychographics, behaviors, and needs.',
-      icon: '📊',
-      recommendedFor: 'Marketing teams working with AI, digital marketers using LLMs, customer insight specialists'
+      id: DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE,
+      title: DOCUMENT_TYPE_NAMES[DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE],
+      description: DOCUMENT_TYPE_DESCRIPTIONS[DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE],
+      icon: DOCUMENT_TYPE_ICONS[DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE],
+      recommendedFor: DOCUMENT_TYPE_RECOMMENDED_FOR[DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE]
     },
     {
-      id: 'styleGuide',
-      title: 'AI Style Guide',
-      description: 'Advanced AI calibration document for consistently aligning AI-generated content with your brand voice, terminology preferences, and communication standards across all platforms.',
-      icon: '📝',
-      recommendedFor: 'Content teams using generative AI, brand managers implementing AI assistants, AI prompt engineers'
+      id: DOCUMENT_TYPES.STYLE_GUIDE,
+      title: DOCUMENT_TYPE_NAMES[DOCUMENT_TYPES.STYLE_GUIDE],
+      description: DOCUMENT_TYPE_DESCRIPTIONS[DOCUMENT_TYPES.STYLE_GUIDE],
+      icon: DOCUMENT_TYPE_ICONS[DOCUMENT_TYPES.STYLE_GUIDE],
+      recommendedFor: DOCUMENT_TYPE_RECOMMENDED_FOR[DOCUMENT_TYPES.STYLE_GUIDE]
     }
   ];
   

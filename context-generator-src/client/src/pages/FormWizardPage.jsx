@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DocumentContext } from '../context/DocumentContext';
-import { DOCUMENT_TYPES } from '../../../shared/constants/documentTypes';
+import { DOCUMENT_TYPES } from '../constants/documentTypes';
 import DocumentTypeSelector from '../components/forms/DocumentTypeSelector';
 import BusinessProfileForm from '../components/forms/BusinessProfileForm';
 import TargetMarketAudienceForm from '../components/forms/TargetMarketAudienceForm';
