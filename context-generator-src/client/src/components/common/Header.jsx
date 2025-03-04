@@ -19,7 +19,7 @@ const Header = () => {
     <header className="app-header">
       <div className="header-container">
         <Link to="/" className="logo">
-          <span className="text-purple">G2L</span> <span className="text-orange">Context</span>
+          <span className="text-purple">Context</span><span className="text-orange">Forge</span>
         </Link>
         
         <nav className="main-nav">

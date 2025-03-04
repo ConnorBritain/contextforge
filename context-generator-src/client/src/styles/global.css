@@ -1,4 +1,4 @@
-/* G2L Brand Identity - Global Styles */
+/* Generative Growth Labs (G2L) ContextForge - Brand Identity */
 
 /* Import Azeret Mono font from Google Fonts */
 @import url('https://fonts.googleapis.com/css?family=Azeret+Mono:300,400,500,700&display=swap');
@@ -62,7 +62,7 @@ body {
 /* Typography */
 h1, h2, h3 {
   font-weight: var(--font-weight-bold);
-  color: var(--color-purple-accent);
+  color: var(--color-white);
   margin-bottom: var(--spacing-md);
   line-height: 1.2;
 }
@@ -381,19 +381,24 @@ button:disabled {
 .hero-section {
   text-align: center;
   padding: 4rem 0;
-  background: linear-gradient(to right, var(--color-orange-accent), var(--color-purple-accent), var(--color-white));
-  color: var(--color-black);
+  background-color: var(--color-dark-bg);
+  color: var(--color-white);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .hero-section h1 {
   font-size: 3rem;
   margin-bottom: 1rem;
-  color: var(--color-black);
+  color: var(--color-white);
+}
+
+.hero-section h1 span {
+  color: var(--color-purple-accent);
 }
 
 .subtitle {
   font-size: 1.5rem;
-  color: var(--color-black);
+  color: var(--color-white);
   margin-bottom: 2rem;
   font-weight: var(--font-weight-medium);
 }
@@ -401,7 +406,8 @@ button:disabled {
 .hero-description {
   max-width: 800px;
   margin: 0 auto 2rem;
-  color: var(--color-black);
+  color: var(--color-white);
+  opacity: 0.8;
   line-height: 1.6;
   font-weight: var(--font-weight-regular);
 }
@@ -413,17 +419,28 @@ button:disabled {
   margin-top: 2rem;
 }
 
-.features-section,
-.how-it-works-section {
+.features-section {
   padding: 4rem 0;
   text-align: center;
   background-color: var(--color-black);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.how-it-works-section {
+  padding: 4rem 0;
+  text-align: center;
+  background-color: var(--color-dark-bg);
 }
 
 .features-section h2,
 .how-it-works-section h2 {
   margin-bottom: 3rem;
-  color: var(--color-purple-accent);
+  color: var(--color-white);
+}
+
+.features-section h2 span,
+.how-it-works-section h2 span {
+  color: var(--color-orange-accent);
 }
 
 .feature-cards {
@@ -482,6 +499,10 @@ button:disabled {
 
 .step-content h3 {
   margin-bottom: 0.5rem;
+  color: var(--color-white);
+}
+
+.step-content h3 span {
   color: var(--color-purple-accent);
 }
 
@@ -502,7 +523,7 @@ button:disabled {
 
 .empty-state h2 {
   margin-bottom: 1rem;
-  color: var(--color-purple-accent);
+  color: var(--color-white);
 }
 
 .empty-state p {
@@ -538,7 +559,7 @@ button:disabled {
 .auth-form-container h2 {
   text-align: center;
   margin-bottom: 1.5rem;
-  color: var(--color-purple-accent);
+  color: var(--color-white);
 }
 
 .auth-form .form-group {
@@ -755,9 +776,56 @@ label {
   
   .feature-cards {
     grid-template-columns: 1fr;
+    padding: 0 1rem;
   }
   
   .steps {
     grid-template-columns: 1fr;
+    padding: 0 1rem;
+  }
+  
+  .hero-section {
+    padding: 3rem 1rem;
+  }
+  
+  .features-section, 
+  .how-it-works-section {
+    padding: 3rem 1rem;
+  }
+  
+  .feature-card {
+    margin-bottom: 1.5rem;
+  }
+  
+  .step {
+    margin-bottom: 2rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .feature-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .hero-section,
+  .features-section,
+  .how-it-works-section {
+    padding: 3.5rem 2rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .hero-section {
+    padding: 5rem 0;
+  }
+  
+  .features-section,
+  .how-it-works-section {
+    padding: 5rem 0;
   }
 }

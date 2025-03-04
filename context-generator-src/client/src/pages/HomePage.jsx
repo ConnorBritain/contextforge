@@ -9,7 +9,7 @@ const HomePage = () => {
     <div className="page-container">
       <div className="hero-section">
         <h1>
-          <span className="text-black">G2L</span> Context Generator
+          <span className="text-purple">Context</span><span className="text-orange">Forge</span>
         </h1>
         <p className="subtitle">Create powerful context documents that semantically calibrate AI systems for your specific business needs</p>
         
@@ -29,7 +29,7 @@ const HomePage = () => {
       </div>
       
       <div className="features-section">
-        <h2>Document Types</h2>
+        <h2>Document <span>Types</span></h2>
         
         <div className="feature-cards">
           <div className="feature-card">
@@ -72,7 +72,7 @@ const HomePage = () => {
       </div>
       
       <div className="how-it-works-section">
-        <h2>How It Works</h2>
+        <h2>How It <span>Works</span></h2>
         
         <div className="steps">
           <div className="step">

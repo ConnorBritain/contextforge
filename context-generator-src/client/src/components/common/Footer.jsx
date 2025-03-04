@@ -9,7 +9,7 @@ const Footer = () => {
       <div className="footer-container">
         <div className="footer-content">
           <p>
-            <span className="text-purple">G2L</span> <span className="text-orange">Context</span> &copy; {new Date().getFullYear()}
+            <span className="text-purple">Context</span><span className="text-orange">Forge</span> &copy; {new Date().getFullYear()} | A <span className="text-mint">Generative Growth Labs</span> Product
           </p>
           <p style={{ fontWeight: 'var(--font-weight-light)', opacity: 0.8 }}>
             Transform your business inputs into comprehensive, professional documents
