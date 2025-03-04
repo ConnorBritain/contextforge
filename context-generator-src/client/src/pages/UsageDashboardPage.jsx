@@ -13,7 +13,7 @@ const UsageDashboardPage = () => {
   const [subscriptionData, setSubscriptionData] = useState(null);
   const [plans, setPlans] = useState(null);
   const [upgrading, setUpgrading] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [_, setSelectedPlan] = useState(null);
   const navigate = useNavigate();
 
   // Load subscription data on mount

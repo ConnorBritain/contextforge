@@ -2,12 +2,7 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-// Auth endpoints
-const AUTH_ENDPOINTS = {
-  register: '/auth/register',
-  login: '/auth/login',
-  profile: '/auth/profile'
-};
+// Auth endpoints are directly used in the code rather than through this variable
 
 // Subscription endpoints
 const SUBSCRIPTION_ENDPOINTS = {

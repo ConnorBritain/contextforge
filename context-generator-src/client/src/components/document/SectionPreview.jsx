@@ -34,7 +34,7 @@ const SectionPreview = ({
         );
       }
     }
-  }, [isEditing, section]);
+  }, [isEditing, section, editContent.length]);
   
   // Handle toggling edit mode
   const toggleEditMode = (e) => {

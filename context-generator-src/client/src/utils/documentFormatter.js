@@ -19,7 +19,7 @@ export const markdownToHtml = (markdown) => {
     
   // Convert paragraphs
   html = html.replace(/^\s*(\n)?(.+)/gim, function(m) {
-    return /\<(\/)?(h[1-3]|ul|ol|li|blockquote|pre|img)/.test(m) ? m : '<p>' + m + '</p>';
+    return /<(\/)?(h[1-3]|ul|ol|li|blockquote|pre|img)/.test(m) ? m : '<p>' + m + '</p>';
   });
     
   // Convert bold

@@ -17,9 +17,9 @@ const Footer = () => {
             Transform your business inputs into comprehensive, professional documents
           </p>
           <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1.5rem' }}>
-            <a href="#" className="text-mint">Privacy Policy</a>
-            <a href="#" className="text-tertiary-blue">Terms of Service</a>
-            <a href="#" className="text-tertiary-green">Contact</a>
+            <button className="text-mint link-button">Privacy Policy</button>
+            <button className="text-tertiary-blue link-button">Terms of Service</button>
+            <button className="text-tertiary-green link-button">Contact</button>
           </div>
         </div>
       </div>
