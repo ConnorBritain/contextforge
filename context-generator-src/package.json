@@ -34,7 +34,8 @@
     "morgan": "^1.10.0",
     "openai": "^4.24.1",
     "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0"
+    "passport-google-oauth20": "^2.0.0",
+    "xss-clean": "0.1.4"
   },
   "devDependencies": {
     "eslint": "^8.56.0",
@@ -47,7 +48,7 @@
   "overrides": {
     "xss-clean": "0.1.4",
     "glob": "^10.3.10",
-    "inflight": "^1.0.6", 
+    "inflight": "^1.0.6",
     "rimraf": "^5.0.5"
   },
   "engines": {
