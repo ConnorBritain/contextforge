@@ -104,7 +104,7 @@ h6 { font-size: 1rem; }
 p, ul, ol {
   font-weight: var(--font-weight-light);
   margin-bottom: var(--spacing-md);
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1.7;
 }
 
@@ -121,6 +121,17 @@ a:hover {
 
 ul {
   list-style: none;
+}
+
+.document-type ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.document-type li {
+  margin-bottom: 0.5rem;
+  padding-left: 0.5rem;
 }
 
 /* App Layout */
@@ -436,11 +447,16 @@ button:disabled {
 }
 
 .subtitle {
-  font-size: 1.5rem;
-  color: var(--color-white);
+  font-size: 1.3rem;
   margin-bottom: 2rem;
   font-weight: var(--font-weight-regular);
-  opacity: 0.9;
+}
+
+.gradient-text-light {
+  background: linear-gradient(to right, #EFD1FD, #FFFFFF);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .hero-description {
@@ -449,7 +465,8 @@ button:disabled {
   color: var(--color-white);
   opacity: 0.8;
   line-height: 1.6;
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-light);
+  font-size: 0.9rem;
 }
 
 .cta-buttons {

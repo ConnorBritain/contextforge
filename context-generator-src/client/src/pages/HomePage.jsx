@@ -13,7 +13,7 @@ const HomePage = () => {
             <span className="brand-title-context">Context</span><span className="brand-title-forge">Forge</span>
           </span>
         </h1>
-        <p className="subtitle">Create powerful context documents that semantically calibrate AI systems for your specific business needs</p>
+        <p className="subtitle gradient-text-light">Create powerful context documents that semantically calibrate AI systems for your specific business needs.</p>
         
         <div className="hero-description">
           <p>Our AI-optimized context documents help you get more precise, tailored responses from ChatGPT, Claude, and other AI systems by providing them with detailed contextual information about your business, audience, and communication style.</p>
