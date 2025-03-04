@@ -7,24 +7,24 @@ import '../../styles/forms.css';
 const DocumentTypeSelector = ({ selectedType, onSelectType, onNext }) => {
   const documentTypes = [
     {
-      id: 'targetMarketAudience',
-      title: 'Target Market Audience Profile',
-      description: 'A comprehensive analysis of your ideal customer segments, including demographics, psychographics, behaviors, and needs.',
-      icon: '=e',
-      recommendedFor: 'Marketing teams, startup founders, product managers'
-    },
-    {
       id: 'businessProfile',
       title: 'Business Dimensional Profile',
       description: 'A detailed business strategy document covering market analysis, offerings, business model, operations, and growth projections.',
-      icon: '=Ê',
+      icon: 'ðŸ“ˆ',
       recommendedFor: 'Business strategists, consultants, entrepreneurs'
+    },
+    {
+      id: 'targetMarketAudience',
+      title: 'Target Market Audience Profile',
+      description: 'A comprehensive analysis of your ideal customer segments, including demographics, psychographics, behaviors, and needs.',
+      icon: 'ðŸ“Š',
+      recommendedFor: 'Marketing teams, startup founders, product managers'
     },
     {
       id: 'styleGuide',
       title: 'AI Style Guide',
       description: 'A comprehensive guide for ensuring consistent AI communications that align with your brand voice, audience, and business objectives.',
-      icon: '<¨',
+      icon: 'ðŸ“',
       recommendedFor: 'Brand managers, content teams, AI implementation specialists'
     }
   ];
