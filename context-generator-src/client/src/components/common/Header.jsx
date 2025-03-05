@@ -68,7 +68,11 @@ const Header = () => {
                   padding: 0
                 }}
               >
-                About <span style={{ marginLeft: '4px', fontSize: '0.7rem' }}>{aboutMenuOpen ? '▲' : '▼'}</span>
+                About <span style={{ 
+                  marginLeft: '4px', 
+                  fontSize: '0.7rem',
+                  color: 'var(--color-purple-accent)'
+                }}>{aboutMenuOpen ? '▲' : '▼'}</span>
               </button>
               {aboutMenuOpen && (
                 <div className="about-dropdown-menu">
