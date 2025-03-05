@@ -122,15 +122,17 @@ const startServer = (port) => {
       config.port = port;
       
       console.log(`Server URL updated to: ${config.serverUrl}`);
-      
-      // Add an endpoint to let the client know what port the server is running on
-      app.get('/api/server-info', (req, res) => {
-        res.json({ 
-          port: port,
-          serverUrl: config.serverUrl 
-        });
-      });
     }
+    
+    // Always ensure server-info endpoint is available with up-to-date port information
+    // This helps the client detect which port to use
+    app.get('/api/server-info', (req, res) => {
+      res.json({ 
+        port: port,
+        serverUrl: config.serverUrl,
+        apiUrl: `http://localhost:${port}/api`
+      });
+    });
   });
   
   server.on('error', (err) => {

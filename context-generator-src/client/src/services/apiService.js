@@ -33,27 +33,41 @@ class ApiService {
      */
     async _detectServerPort() {
       // Test ports in sequence starting with the default
-      const testPorts = [5000, 5001, 5002, 5003, 5004, 5005];
+      const testPorts = [5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007, 5008, 5009, 5010];
+      let foundPort = false;
       
       for (const port of testPorts) {
         try {
           // Try to fetch server info from this port
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 1000);
+          
           const response = await fetch(`http://localhost:${port}/api/server-info`, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal
           });
+          
+          clearTimeout(timeoutId);
           
           if (response.ok) {
             const data = await response.json();
             // Update baseUrl with the correct port
             this.baseUrl = `http://localhost:${data.port}/api`;
             console.log(`API Service: Connected to server at ${this.baseUrl}`);
+            foundPort = true;
             break;
           }
         } catch (error) {
           // Continue trying other ports
           console.log(`API Service: Port ${port} not available, trying next...`);
         }
+      }
+      
+      // If no port is found, retry after a delay
+      if (!foundPort) {
+        console.log('API Service: Could not connect to server. Will retry in 3 seconds...');
+        setTimeout(() => this._detectServerPort(), 3000);
       }
     }
     
