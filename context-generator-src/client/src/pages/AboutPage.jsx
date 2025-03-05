@@ -49,7 +49,7 @@ const AboutPage = () => {
       <div className="about-section">
         <h2>Our Document Types</h2>
         
-        <div className="document-type">
+        <div className="document-type" id="business-profile">
           <h3>📈 Business Dimensional Profile</h3>
           <p>A comprehensive business context document that semantically calibrates AI systems to understand your:</p>
           <ul>
@@ -61,7 +61,7 @@ const AboutPage = () => {
           <p>This document helps AI systems generate outputs that precisely align with your business strategy and market position, ensuring all AI-generated content is contextually appropriate for your specific business situation.</p>
         </div>
 
-        <div className="document-type">
+        <div className="document-type" id="target-audience">
           <h3>📊 Target Market Audience Profile</h3>
           <p>A detailed audience analysis document that helps AI systems accurately understand and address your specific customer segments with:</p>
           <ul>
@@ -73,7 +73,7 @@ const AboutPage = () => {
           <p>This document significantly improves how well AI systems can generate content that resonates with your specific target audiences, rather than generic customer profiles.</p>
         </div>
 
-        <div className="document-type">
+        <div className="document-type" id="style-guide">
           <h3>📝 AI Style Guide</h3>
           <p>A specialized communication framework document that calibrates AI outputs to match your brand voice with:</p>
           <ul>
@@ -85,7 +85,7 @@ const AboutPage = () => {
           <p>This document ensures that all AI-generated content maintains consistent brand standards and communication style, regardless of who's prompting the AI system.</p>
         </div>
 
-        <div className="document-type">
+        <div className="document-type" id="personal-bio">
           <h3>👤 Personal Bio Document</h3>
           <p>A comprehensive personal profile that helps AI systems understand your unique professional identity:</p>
           <ul>
@@ -97,7 +97,7 @@ const AboutPage = () => {
           <p>This document enables AI systems to provide highly personalized responses that align with your individual preferences, professional expertise, and communication style, creating a more tailored experience.</p>
         </div>
         
-        <div className="document-type">
+        <div className="document-type" id="offer-documentation">
           <h3>🏷️ Offer Documentation Brief</h3>
           <p>A detailed, structured blueprint for your product or service offering:</p>
           <ul>
@@ -109,7 +109,7 @@ const AboutPage = () => {
           <p>This document helps AI systems create more effective sales copy, marketing materials, and customer communications that accurately reflect your offer's unique value and competitive positioning.</p>
         </div>
         
-        <div className="document-type">
+        <div className="document-type" id="sales-messaging">
           <h3>🎯 Sales Messaging Playbook</h3>
           <p>A comprehensive communication framework for persuasive, consistent sales messaging:</p>
           <ul>
