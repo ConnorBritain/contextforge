@@ -416,7 +416,7 @@ button:disabled {
 .hero-section {
   text-align: center;
   padding: 4rem 0;
-  background-color: var(--color-dark-bg);
+  background-color: var(--color-black);
   color: var(--color-white);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -486,7 +486,7 @@ button:disabled {
 .how-it-works-section {
   padding: 4rem 0;
   text-align: center;
-  background-color: var(--color-dark-bg);
+  background-color: var(--color-black);
 }
 
 .features-section h2,
