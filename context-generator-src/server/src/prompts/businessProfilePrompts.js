@@ -1,6 +1,6 @@
 const fullDocumentPrompt = (formData) => {
    return `
- You are creating a comprehensive Business Dimensional Profile for ${formData.businessName} that follows a specific structured format.
+ You are creating a comprehensive Business Dimensional Profile for ${formData.companyName || "the company"} that will be used for AI semantic calibration. This document will help AI systems better understand the business and generate more accurate, relevant outputs.
  
  BUSINESS INFORMATION:
  ${JSON.stringify(formData, null, 2)}
@@ -9,87 +9,99 @@ const fullDocumentPrompt = (formData) => {
  Create a complete, professional Business Dimensional Profile document with the following specific sections:
  
  Section I: Executive Summary
- - Provide a concise purpose statement for ${formData.businessName}
- - Include mission and vision statements
- - Describe the target audience precisely
- - Highlight 3-5 key differentiators
- - Summarize current offerings
- - Explain strategic positioning within the market
+ - Provide a concise, clear purpose statement for the business
+ - Include the mission statement and future vision
+ - Describe the target audience and customer base precisely
+ - Highlight 3-5 key differentiators that make this business unique
+ - Summarize core offerings and services
+ - Explain the company's stage and positioning within the market
  
- Section II: Market Analysis
- - Analyze the industry landscape and trends
- - Provide a target market overview with detailed segmentation
- - Detail specific audience pain points (4-6 points)
- - Assess the competitive landscape with specific differentiators
- - Identify 2-3 key market opportunities
+ Section II: Market Analysis & Customer Insights
+ - Identify the core problems this business solves for customers
+ - Provide a detailed overview of primary customers and audience segments
+ - Detail specific customer challenges and pain points (2-4 points)
+ - Explain why customers choose this business over competitors
+ - Identify market positioning and competitive advantages
  
- Section III: Offerings Overview
- - Introduce the core value proposition
- - Detail each core offering with description and goals (4-5 offerings)
- - Include any supplementary offerings
- - Explain how offerings align with the company's mission
+ Section III: Products & Services
+ - List and describe all main products/services offered
+ - Explain the unique benefits provided that competitors don't offer
+ - Detail special methods, processes, or approaches used
+ - Connect offerings to customer needs and problems solved
+ - Explain how products/services create value for customers
  
- Section IV: Business Model & Funnel Strategy
- - Outline the multi-tiered funnel approach
- - Detail each tier's focus, team structure, and tools
- - Explain strategic integration between tiers
- - Highlight time compression and quality multiplication benefits
- - Describe strategic upselling methodologies
+ Section IV: Customer Experience & Journey
+ - Map the customer journey from discovery to satisfaction
+ - Explain typical customer discovery channels and methods
+ - Detail customer onboarding and relationship processes
+ - Describe post-purchase support and resources provided
+ - Highlight key touchpoints and experience differentiators
  
- Section V: Community & Engagement
- - Explain the role of community in the business
- - Detail interactive events, peer networking, and recognition systems
- - Outline specific engagement strategies
- - Explain why the community matters to the business model
- - Describe how community integrates with the funnel strategy
+ Section V: Sales & Marketing Approach
+ - Outline customer acquisition strategies and channels
+ - Describe the sales process and customer conversion journey
+ - Detail effective marketing channels and tactics
+ - Explain lead nurturing and relationship-building approaches
+ - Connect marketing approaches to customer needs and pain points
  
- Section VI: Marketing & Sales Strategy
- - Provide a strategic overview of marketing approach
- - Detail specific channels and tactics for awareness
- - Outline lead nurturing strategies
- - Explain conversion optimization techniques
- - Include metrics and KPIs for measuring success
+ Section VI: Brand Values & Identity
+ - List core values and principles guiding the business
+ - Explain how these values manifest in business operations
+ - Describe the desired brand impression and emotional response
+ - Connect values to customer expectations and market positioning
+ - Detail brand authenticity and consistency measures
  
- Section VII: Operational Framework
- - Structure in stages of operations (startup, scale-up, mature operations)
- - Detail team evolution at each stage
- - Outline key processes and responsibilities
- - Recommend specific tools and systems
- - Provide efficiency recommendations
+ Section VII: Operational Structure
+ - Describe the team size and composition
+ - Explain key operational processes and workflows
+ - Detail essential tools, systems, and technologies used
+ - Connect operational approach to customer experience
+ - Highlight operational strengths and efficiency measures
  
- Section VIII: Financial & Growth Projections
- - Include realistic revenue projections with multiple scenarios
- - Detail operational overhead at different stages
- - Present profitability scenarios with actual numbers
- - Include strategic insights on maximizing growth
- - Incorporate advertising and reinvestment strategies
+ Section VIII: Growth Strategy & Future Direction
+ - Outline short-term goals and priorities (1 year)
+ - Describe medium-term vision (3-5 years)
+ - Address known challenges and growth obstacles
+ - Explain adaptation strategies for industry changes
+ - Connect growth plans to market opportunities
  
- Section IX: Ethical & Philosophical Alignment
- - Reference core values and principles guiding the business
- - Explain alignment with audience values
- - Detail ethical commitments in practice
- - Show how ethics harmonizes with growth objectives
- - Present a philosophical foundation for offerings
+ Section IX: Financial Model & Pricing Strategy
+ - Explain the business revenue model and income sources
+ - Detail pricing structures and models
+ - Position pricing strategy relative to market (premium, competitive, value)
+ - Connect pricing approach to value proposition
+ - Highlight financial strengths and considerations
  
- Section X: Next Steps & Contingency Plan
- - Outline immediate pre-launch priorities
- - Detail scaling strategy for first 12 months
- - Provide contingency plans for 3-4 potential challenges
- - List key performance indicators
- - Conclude with focus on adaptability and resilience
+ Section X: Competitive Landscape
+ - Identify key competitors and market alternatives
+ - Detail specific competitive advantages and differentiators
+ - Explain industry adaptation and innovation approaches
+ - Highlight unique positioning against each competitor
+ - Address competitive threats and mitigation strategies
  
- Appendix & Resources
- - Include relevant supporting materials and resources
+ Section XI: Ethics & Community Engagement
+ - Describe ethical practices and commitments
+ - Detail community initiatives and social responsibility
+ - Explain authenticity measures and trust-building approaches
+ - Connect ethics to brand values and customer expectations
+ - Highlight any cause-related or purpose-driven elements
+ 
+ Section XII: AI Guidance & Special Considerations
+ - Note specific areas of focus for AI content generation
+ - List any topics, approaches, or messaging to avoid
+ - Highlight terminology preferences and language guidance
+ - Provide additional context that would help AI systems
+ - Include any other business-specific information not covered elsewhere
  
  FORMAT REQUIREMENTS:
- - Use professional, business language while maintaining readability
- - Include section dividers and clear formatting
- - Balance thoroughness with conciseness
- - Use bullet points for lists and key information
- - Create a document that appears professionally designed for executive review
- - Ensure consistent styling throughout
- - Maintain strong coherence between sections, with cross-references where appropriate
+ - Use clear, professional language that balances expertise with readability
+ - Include section headers and logical organization
+ - Prioritize conciseness while maintaining comprehensive coverage
+ - Use bullet points for lists and easy scanning
+ - Ensure the document is semantically rich for AI systems to understand the business context
+ - Maintain consistency in tone and detail level throughout
+ - Include cross-references between related sections where helpful
  
- The final document should look and feel like a premium business intelligence document that would be created by a high-end business consulting firm.
+ The final document should serve as a comprehensive semantic calibration tool that helps AI systems understand this business's unique context, values, offerings, and positioning.
  `;
  };
