@@ -81,6 +81,18 @@ const HomePage = () => {
             <h3>Personal Bio Document</h3>
             <p>Comprehensive personal profile that helps AI systems understand your professional background, expertise, communication style, and preferences to generate more personalized and contextually relevant outputs.</p>
           </div>
+          
+          <div className="feature-card">
+            <div className="feature-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3h18v18H3V3z" fill="#75c3e8" fillOpacity="0.2"/>
+                <path d="M20 6h-2V4h-2v2h-4V4h-2v2H6v12h14V6zm-2 10H6v-8h12v8z" fill="#ff7d45"/>
+                <path d="M14 12h2v2h-2v-2zm-4 0h2v2h-2v-2zm-4 0h2v2H6v-2z" fill="#dc97ff"/>
+              </svg>
+            </div>
+            <h3>Offer Documentation Brief</h3>
+            <p>Detailed, AI-calibrated offer brief that structures your product or service messaging, positioning, and customer clarity for more effective sales pages, pitches, and marketing materials.</p>
+          </div>
         </div>
       </div>
       

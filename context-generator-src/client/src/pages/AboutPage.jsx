@@ -96,6 +96,18 @@ const AboutPage = () => {
           </ul>
           <p>This document enables AI systems to provide highly personalized responses that align with your individual preferences, professional expertise, and communication style, creating a more tailored experience.</p>
         </div>
+        
+        <div className="document-type">
+          <h3>🏷️ Offer Documentation Brief</h3>
+          <p>A detailed, structured blueprint for your product or service offering:</p>
+          <ul>
+            <li>Core value proposition and positioning strategy</li>
+            <li>Target customer profile and pain points addressed</li>
+            <li>Features, deliverables, and customer experience journey</li>
+            <li>Pricing strategy, conversion mechanisms, and objection handling</li>
+          </ul>
+          <p>This document helps AI systems create more effective sales copy, marketing materials, and customer communications that accurately reflect your offer's unique value and competitive positioning.</p>
+        </div>
       </div>
 
       <div className="about-section">
