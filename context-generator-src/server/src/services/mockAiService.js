@@ -3,6 +3,7 @@ const marketAudiencePrompts = require('../prompts/marketAudiencePrompts');
 const styleGuidePrompts = require('../prompts/styleGuidePrompts');
 const personalBioPrompts = require('../prompts/personalBioPrompts');
 const offerDocumentationPrompts = require('../prompts/offerDocumentationPrompts');
+const salesMessagingPlaybookPrompts = require('../prompts/salesMessagingPlaybookPrompts');
 
 /**
  * Mock AI service for development and testing
@@ -31,6 +32,8 @@ class MockAiService {
         return this._generatePersonalBio(formData);
       case 'offerDocumentation':
         return this._generateOfferDocumentation(formData);
+      case 'salesMessagingPlaybook':
+        return this._generateSalesMessagingPlaybook(formData);
       default:
         throw new Error(`Unknown context type: ${contextType}`);
     }
@@ -137,6 +140,38 @@ ${offerName} combines cutting-edge strategies with practical implementation tool
 
 ### Unique Selling Proposition
 ${formData.uniqueSellingProposition || "Our proprietary methodology delivers results in half the time of competing approaches while providing superior long-term outcomes and implementation support."}`;
+  }
+  
+  /**
+   * Generate mock sales messaging playbook
+   * @param {Object} formData - User form data
+   * @returns {string} - Mock document content
+   */
+  _generateSalesMessagingPlaybook(formData) {
+    // Access the full prompt to understand expected structure
+    const prompt = salesMessagingPlaybookPrompts.fullDocumentPrompt(formData);
+    
+    const offerDescription = formData.offerDescription || "A transformative solution designed to optimize results";
+    const idealCustomer = formData.idealCustomer || "growth-focused professionals";
+    
+    return `# Sales Messaging Playbook
+
+## I. Executive Summary
+
+This playbook provides a comprehensive framework for communicating the value of "${offerDescription}" to ${idealCustomer}. Our core messaging emphasizes ${formData.valuePropositions?.split('\n')[0] || "exceptional results with minimal effort"} while differentiating through ${formData.differentiation || "our unique methodology and personalized approach"}. The primary messaging strategy focuses on emotional connection first, followed by logical justification, with conversion triggers centered on ${formData.keyBenefits || "proven results and risk elimination"}.
+
+## II. Offer Positioning & Core Messaging
+
+**Offer Description:** ${offerDescription}
+
+**Primary Value Propositions:**
+${formData.valuePropositions || "- Achieve better results in less time\n- Eliminate common frustrations and bottlenecks\n- Gain a competitive advantage through proprietary methodologies"}
+
+**Core Message Theme:** ${formData.coreMessage || "Transform your results through proven, personalized strategies that consistently deliver measurable impact."}
+
+## III. Audience & Psychographic Analysis
+
+Our ideal customer is ${idealCustomer} who ${formData.customerDesires || "seeks growth and improvement while facing time constraints and increasing pressure to perform"}.`;
   }
 }
 

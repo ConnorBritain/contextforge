@@ -93,6 +93,17 @@ const HomePage = () => {
             <h3>Offer Documentation Brief</h3>
             <p>Detailed, AI-calibrated offer brief that structures your product or service messaging, positioning, and customer clarity for more effective sales pages, pitches, and marketing materials.</p>
           </div>
+          
+          <div className="feature-card">
+            <div className="feature-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z" fill="#75c3e8" fillOpacity="0.2"/>
+                <path d="M18 9l-6 6-3-3 1.41-1.41L12 12.17l4.59-4.58L18 9z" fill="#ff7d45"/>
+              </svg>
+            </div>
+            <h3>Sales Messaging Playbook</h3>
+            <p>Strategic communication framework that helps AI systems create persuasive, audience-aligned sales copy across different awareness levels, channels, and buyer personas for consistent and effective messaging.</p>
+          </div>
         </div>
       </div>
       

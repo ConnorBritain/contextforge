@@ -8,6 +8,7 @@ import TargetMarketAudienceForm from '../components/forms/TargetMarketAudienceFo
 import StyleGuideForm from '../components/forms/StyleGuideForm';
 import PersonalBioForm from '../components/forms/PersonalBioForm';
 import OfferDocumentationForm from '../components/forms/OfferDocumentationForm';
+import SalesMessagingPlaybookForm from '../components/forms/SalesMessagingPlaybookForm';
 import ReviewForm from '../components/forms/ReviewForm';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
@@ -138,6 +139,14 @@ const FormWizardPage = () => {
               onBack={handleBack}
             />
           );
+        case DOCUMENT_TYPES.SALES_MESSAGING_PLAYBOOK:
+          return (
+            <SalesMessagingPlaybookForm 
+              initialData={formData}
+              onSubmit={handleNext}
+              onBack={handleBack}
+            />
+          );
         default:
           return <div>Please select a document type first</div>;
       }
@@ -171,6 +180,7 @@ const FormWizardPage = () => {
                 {documentType === DOCUMENT_TYPES.STYLE_GUIDE && 'Style Guide'}
                 {documentType === DOCUMENT_TYPES.PERSONAL_BIO && 'Personal Bio'}
                 {documentType === DOCUMENT_TYPES.OFFER_DOCUMENTATION && 'Offer Brief'}
+                {documentType === DOCUMENT_TYPES.SALES_MESSAGING_PLAYBOOK && 'Messaging Playbook'}
                 {!documentType && 'Document Details'}
               </div>
             </div>

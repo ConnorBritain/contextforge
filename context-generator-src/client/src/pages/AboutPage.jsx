@@ -108,6 +108,18 @@ const AboutPage = () => {
           </ul>
           <p>This document helps AI systems create more effective sales copy, marketing materials, and customer communications that accurately reflect your offer's unique value and competitive positioning.</p>
         </div>
+        
+        <div className="document-type">
+          <h3>🎯 Sales Messaging Playbook</h3>
+          <p>A comprehensive communication framework for persuasive, consistent sales messaging:</p>
+          <ul>
+            <li>Core messaging and value proposition frameworks</li>
+            <li>Customer awareness-level specific communication strategies</li>
+            <li>Channel-optimized messaging templates and examples</li>
+            <li>Emotional triggers, objection handling, and conversion techniques</li>
+          </ul>
+          <p>This document enables AI systems to generate highly persuasive, audience-calibrated sales copy across various platforms and touchpoints while maintaining consistent messaging aligned with your unique value proposition.</p>
+        </div>
       </div>
 
       <div className="about-section">
