@@ -55,8 +55,8 @@ body {
   font-family: var(--font-family);
   font-weight: var(--font-weight-light);
   background-color: var(--color-black);
-  background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 25px 25px;
   color: var(--color-white);
   line-height: 1.6;
@@ -157,7 +157,8 @@ ul {
 
 /* Header */
 .app-header {
-  background-color: var(--color-black);
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
   box-shadow: var(--shadow-sm);
   border-bottom: 1px solid var(--color-dark-bg);
   position: sticky;
@@ -419,7 +420,7 @@ button:disabled {
 .hero-section {
   text-align: center;
   padding: 4rem 0;
-  background-color: var(--color-black);
+  background-color: transparent;
   color: var(--color-white);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -482,14 +483,14 @@ button:disabled {
 .features-section {
   padding: 4rem 0;
   text-align: center;
-  background-color: var(--color-black);
+  background-color: transparent;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .how-it-works-section {
   padding: 4rem 0;
   text-align: center;
-  background-color: var(--color-black);
+  background-color: transparent;
 }
 
 .features-section h2,
