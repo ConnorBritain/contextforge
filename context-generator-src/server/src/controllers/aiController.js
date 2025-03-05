@@ -2,6 +2,7 @@ const AIServiceFactory = require('../services/aiServiceFactory');
 const PromptBuilder = require('../utils/promptBuilder');
 const DocumentProcessor = require('../utils/documentProcessor');
 const { BadRequestError } = require('../middleware/errorHandler');
+const userService = require('../services/userService');
 
 /**
  * Generate a context document based on form data
@@ -32,19 +33,21 @@ exports.generateContext = async (req, res, next) => {
       contextType
     );
     
-    // If authenticated, update token usage
-    if (req.currentUser) {
-      await req.currentUser.updateTokenUsage(responseData.tokensUsed);
-      await req.currentUser.incrementDocumentCount();
+    // If authenticated, update token usage with Firebase
+    if (req.user && req.userData) {
+      await userService.updateTokenUsage(req.user.id, responseData.tokensUsed);
+      await userService.incrementDocumentCount(req.user.id);
       
       // Add usage information to the response
+      const userData = req.userData;
+      
       processedDocument.usage = {
         tokensUsed: responseData.tokensUsed,
-        currentMonthUsage: req.currentUser.usage.tokenCount,
-        monthlyAllowance: req.currentUser.usage.monthlyAllowance,
-        documentsGenerated: req.currentUser.usage.documents.generated,
-        documentLimit: req.currentUser.usage.documents.limit,
-        resetDate: req.currentUser.usage.resetDate
+        currentMonthUsage: userData.usage?.tokenCount || 0,
+        monthlyAllowance: userData.usage?.monthlyAllowance || 50000,
+        documentsGenerated: userData.usage?.documents?.generated || 0,
+        documentLimit: userData.usage?.documents?.limit || 5,
+        resetDate: userData.usage?.resetDate
       };
     }
     

@@ -2,15 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const config = require('./config/default');
-const mongoose = require('mongoose');
-const passport = require('passport');
 const documentRoutes = require('./routes/documentRoutes');
 const authRoutes = require('./routes/authRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 const configureSecurityMiddleware = require('./middleware/security');
 const { errorHandler } = require('./middleware/errorHandler');
-const configurePassport = require('./config/passport');
+const firebaseAdmin = require('./services/firebaseAdmin');
 
 // Initialize Express app
 const app = express();
@@ -40,32 +38,8 @@ if (process.env.NODE_ENV === 'production') {
   app.use(morgan('dev'));
 }
 
-// Initialize Passport
-app.use(passport.initialize());
-// Configure passport strategies
-configurePassport();
-
-// Connect to MongoDB with improved options for production
-const mongoOptions = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
-  socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
-};
-
-// Only attempt MongoDB connection in production or if MONGODB_REQUIRED is set
-if (process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true') {
-  mongoose.connect(config.mongodb.uri, mongoOptions)
-    .then(() => console.log('MongoDB connected successfully'))
-    .catch(err => {
-      console.error('MongoDB connection error:', err);
-      process.exit(1);
-    });
-} else {
-  console.log('MongoDB connection skipped in development mode.');
-  console.log('Note: Document saving and user authentication features will be unavailable.');
-  console.log('To enable MongoDB, set MONGODB_REQUIRED=true or install MongoDB locally.');
-}
+// Log the Firebase initialization
+console.log(`Firebase Admin SDK initialized for project: ${firebaseAdmin.app().options.projectId}`);
 
 // Health check routes (must be before auth middleware)
 app.use('/api/health', healthRoutes);
