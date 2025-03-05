@@ -1,5 +1,4 @@
 const express = require('express');
-const cors = require('cors');
 const morgan = require('morgan');
 const config = require('./config/default');
 const documentRoutes = require('./routes/documentRoutes');
@@ -7,6 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 const configureSecurityMiddleware = require('./middleware/security');
+const configureCorsMiddleware = require('./middleware/cors');
 const { errorHandler } = require('./middleware/errorHandler');
 const firebaseAdmin = require('./services/firebaseAdmin');
 
@@ -17,12 +17,12 @@ const app = express();
 const path = require('path');
 app.use(express.static(path.join(__dirname, '../../client/build')));
 
-// Configure security middleware for production
+// Apply CORS middleware for all environments
+app.use(configureCorsMiddleware());
+
+// Configure additional security middleware for production
 if (process.env.NODE_ENV === 'production') {
   configureSecurityMiddleware(app);
-} else {
-  // Basic CORS for development
-  app.use(cors());
 }
 
 // JSON body parser
