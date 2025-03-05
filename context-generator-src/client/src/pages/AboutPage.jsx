@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/global.css';
 
@@ -6,6 +6,22 @@ import '../styles/global.css';
  * About page explaining how the Context Generator works with AI systems
  */
 const AboutPage = () => {
+  // Scroll to the element if a hash is present in the URL
+  useEffect(() => {
+    // Get the hash from the URL (without the # symbol)
+    const hash = window.location.hash.substring(1);
+    
+    // If there's a hash, try to scroll to the element
+    if (hash) {
+      const element = document.getElementById(hash);
+      if (element) {
+        // Wait a bit for the page to fully render before scrolling
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+  }, []);
   return (
     <div className="page-container about-page">
       <div className="about-header">

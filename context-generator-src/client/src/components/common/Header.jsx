@@ -60,23 +60,25 @@ const Header = () => {
                   border: 'none', 
                   color: 'var(--color-white)',
                   fontFamily: 'var(--font-family)',
-                  fontWeight: 'var(--font-weight-medium)',
+                  fontWeight: 'var(--font-weight-regular)',
                   cursor: 'pointer',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  height: '100%',
+                  padding: 0
                 }}
               >
-                About {aboutMenuOpen ? '▲' : '▼'}
+                About <span style={{ marginLeft: '4px', fontSize: '0.7rem' }}>{aboutMenuOpen ? '▲' : '▼'}</span>
               </button>
               {aboutMenuOpen && (
                 <div className="about-dropdown-menu">
-                  <Link to="/about" onClick={() => setAboutMenuOpen(false)}>About ContextForge</Link>
-                  <Link to="/about#business-profile" onClick={() => setAboutMenuOpen(false)}>Business Profile</Link>
-                  <Link to="/about#target-audience" onClick={() => setAboutMenuOpen(false)}>Target Audience Profile</Link>
-                  <Link to="/about#style-guide" onClick={() => setAboutMenuOpen(false)}>AI Style Guide</Link>
-                  <Link to="/about#personal-bio" onClick={() => setAboutMenuOpen(false)}>Personal Bio</Link>
-                  <Link to="/about#offer-documentation" onClick={() => setAboutMenuOpen(false)}>Offer Documentation</Link>
-                  <Link to="/about#sales-messaging" onClick={() => setAboutMenuOpen(false)}>Sales Messaging Playbook</Link>
+                  <a href="/about" onClick={() => setAboutMenuOpen(false)}>About ContextForge</a>
+                  <a href="/about#business-profile" onClick={() => setAboutMenuOpen(false)}>Business Profile</a>
+                  <a href="/about#target-audience" onClick={() => setAboutMenuOpen(false)}>Target Audience Profile</a>
+                  <a href="/about#style-guide" onClick={() => setAboutMenuOpen(false)}>AI Style Guide</a>
+                  <a href="/about#personal-bio" onClick={() => setAboutMenuOpen(false)}>Personal Bio</a>
+                  <a href="/about#offer-documentation" onClick={() => setAboutMenuOpen(false)}>Offer Documentation</a>
+                  <a href="/about#sales-messaging" onClick={() => setAboutMenuOpen(false)}>Sales Messaging Playbook</a>
                 </div>
               )}
             </li>

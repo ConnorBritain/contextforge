@@ -186,6 +186,8 @@ ul {
 .main-nav ul {
   display: flex;
   gap: 1.5rem;
+  align-items: center;
+  height: 100%;
 }
 
 .main-nav a, .main-nav .nav-button {
@@ -202,6 +204,15 @@ ul {
 /* About Menu Dropdown */
 .about-menu-container {
   position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.main-nav li {
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 .about-dropdown-menu {
@@ -218,6 +229,7 @@ ul {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  margin-top: 0.5rem;
 }
 
 .about-dropdown-menu a {
