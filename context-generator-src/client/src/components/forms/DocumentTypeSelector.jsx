@@ -69,7 +69,7 @@ const DocumentTypeSelector = ({ selectedType, onSelectType, onNext }) => {
   return (
     <form className="form-container form-container-wide" onSubmit={handleSubmit}>
       <div className="form-header">
-        <h2>Select Forge Type</h2>
+        <h2>Select Document Type</h2>
         <p>Choose the type of document you want to create with our AI-powered system.</p>
       </div>
       
