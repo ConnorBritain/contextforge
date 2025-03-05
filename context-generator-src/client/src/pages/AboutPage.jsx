@@ -55,16 +55,16 @@ const AboutPage = () => {
         </p>
         <ul className="feature-list">
           <li>
-            <strong>Attached to Conversations:</strong> Upload or paste these documents directly into AI chat interfaces to establish context
+            <strong className="text-purple">Attached to Conversations:</strong> Upload or paste these documents directly into AI chat interfaces to establish context
           </li>
           <li>
-            <strong>Used for Knowledge Retrieval:</strong> Create dedicated knowledge bases or embeddings from these documents
+            <strong className="text-purple">Used for Knowledge Retrieval:</strong> Create dedicated knowledge bases or embeddings from these documents
           </li>
           <li>
-            <strong>Integrated with AI APIs:</strong> Incorporate into your system prompts when building applications with AI APIs
+            <strong className="text-purple">Integrated with AI APIs:</strong> Incorporate into your system prompts when building applications with AI APIs
           </li>
           <li>
-            <strong>Referenced in Prompts:</strong> Refer back to specific sections in your ongoing conversations with AI systems
+            <strong className="text-purple">Referenced in Prompts:</strong> Refer back to specific sections in your ongoing conversations with AI systems
           </li>
         </ul>
       </div>

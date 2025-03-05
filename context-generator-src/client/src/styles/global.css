@@ -999,6 +999,29 @@ label {
   }
 }
 
+/* Feature List Styling */
+.feature-list {
+  margin-bottom: 2rem;
+}
+
+.feature-list li {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.feature-list li:before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--color-orange-accent);
+  font-size: 1.2rem;
+}
+
+.feature-list strong {
+  font-weight: var(--font-weight-medium);
+}
+
 /* About Page Styles */
 .document-type {
   background-color: var(--color-dark-bg);
@@ -1067,7 +1090,7 @@ label {
 }
 
 .benefit-card {
-  background-color: var(--color-dark-bg);
+  background-color: rgba(40, 44, 51, 0.7); /* Reduced opacity for var(--color-dark-bg) */
   border-radius: var(--border-radius);
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 2rem;
@@ -1075,6 +1098,7 @@ label {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(4px); /* Subtle blur effect */
 }
 
 .benefit-card:nth-child(3n+1)::before {
