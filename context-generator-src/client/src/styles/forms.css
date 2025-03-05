@@ -170,7 +170,7 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--border-radius);
   padding: 1.5rem;
-  padding-bottom: 4rem;
+  padding-bottom: 1.5rem; /* Reduced padding since buttons are in a flex container now */
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
@@ -248,6 +248,9 @@
   color: var(--color-white);
   font-weight: var(--font-weight-medium);
   text-align: center;
+  font-size: 1.3rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .document-type-card p {
@@ -263,10 +266,11 @@
 .document-type-recommended {
   font-size: 0.875rem;
   margin-top: 1rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
   color: var(--color-white);
   opacity: 0.7;
   text-align: center;
+  flex-grow: 1; /* Allow this to grow and push buttons to bottom */
 }
 
 .document-type-recommended span {
@@ -274,11 +278,52 @@
   color: #dc97ff;
 }
 
+/* Button container for both buttons */
+.document-card-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  margin-top: auto; /* Push to bottom of card */
+  flex-wrap: wrap; /* Allow buttons to wrap if needed */
+}
+
+/* Learn More button styling */
+.learn-more-button {
+  background: linear-gradient(90deg, hsla(280, 90%, 92%, 1) 0%, hsla(280, 90%, 82%, 1) 100%);
+  color: var(--color-black);
+  font-weight: var(--font-weight-medium);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  font-size: 0.9rem;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  letter-spacing: -0.2px;
+}
+
+.learn-more-button:hover {
+  background-color: var(--color-purple-accent);
+  background-image: none;
+  color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.learn-more-button:active {
+  background: linear-gradient(90deg, hsla(280, 90%, 92%, 1) 0%, hsla(280, 90%, 82%, 1) 100%);
+  color: var(--color-black);
+  transform: translateY(0);
+}
+
 .document-type-select {
-  position: absolute;
-  bottom: 1rem;
-  left: 0;
-  right: 0;
   display: flex;
   justify-content: center;
 }
@@ -288,28 +333,45 @@
 }
 
 .document-type-select label {
-  background: linear-gradient(90deg, hsla(18, 100%, 78%, 1) 0%, hsla(280, 90%, 92%, 1) 100%);
-  color: var(--color-black);
+  background-color: var(--color-orange-accent);
+  background-image: none;
+  color: var(--color-white);
   font-weight: var(--font-weight-medium);
-  padding: 0.5rem 1.25rem;
+  padding: 0.5rem 1rem;
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: all 0.3s ease;
   border: 1px solid transparent;
   box-shadow: var(--shadow-sm);
+  font-size: 0.9rem;
+  text-align: center;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
 }
 
 .document-type-select label:hover {
-  background: var(--color-orange-accent);
-  color: var(--color-white);
+  background: linear-gradient(90deg, hsla(18, 100%, 78%, 1) 0%, hsla(18, 100%, 65%, 1) 100%);
+  color: var(--color-black);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
+.document-type-select label:active {
+  background-color: var(--color-orange-accent);
+  background-image: none;
+  color: var(--color-white);
+  transform: translateY(0);
+}
+
 .document-type-card.selected .document-type-select label {
-  background: var(--color-purple-accent);
-  color: var(--color-black);
+  background-color: var(--color-orange-accent);
+  background-image: none;
+  color: var(--color-white);
   border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 2px rgba(255, 125, 69, 0.4);
 }
 
 /* Review Form */
@@ -489,6 +551,16 @@
   }
   
   .form-navigation button {
+    width: 100%;
+  }
+  
+  /* Make buttons stack on smaller screens */
+  .document-card-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .learn-more-button, .document-type-select label {
     width: 100%;
   }
 }
