@@ -313,7 +313,6 @@ const BusinessProfileForm = ({ initialData = {}, onSubmit, onBack }) => {
               value={formData.businessStage}
               onChange={handleChange}
               options={[
-                { value: '', label: 'Select a stage' },
                 { value: 'early-stage', label: 'Early-stage' },
                 { value: 'growing', label: 'Growing' },
                 { value: 'established', label: 'Established' }
@@ -638,7 +637,6 @@ const BusinessProfileForm = ({ initialData = {}, onSubmit, onBack }) => {
               value={formData.marketComparison}
               onChange={handleChange}
               options={[
-                { value: '', label: 'Select an option' },
                 { value: 'lower', label: 'Lower than competitors' },
                 { value: 'competitive', label: 'Competitive with market rates' },
                 { value: 'premium', label: 'Premium pricing' }
