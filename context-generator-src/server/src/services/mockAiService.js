@@ -112,7 +112,6 @@ ${fullName} is an experienced professional in the ${industry} sector with a prov
 ### Expertise & Specialization
 ${formData.expertise || "Core areas of expertise include strategic planning, process optimization, and cross-functional team leadership. Technical proficiencies encompass data analytics, system architecture, and implementation methodologies that bridge theoretical frameworks with practical applications."}`;
   }
-}
 
   /**
    * Generate mock offer documentation brief
