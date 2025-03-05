@@ -13,6 +13,8 @@ ContextForge is a full-stack application that helps you generate professional co
 2. Business Dimensional Profiles 
 3. AI Style Guides
 4. Personal Bio Documents
+5. Offer Documentation Briefs
+6. Sales Messaging Playbooks
 
 ## ✨ Features
 
@@ -258,17 +260,37 @@ ContextForge implements industry-standard security practices:
   <tr>
     <td>Document Types</td>
     <td>✅ Complete</td>
-    <td>4 document types fully implemented</td>
+    <td>6 document types fully implemented</td>
+  </tr>
+  <tr>
+    <td>Multi-step Form Wizard</td>
+    <td>✅ Complete</td>
+    <td>User-friendly section-by-section form progression</td>
   </tr>
   <tr>
     <td>User Authentication</td>
-    <td>✅ Complete</td>
-    <td>JWT-based auth with secure storage</td>
+    <td>🔄 In Progress</td>
+    <td>JWT-based auth with Google OAuth integration</td>
+  </tr>
+  <tr>
+    <td>Database Integration</td>
+    <td>🔄 In Progress</td>
+    <td>MongoDB for document and user storage</td>
+  </tr>
+  <tr>
+    <td>Live AI Integration</td>
+    <td>🔄 In Progress</td>
+    <td>Testing with live API keys and optimizing prompts</td>
   </tr>
   <tr>
     <td>Usage Tracking</td>
     <td>✅ Complete</td>
     <td>Token counting and subscription limits</td>
+  </tr>
+  <tr>
+    <td>Payment Integration</td>
+    <td>📅 Planned</td>
+    <td>Stripe for one-time purchases and token-based usage</td>
   </tr>
   <tr>
     <td>Dashboards</td>
@@ -287,10 +309,42 @@ ContextForge implements industry-standard security practices:
   </tr>
   <tr>
     <td>Testing</td>
-    <td>✅ Complete</td>
-    <td>Unit, integration, and token usage tests</td>
+    <td>🔄 In Progress</td>
+    <td>End-to-end testing with live API integrations</td>
   </tr>
 </table>
+
+## 🗺️ Development Roadmap
+
+### Phase 1: Core Functionality Testing (Current)
+- Complete Google OAuth integration for seamless authentication
+- Set up MongoDB for document and user data persistence
+- Implement live testing with Anthropic and OpenAI API keys
+- Optimize AI prompts for high-quality document generation
+- Refine token usage tracking for accurate billing
+
+### Phase 2: Payment Integration (Q2 2025)
+- Integrate Stripe for secure payment processing
+- Implement tiered pricing models:
+  - One-time document generation
+  - Token-based subscription plans
+  - Enterprise volume discounts
+- Add checkout flow and purchase confirmation emails
+- Develop usage dashboards for token consumption
+
+### Phase 3: Advanced Features (Q3 2025)
+- Implement document versioning and comparison
+- Add collaborative editing and sharing options
+- Create template library for common business scenarios
+- Develop AI-assisted document refinement tools
+- Add export options to additional formats (PDF, DOCX)
+
+### Phase 4: Enterprise Expansion (Q4 2025)
+- Implement team management and role-based access
+- Add SSO options for enterprise customers
+- Create custom branding and white-label options
+- Develop analytics for document effectiveness
+- Build integration APIs for third-party systems
 
 ## 🤝 Contributing
 
