@@ -2,6 +2,7 @@ const businessProfilePrompts = require('../prompts/businessProfilePrompts');
 const marketAudiencePrompts = require('../prompts/marketAudiencePrompts');
 const styleGuidePrompts = require('../prompts/styleGuidePrompts');
 const personalBioPrompts = require('../prompts/personalBioPrompts');
+const offerDocumentationPrompts = require('../prompts/offerDocumentationPrompts');
 
 /**
  * Mock AI service for development and testing
@@ -28,6 +29,8 @@ class MockAiService {
         return this._generateStyleGuide(formData);
       case 'personalBio':
         return this._generatePersonalBio(formData);
+      case 'offerDocumentation':
+        return this._generateOfferDocumentation(formData);
       default:
         throw new Error(`Unknown context type: ${contextType}`);
     }
@@ -108,6 +111,33 @@ ${fullName} is an experienced professional in the ${industry} sector with a prov
 
 ### Expertise & Specialization
 ${formData.expertise || "Core areas of expertise include strategic planning, process optimization, and cross-functional team leadership. Technical proficiencies encompass data analytics, system architecture, and implementation methodologies that bridge theoretical frameworks with practical applications."}`;
+  }
+}
+
+  /**
+   * Generate mock offer documentation brief
+   * @param {Object} formData - User form data
+   * @returns {string} - Mock document content
+   */
+  _generateOfferDocumentation(formData) {
+    // Access the full prompt to understand expected structure
+    const prompt = offerDocumentationPrompts.fullDocumentPrompt(formData);
+    
+    const offerName = formData.offerName || "ProductX";
+    const offerType = formData.offerType || "service";
+    
+    return `# Offer Documentation Brief: ${offerName}
+
+## I. Executive Summary
+
+${offerName} is a comprehensive ${offerType} designed to transform how professionals approach their work through innovative methodologies and proven frameworks. This offer delivers exceptional results for ${formData.primaryAudience || "business professionals"} by addressing their core challenges and unlocking new possibilities. Key differentiators include proprietary frameworks, personalized implementation support, and measurable ROI tracking.
+
+## II. Offer Overview & Value Proposition
+
+${offerName} combines cutting-edge strategies with practical implementation tools to create a complete solution for ${formData.primaryAudience || "clients"}. The core transformation focuses on ${formData.coreTransformation || "improved productivity and outcomes"} through a structured approach that consistently delivers results.
+
+### Unique Selling Proposition
+${formData.uniqueSellingProposition || "Our proprietary methodology delivers results in half the time of competing approaches while providing superior long-term outcomes and implementation support."}`;
   }
 }
 
