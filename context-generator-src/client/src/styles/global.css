@@ -36,7 +36,7 @@
   --transition-medium: 0.3s ease;
   
   /* Border Radius */
-  --border-radius: 4px;
+  --border-radius: 8px;
   
   /* Shadows */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -510,6 +510,7 @@ button:disabled {
 .feature-card {
   background-color: var(--color-dark-bg);
   border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: var(--shadow-md);
   padding: 2rem;
   text-align: center;
@@ -761,6 +762,7 @@ button:disabled {
 .card {
   background-color: var(--color-dark-bg);
   border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
@@ -908,6 +910,7 @@ label {
 .document-type {
   background-color: var(--color-dark-bg);
   border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   box-shadow: var(--shadow-md);
@@ -963,6 +966,7 @@ label {
 .benefit-card {
   background-color: var(--color-dark-bg);
   border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 2rem;
   box-shadow: var(--shadow-md);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
