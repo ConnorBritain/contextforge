@@ -91,7 +91,7 @@ const SavedDocumentsPage = () => {
         {documents.length === 0 ? (
           <div className="empty-state">
             <h2>No Saved Documents</h2>
-            <p>You haven't saved any documents yet. Create your first document to get started.</p>
+            <p>You haven't saved any documents yet. Forge your first document to get started.</p>
             <button 
               className="primary-button"
               onClick={() => navigate('/forge')}
