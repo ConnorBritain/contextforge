@@ -8,6 +8,10 @@
   margin: 0 auto;
 }
 
+.form-container-wide {
+  max-width: 1200px; /* Wider container for the document type selector */
+}
+
 .form-header {
   margin-bottom: 2rem;
   text-align: center;
@@ -152,9 +156,13 @@
 /* Document Type Selection */
 .document-type-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  /* Adjust for 3 columns on larger screens */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .document-type-card {
@@ -164,16 +172,17 @@
   padding: 1.5rem;
   padding-bottom: 4rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   height: 100%;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
-.document-type-card::before {
+/* Always show gradient at the top - with variety by position */
+.document-type-card:nth-child(3n+1)::before {
   content: '';
   position: absolute;
   top: 0;
@@ -181,21 +190,42 @@
   width: 100%;
   height: 4px;
   background: linear-gradient(90deg, hsla(18, 100%, 78%, 1) 0%, hsla(280, 90%, 92%, 1) 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  opacity: 1;
 }
 
-.document-type-card:hover::before {
+.document-type-card:nth-child(3n+2)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, hsla(280, 90%, 92%, 1) 0%, hsla(189, 75%, 75%, 1) 100%);
   opacity: 1;
+}
+
+.document-type-card:nth-child(3n+3)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, hsla(189, 75%, 75%, 1) 0%, hsla(153, 67%, 82%, 1) 100%);
+  opacity: 1;
+}
+
+/* Change background on hover instead of showing the gradient */
+.document-type-card:hover {
+  border-color: hsla(280, 90%, 92%, 1);
+  background-color: rgba(220, 151, 255, 0.05);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
 }
 
 .document-type-card.selected {
   border-color: hsla(280, 90%, 92%, 1);
   background-color: rgba(220, 151, 255, 0.05);
-}
-
-.document-type-card.selected::before {
-  opacity: 1;
 }
 
 .document-type-icon {
@@ -204,6 +234,13 @@
   text-align: center;
   display: flex;
   justify-content: center;
+  color: var(--color-purple-accent);
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.document-type-card:hover .document-type-icon {
+  transform: scale(1.1);
+  color: var(--color-orange-accent);
 }
 
 .document-type-card h3 {
@@ -257,16 +294,22 @@
   padding: 0.5rem 1.25rem;
   border-radius: var(--border-radius);
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  box-shadow: var(--shadow-sm);
 }
 
 .document-type-select label:hover {
   background: var(--color-orange-accent);
+  color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .document-type-card.selected .document-type-select label {
-  background: var(--color-orange-accent);
-  color: var(--color-white);
+  background: var(--color-purple-accent);
+  color: var(--color-black);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* Review Form */
@@ -411,6 +454,18 @@
 }
 
 /* Responsive Form Design */
+@media (max-width: 1200px) {
+  .document-type-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 992px) {
+  .document-type-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .form-container {
     padding: 1.5rem;
@@ -435,5 +490,13 @@
   
   .form-navigation button {
     width: 100%;
+  }
+}
+
+/* Small adjustments for very large screens */
+@media (min-width: 1600px) {
+  .document-type-grid {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 1400px;
   }
 }
