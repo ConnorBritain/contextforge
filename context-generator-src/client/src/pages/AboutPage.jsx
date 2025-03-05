@@ -7,29 +7,43 @@ import { DOCUMENT_TYPES, DOCUMENT_TYPE_RECOMMENDED_FOR } from '../constants/docu
  * About page explaining how the Context Generator works with AI systems
  */
 const AboutPage = () => {
-  // Scroll to the element if a hash is present in the URL
+  // Scroll to the element based on query param or hash
   useEffect(() => {
-    // Get the hash from the URL (without the # symbol)
-    const hash = window.location.hash.substring(1);
-    
-    // If there's a hash, try to scroll to the element
-    if (hash) {
-      const element = document.getElementById(hash);
+    // Function to handle scrolling to a section
+    const scrollToSection = (sectionId) => {
+      const element = document.getElementById(sectionId);
       if (element) {
-        // Wait a bit longer for the page to fully render before scrolling
+        // Wait for the page to fully render
         setTimeout(() => {
-          // Use scrollIntoView with smooth behavior
-          // The scroll-padding-top CSS property will handle the header offset
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // Get the header height to offset the scroll position
+          const headerHeight = document.querySelector('.app-header')?.offsetHeight || 70;
           
-          // Add a small additional scroll to ensure no overlap
-          setTimeout(() => {
-            window.scrollBy(0, -10); // Slight additional offset for safety
-          }, 50);
-        }, 150);
+          // Get the element's position
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          
+          // Scroll to the element with offset for the header
+          window.scrollTo({
+            top: elementPosition - headerHeight - 5, // Small 5px buffer
+            behavior: 'smooth'
+          });
+        }, 200);
+      }
+    };
+    
+    // First check for section query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const sectionParam = urlParams.get('section');
+    
+    if (sectionParam) {
+      scrollToSection(sectionParam);
+    } else {
+      // Fall back to hash if no query parameter
+      const hash = window.location.hash.substring(1);
+      if (hash) {
+        scrollToSection(hash);
       }
     }
-  }, [window.location.hash]); // Re-run if hash changes
+  }, [window.location.search, window.location.hash]); // Re-run if either changes
   return (
     <div className="page-container about-page">
       <div className="about-header">

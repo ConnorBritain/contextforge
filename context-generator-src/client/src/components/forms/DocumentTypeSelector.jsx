@@ -120,7 +120,7 @@ const DocumentTypeSelector = ({ selectedType, onSelectType, onNext }) => {
 
               {/* Learn More button */}
               <Link 
-                to={`/about#${type.aboutLink}`} 
+                to={`/about?section=${type.aboutLink}`}
                 className="learn-more-button"
                 onClick={(e) => e.stopPropagation()} // Prevent card click
               >
