@@ -1,19 +1,17 @@
-const jwt = require('jsonwebtoken');
-const config = require('../config/default');
+const admin = require('../services/firebaseAdmin');
 
 /**
- * Middleware to authenticate and authorize requests using JWT tokens
+ * Middleware to authenticate and authorize requests using Firebase ID tokens
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @param {Function} next - Express next middleware function
  */
-module.exports = function(req, res, next) {
-  // Get token from header
-  const token = req.header('x-auth-token');
-
-  // In development mode without MongoDB, allow requests without authentication
-  // or with a mock token for testing
-  if (!(process.env.NODE_ENV === 'production' || process.env.MONGODB_REQUIRED === 'true')) {
+module.exports = async function(req, res, next) {
+  // Get token from Authorization header (Bearer token)
+  const authHeader = req.header('Authorization');
+  
+  // In development mode, allow requests without authentication
+  if (process.env.NODE_ENV !== 'production' && process.env.FIREBASE_AUTH_REQUIRED !== 'true') {
     // For development, use mock user
     req.user = {
       id: 'mock-user-1',
@@ -25,18 +23,28 @@ module.exports = function(req, res, next) {
   }
 
   // Check if no token
-  if (!token) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'No token, authorization denied' });
   }
 
+  // Extract the token
+  const idToken = authHeader.split('Bearer ')[1];
+
   try {
-    // Verify token
-    const decoded = jwt.verify(token, config.jwt.secret);
+    // Verify the Firebase ID token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
     
-    // Add user from payload to request
-    req.user = decoded;
+    // Add user from Firebase to request
+    req.user = {
+      id: decodedToken.uid,
+      email: decodedToken.email,
+      name: decodedToken.name || '',
+      role: decodedToken.role || 'user'
+    };
+    
     next();
   } catch (err) {
-    res.status(401).json({ error: 'Token is not valid' });
+    console.error('Token verification error:', err);
+    res.status(401).json({ error: 'Invalid authentication token' });
   }
 };
