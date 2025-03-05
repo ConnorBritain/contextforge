@@ -80,6 +80,7 @@ const DocumentTypeSelector = ({ selectedType, onSelectType, onNext }) => {
             className={`document-type-card ${selectedType === type.id ? 'selected' : ''}`}
             onClick={() => {
               onSelectType(type.id);
+              onNext(type.id); // Proceed to next step when clicking on card
             }}
           >
             <div className="document-type-icon">{type.icon}</div>
