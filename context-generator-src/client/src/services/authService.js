@@ -1,8 +1,19 @@
 import axios from 'axios';
+import { 
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  sendPasswordResetEmail,
+  updateProfile as updateFirebaseProfile,
+  onAuthStateChanged,
+  getIdToken
+} from 'firebase/auth';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { auth, firestore } from '../config/firebase';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
-// Auth endpoints are directly used in the code rather than through this variable
 
 // Subscription endpoints
 const SUBSCRIPTION_ENDPOINTS = {
@@ -14,78 +25,196 @@ const SUBSCRIPTION_ENDPOINTS = {
 
 /**
  * Authentication service for user registration, login, and session management
+ * Now using Firebase Authentication
  */
 const authService = {
   /**
-   * Initiate Google OAuth login
-   * Redirects the user to the Google authentication page
+   * Set up auth state listener
+   * @param {Function} callback - Function to call when auth state changes
+   * @returns {Function} - Unsubscribe function
    */
-  loginWithGoogle: () => {
-    const googleAuthUrl = `${API_URL}/auth/google`;
-    // Store the current location to redirect back after login
-    localStorage.setItem('redirectAfterLogin', window.location.pathname);
-    // Redirect to Google auth page
-    window.location.href = googleAuthUrl;
+  onAuthStateChanged: (callback) => {
+    return onAuthStateChanged(auth, callback);
   },
+
   /**
-   * Register a new user
+   * Initiate Google OAuth login with Firebase
+   */
+  loginWithGoogle: async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      // This gives you a Google Access Token
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+      
+      // The signed-in user info
+      const user = result.user;
+      
+      // Check if it's a new user and create firestore doc if needed
+      await authService.createUserProfileIfNeeded(user);
+      
+      return { user, token };
+    } catch (error) {
+      throw { error: error.message || 'Google login failed' };
+    }
+  },
+
+  /**
+   * Register a new user with Firebase
    * @param {Object} userData - User registration data
-   * @returns {Promise} - Response with token and user data
+   * @returns {Promise} - Response with user data
    */
   register: async (userData) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, userData);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      // Create user with Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(
+        auth, 
+        userData.email, 
+        userData.password
+      );
+
+      const user = userCredential.user;
+      
+      // Update display name if provided
+      if (userData.name) {
+        await updateFirebaseProfile(user, {
+          displayName: userData.name
+        });
       }
-      return response.data;
+      
+      // Create user profile document in Firestore
+      await setDoc(doc(firestore, 'users', user.uid), {
+        uid: user.uid,
+        email: user.email,
+        displayName: userData.name || '',
+        createdAt: new Date().toISOString(),
+        role: 'user',
+        subscription: {
+          plan: 'free',
+          status: 'active',
+          createdAt: new Date().toISOString()
+        }
+      });
+      
+      // Get ID token for API calls
+      const token = await getIdToken(user);
+      
+      return { user, token };
     } catch (error) {
-      throw error.response?.data || { error: 'Registration failed' };
+      throw { error: error.message || 'Registration failed' };
     }
   },
 
   /**
-   * Login a user
+   * Login a user with Firebase
    * @param {Object} credentials - User login credentials
-   * @returns {Promise} - Response with token and user data
+   * @returns {Promise} - Response with user data
    */
   login: async (credentials) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, credentials);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-      }
-      return response.data;
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        credentials.email,
+        credentials.password
+      );
+      
+      const user = userCredential.user;
+      const token = await getIdToken(user);
+      
+      return { user, token };
     } catch (error) {
-      throw error.response?.data || { error: 'Login failed' };
+      // Map Firebase error codes to user-friendly messages
+      let errorMessage = 'Login failed';
+      if (error.code === 'auth/invalid-credential') {
+        errorMessage = 'Invalid email or password';
+      } else if (error.code === 'auth/user-disabled') {
+        errorMessage = 'This account has been disabled';
+      } else if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Invalid password';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many failed login attempts. Please try again later.';
+      }
+      
+      throw { error: errorMessage };
     }
   },
 
   /**
-   * Logout the current user
+   * Logout the current user with Firebase
    */
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  logout: async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   },
 
   /**
-   * Get the current user from local storage
+   * Get the current user from Firebase Auth
    * @returns {Object|null} - Current user data or null
    */
   getCurrentUser: () => {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    return auth.currentUser;
+  },
+
+  /**
+   * Check if a user exists in Firestore and create profile if needed
+   * @param {Object} user - Firebase auth user
+   */
+  createUserProfileIfNeeded: async (user) => {
+    if (!user) return;
+    
+    const userRef = doc(firestore, 'users', user.uid);
+    const userSnap = await getDoc(userRef);
+    
+    if (!userSnap.exists()) {
+      // Create new user document
+      await setDoc(userRef, {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || '',
+        photoURL: user.photoURL || '',
+        createdAt: new Date().toISOString(),
+        role: 'user',
+        subscription: {
+          plan: 'free',
+          status: 'active',
+          createdAt: new Date().toISOString()
+        }
+      });
+    }
+  },
+
+  /**
+   * Send password reset email
+   * @param {string} email - User email
+   */
+  sendPasswordResetEmail: async (email) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (error) {
+      throw { error: error.message || 'Failed to send password reset email' };
+    }
   },
 
   /**
    * Get the current user's token
-   * @returns {string|null} - Current user's token or null
+   * @returns {Promise<string|null>} - Current user's ID token or null
    */
-  getToken: () => {
-    return localStorage.getItem('token');
+  getToken: async () => {
+    const user = auth.currentUser;
+    if (!user) return null;
+    
+    try {
+      return await getIdToken(user, true); // Force refresh
+    } catch (error) {
+      console.error('Error getting token:', error);
+      return null;
+    }
   },
 
   /**
@@ -93,58 +222,67 @@ const authService = {
    * @returns {boolean} - Whether the user is authenticated
    */
   isAuthenticated: () => {
-    return !!localStorage.getItem('token');
+    return !!auth.currentUser;
   },
 
   /**
-   * Get current user's profile
+   * Get current user's profile from Firestore
    * @returns {Promise} - Response with user profile data
    */
   getProfile: async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      throw { error: 'No authenticated user found' };
+    }
+    
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
+      const userRef = doc(firestore, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists()) {
+        return { ...userSnap.data(), id: user.uid };
+      } else {
+        // Create profile if it doesn't exist
+        await authService.createUserProfileIfNeeded(user);
+        const newUserSnap = await getDoc(userRef);
+        return { ...newUserSnap.data(), id: user.uid };
       }
-      
-      const response = await axios.get(`${API_URL}/auth/profile`, {
-        headers: {
-          'x-auth-token': token
-        }
-      });
-      
-      return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Failed to fetch profile' };
+      throw { error: error.message || 'Failed to fetch profile' };
     }
   },
 
   /**
-   * Update user profile
+   * Update user profile in Firestore
    * @param {Object} profileData - Updated profile data
    * @returns {Promise} - Response with updated user data
    */
   updateProfile: async (profileData) => {
+    const user = auth.currentUser;
+    if (!user) {
+      throw { error: 'No authenticated user found' };
+    }
+    
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
+      // Update display name in Firebase Auth if provided
+      if (profileData.displayName) {
+        await updateFirebaseProfile(user, {
+          displayName: profileData.displayName
+        });
       }
       
-      const response = await axios.put(`${API_URL}/auth/profile`, profileData, {
-        headers: {
-          'x-auth-token': token
-        }
+      // Update profile in Firestore
+      const userRef = doc(firestore, 'users', user.uid);
+      await updateDoc(userRef, {
+        ...profileData,
+        updatedAt: new Date().toISOString()
       });
       
-      // Update stored user data
-      if (response.data.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-      }
-      
-      return response.data;
+      // Get updated profile
+      const updatedProfile = await authService.getProfile();
+      return { user: updatedProfile };
     } catch (error) {
-      throw error.response?.data || { error: 'Failed to update profile' };
+      throw { error: error.message || 'Failed to update profile' };
     }
   },
 
@@ -154,7 +292,10 @@ const authService = {
    */
   getSubscriptionPlans: async () => {
     try {
-      const response = await axios.get(`${API_URL}${SUBSCRIPTION_ENDPOINTS.plans}`);
+      const token = await authService.getToken();
+      const response = await axios.get(`${API_URL}${SUBSCRIPTION_ENDPOINTS.plans}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: 'Failed to fetch subscription plans' };
@@ -167,14 +308,14 @@ const authService = {
    */
   getCurrentSubscription: async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = await authService.getToken();
       if (!token) {
         throw new Error('No authentication token found');
       }
       
       const response = await axios.get(`${API_URL}${SUBSCRIPTION_ENDPOINTS.current}`, {
         headers: {
-          'x-auth-token': token
+          Authorization: `Bearer ${token}`
         }
       });
       
@@ -191,7 +332,7 @@ const authService = {
    */
   updateSubscription: async (plan) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = await authService.getToken();
       if (!token) {
         throw new Error('No authentication token found');
       }
@@ -200,7 +341,7 @@ const authService = {
         { plan },
         {
           headers: {
-            'x-auth-token': token
+            Authorization: `Bearer ${token}`
           }
         }
       );
@@ -217,14 +358,14 @@ const authService = {
    */
   cancelSubscription: async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = await authService.getToken();
       if (!token) {
         throw new Error('No authentication token found');
       }
       
       const response = await axios.post(`${API_URL}${SUBSCRIPTION_ENDPOINTS.cancel}`, {}, {
         headers: {
-          'x-auth-token': token
+          Authorization: `Bearer ${token}`
         }
       });
       
