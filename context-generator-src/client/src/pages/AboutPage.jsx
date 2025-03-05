@@ -15,13 +15,20 @@ const AboutPage = () => {
     if (hash) {
       const element = document.getElementById(hash);
       if (element) {
-        // Wait a bit for the page to fully render before scrolling
+        // Wait a bit longer for the page to fully render before scrolling
         setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+          // Use scrollIntoView with smooth behavior
+          // The scroll-padding-top CSS property will handle the header offset
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          
+          // Add a small additional scroll to ensure no overlap
+          setTimeout(() => {
+            window.scrollBy(0, -10); // Slight additional offset for safety
+          }, 50);
+        }, 150);
       }
     }
-  }, []);
+  }, [window.location.hash]); // Re-run if hash changes
   return (
     <div className="page-container about-page">
       <div className="about-header">
