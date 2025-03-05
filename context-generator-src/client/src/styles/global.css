@@ -1037,6 +1037,16 @@ label {
   scroll-margin-top: var(--scroll-offset); /* Use larger scroll margin */
 }
 
+.document-type-for {
+  font-size: 0.9rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  color: var(--color-white);
+  opacity: 0.8;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .document-type:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
