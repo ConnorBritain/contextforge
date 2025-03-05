@@ -15,15 +15,7 @@ const configureSecurityMiddleware = (app) => {
   // Set security HTTP headers with Helmet
   app.use(helmet());
   
-  // Enable CORS with appropriate configuration
-  const corsOptions = {
-    origin: [config.clientUrl], // Allow only your frontend origin
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true, // Allow cookies to be sent with requests
-    maxAge: 86400 // CORS preflight request cache time (1 day)
-  };
-  app.use(cors(corsOptions));
+  // CORS is now configured separately in middleware/cors.js
   
   // Configure global rate limiting to prevent brute force attacks
   const generalLimiter = rateLimit({

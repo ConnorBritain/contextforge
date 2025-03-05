@@ -5,7 +5,7 @@ import authService from '../services/authService';
 const AuthContext = createContext();
 
 /**
- * AuthProvider component for managing authentication state
+ * AuthProvider component for managing authentication state with Firebase
  * @param {Object} props - Component props
  * @returns {JSX.Element} - Auth provider component
  */
@@ -13,26 +13,43 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
 
-  // Initialize auth state from local storage on component mount
+  // Subscribe to Firebase auth state changes
   useEffect(() => {
-    const initializeAuth = () => {
+    const unsubscribe = authService.onAuthStateChanged(async (user) => {
+      setLoading(true);
       try {
-        const user = authService.getCurrentUser();
-        setCurrentUser(user);
+        if (user) {
+          // User is signed in
+          setCurrentUser(user);
+          
+          // Get user profile data from Firestore if needed
+          try {
+            const profileData = await authService.getProfile();
+            setUserProfile(profileData);
+          } catch (profileError) {
+            console.error('Error fetching user profile:', profileError);
+          }
+        } else {
+          // User is signed out
+          setCurrentUser(null);
+          setUserProfile(null);
+        }
       } catch (err) {
-        console.error('Error initializing auth:', err);
-        setError('Failed to initialize authentication');
+        console.error('Auth state change error:', err);
+        setError('Authentication error occurred');
       } finally {
         setLoading(false);
       }
-    };
+    });
 
-    initializeAuth();
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, []);
 
   /**
-   * Register a new user
+   * Register a new user with Firebase
    * @param {Object} userData - User registration data
    * @returns {Promise} - Registration result
    */
@@ -42,7 +59,6 @@ export const AuthProvider = ({ children }) => {
     
     try {
       const result = await authService.register(userData);
-      setCurrentUser(result.user);
       return result;
     } catch (err) {
       setError(err.error || 'Registration failed');
@@ -53,7 +69,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * Login a user
+   * Login a user with Firebase
    * @param {Object} credentials - User login credentials
    * @returns {Promise} - Login result
    */
@@ -63,7 +79,6 @@ export const AuthProvider = ({ children }) => {
     
     try {
       const result = await authService.login(credentials);
-      setCurrentUser(result.user);
       return result;
     } catch (err) {
       setError(err.error || 'Login failed');
@@ -74,15 +89,24 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * Logout the current user
+   * Logout the current user with Firebase
    */
-  const logout = () => {
-    authService.logout();
-    setCurrentUser(null);
+  const logout = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await authService.logout();
+    } catch (err) {
+      setError(err.error || 'Logout failed');
+      console.error('Logout error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   /**
-   * Get the current user's profile
+   * Get the current user's profile from Firestore
    * @returns {Promise} - User profile data
    */
   const getProfile = async () => {
@@ -91,7 +115,7 @@ export const AuthProvider = ({ children }) => {
     
     try {
       const profile = await authService.getProfile();
-      setCurrentUser(profile);
+      setUserProfile(profile);
       return profile;
     } catch (err) {
       setError(err.error || 'Failed to fetch profile');
@@ -102,7 +126,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * Update the current user's profile
+   * Update the current user's profile in Firestore
    * @param {Object} profileData - Updated profile data
    * @returns {Promise} - Updated user data
    */
@@ -112,10 +136,28 @@ export const AuthProvider = ({ children }) => {
     
     try {
       const result = await authService.updateProfile(profileData);
-      setCurrentUser(result.user);
+      setUserProfile(result.user);
       return result;
     } catch (err) {
       setError(err.error || 'Failed to update profile');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Send password reset email
+   * @param {string} email - User email
+   */
+  const sendPasswordReset = async (email) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await authService.sendPasswordResetEmail(email);
+    } catch (err) {
+      setError(err.error || 'Failed to send password reset email');
       throw err;
     } finally {
       setLoading(false);
@@ -128,15 +170,26 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * Initiate Google OAuth login
+   * Initiate Google OAuth login with Firebase
    */
-  const loginWithGoogle = () => {
-    authService.loginWithGoogle();
+  const loginWithGoogle = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await authService.loginWithGoogle();
+    } catch (err) {
+      setError(err.error || 'Google login failed');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Create auth context value object
+  // Create auth context value object with combined user data
   const contextValue = {
     currentUser,
+    profile: userProfile,
     loading,
     error,
     register,
@@ -145,6 +198,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     getProfile,
     updateProfile,
+    sendPasswordReset,
     isAuthenticated
   };
 
