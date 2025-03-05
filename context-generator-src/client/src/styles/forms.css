@@ -102,7 +102,7 @@
   width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
-  color: var(--text-color);
+  color: #333333;
   background-color: white;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
@@ -570,5 +570,103 @@
   .document-type-grid {
     grid-template-columns: repeat(3, 1fr);
     max-width: 1400px;
+  }
+}
+
+/* Section form progress bar (at bottom of form) */
+.form-progress-bar {
+  height: 6px;
+  background-color: rgba(110, 120, 140, 0.2);
+  border-radius: 3px;
+  margin-top: 2rem;
+  overflow: hidden;
+  position: relative;
+  max-width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.form-progress-bar .progress-indicator {
+  background: linear-gradient(90deg, var(--color-orange-accent) 0%, var(--color-purple-accent) 50%, white 100%);
+  background-size: 200% 100%;
+  height: 100%;
+  transition: width 0.5s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Section indicators */
+.section-indicators {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.current-section h3 {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 1.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.current-section p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.section-counter {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+}
+
+/* Section dots navigation */
+.section-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0;
+}
+
+.section-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #d2ddec;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.section-dot:hover {
+  background-color: #b0bec5;
+  transform: scale(1.2);
+}
+
+.section-dot.active {
+  background-color: var(--primary-color);
+  transform: scale(1.3);
+}
+
+/* Responsive adjustments for section navigation */
+@media (max-width: 768px) {
+  .section-indicators {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .section-counter {
+    align-self: flex-start;
   }
 }
