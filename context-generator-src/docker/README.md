@@ -5,31 +5,57 @@ This directory contains Docker-related files for containerizing and deploying th
 ## Files
 
 - `docker-compose.yml` - Docker Compose configuration for multi-container setup
-- `.env.docker` - Docker-specific environment variables
-- `docker-setup.bat` - Windows setup script
-- `docker-setup.sh` - Linux/macOS setup script
+- `Dockerfile` - Container definition for the application
+- `entrypoint.sh` - Container startup script that handles configuration
+- `deploy-with-firebase.sh` - Linux/macOS deployment script with Firebase setup
+- `deploy-with-firebase.bat` - Windows deployment script with Firebase setup
+- `docker-setup.bat` - Basic Windows setup script
+- `docker-setup.sh` - Basic Linux/macOS setup script
 - `docker-troubleshoot.bat` - Windows troubleshooting script
 
-## Docker Deployment
+## Docker Deployment Options
 
-### Basic Usage
+### Option 1: Automated Firebase Deployment (Recommended)
 
-To start the application with Docker:
+For a fully automated deployment that handles Firebase configuration:
 
+**On Linux/macOS:**
 ```bash
-# Navigate to the project root
 cd context-generator-src
+./docker/deploy-with-firebase.sh
+```
 
-# Run the setup script (detects your OS automatically)
+**On Windows:**
+```batch
+cd context-generator-src
+docker\deploy-with-firebase.bat
+```
+
+This approach:
+- Prompts for Firebase configuration
+- Automatically sets up both client and server environments
+- Installs missing dependencies at runtime
+- Works in any environment without manual file editing
+
+For details on this approach, see the [Docker Firebase Setup Guide](../docs/DOCKER_FIREBASE_SETUP.md).
+
+### Option 2: Basic Setup
+
+For a simpler setup without Firebase (or with manual Firebase configuration):
+
+**On Linux/macOS:**
+```bash
+cd context-generator-src
 ./docker/docker-setup.sh
 ```
 
-For Windows:
+**On Windows:**
 ```batch
+cd context-generator-src
 docker\docker-setup.bat
 ```
 
-### Manual Setup
+### Option 3: Manual Setup
 
 If you prefer to manually set up Docker:
 
@@ -62,5 +88,6 @@ If you encounter issues with Docker deployment:
 - Check the Docker logs: `docker-compose -f docker/docker-compose.yml logs`
 - Verify your environment variables in `.env`
 - See the [Docker Windows Guide](../docs/DOCKER_WINDOWS_GUIDE.md) for Windows-specific issues
+- For Firebase issues, see the [Docker Firebase Setup Guide](../docs/DOCKER_FIREBASE_SETUP.md)
 
 For more detailed instructions, see the [Deployment Documentation](../docs/DEPLOYMENT.md).
