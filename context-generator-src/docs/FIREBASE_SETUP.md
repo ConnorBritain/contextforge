@@ -84,9 +84,11 @@ const firebaseConfig = {
 
 ## Step 6: Configure Environment Variables
 
-Add the Firebase configuration to your environment variables:
+Add the Firebase configuration to your environment variables in the proper locations:
 
-### Client Configuration (.env)
+### Client Configuration (in `/client/.env`)
+
+Create a `.env` file in the client directory (`/context-generator-src/client/.env`) with:
 
 ```
 REACT_APP_FIREBASE_API_KEY=your-api-key
@@ -98,16 +100,20 @@ REACT_APP_FIREBASE_APP_ID=your-app-id
 REACT_APP_FIREBASE_MEASUREMENT_ID=your-measurement-id
 ```
 
-### Server Configuration (.env)
+> **IMPORTANT**: Create React App requires environment variables to be in the client root folder with the `REACT_APP_` prefix.
+
+### Server Configuration (in `/config/.env`)
+
+Update the `.env` file in the config directory (`/context-generator-src/config/.env`) with:
 
 ```
-# Option 1: Copy the entire service account JSON as a single line
+# Option 1: Copy the entire service account JSON as a single line (recommended)
 FIREBASE_SERVICE_ACCOUNT={"type":"service_account","project_id":"your-project-id","private_key_id":"...","private_key":"...","client_email":"...","client_id":"...","auth_uri":"...","token_uri":"...","auth_provider_x509_cert_url":"...","client_x509_cert_url":"..."}
 
 # Option 2: Use individual environment variables
-FIREBASE_PROJECT_ID=your-project-id
-FIREBASE_CLIENT_EMAIL=your-client-email@your-project-id.iam.gserviceaccount.com
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYour Private Key\n-----END PRIVATE KEY-----\n"
+# FIREBASE_PROJECT_ID=your-project-id
+# FIREBASE_CLIENT_EMAIL=your-client-email@your-project-id.iam.gserviceaccount.com
+# FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYour Private Key\n-----END PRIVATE KEY-----\n"
 
 # Common settings
 FIREBASE_DATABASE_URL=https://your-project-id.firebaseio.com
