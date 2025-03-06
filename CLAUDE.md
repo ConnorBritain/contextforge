@@ -10,9 +10,15 @@
 - `npm test -- -t "test name"` - Run specific test
 - `cd context-generator-src/client && npm run firebase:emulators:start` - Start Firebase emulators for local development
 
+## Project Structure
+- Configuration files are in their respective directories:
+  - Environment config: `context-generator-src/config/`
+  - Docker config: `context-generator-src/docker/`
+- Development scripts: `context-generator-src/scripts/`
+
 ## Firebase Implementation
 - Project: ContextForge
-- Configuration stored in client/.env file (copy from .env.example)
+- Configuration stored in client/.env file (copy from config/.env.example)
 - Authentication: Email/password and Google OAuth
 - Database: Firestore for storing user profiles and documents
 - Storage: For document attachments and user uploads
@@ -22,7 +28,7 @@
   3. Enable Firestore Database 
   4. Enable Storage
   5. Add a web app to your Firebase project
-  6. Copy the Firebase config to your .env file
+  6. Copy the Firebase config to `config/.env` file
   7. Run `firebase init` in the project root to set up Firebase tools
 
 ## Code Style Guidelines

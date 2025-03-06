@@ -4,11 +4,11 @@
 # Exit on error
 set -e
 
-# Load environment variables from .env.production
-if [ -f .env.production ]; then
-  export $(grep -v '^#' .env.production | xargs)
+# Load environment variables from config/.env.production
+if [ -f config/.env.production ]; then
+  export $(grep -v '^#' config/.env.production | xargs)
 else
-  echo "Error: .env.production file not found!"
+  echo "Error: config/.env.production file not found!"
   exit 1
 fi
 
@@ -24,8 +24,8 @@ echo "=======================================\n"
 
 # Build and deploy with Docker Compose
 echo "Building and deploying application..."
-docker-compose -f docker-compose.yml build --no-cache
-docker-compose -f docker-compose.yml up -d
+docker-compose -f docker/docker-compose.yml build --no-cache
+docker-compose -f docker/docker-compose.yml up -d
 
 # Check if containers are running
 echo "Checking container status..."
