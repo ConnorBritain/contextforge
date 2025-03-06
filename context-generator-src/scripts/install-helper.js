@@ -74,6 +74,18 @@ try {
   console.log('You may need to install it manually with: npm install xss-clean@0.1.4 --save-exact');
 }
 
+// Install Firebase dependencies
+try {
+  console.log('Installing Firebase dependencies...');
+  execSync('npm install firebase-admin@^11.11.0 --save', { stdio: 'inherit' });
+  execSync('cd client && npm install firebase@^10.8.0 --save', { stdio: 'inherit' });
+} catch (error) {
+  console.log('Warning: Unable to install Firebase dependencies.');
+  console.log('You may need to install them manually with:');
+  console.log('  npm install firebase-admin@^11.11.0 --save');
+  console.log('  cd client && npm install firebase@^10.8.0 --save');
+}
+
 // Update package-lock.json to resolve vulnerabilities where possible
 try {
   console.log('Running npm audit fix in client directory...');

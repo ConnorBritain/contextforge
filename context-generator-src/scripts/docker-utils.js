@@ -237,7 +237,7 @@ async function findAvailablePortRange(count, startPort = 8000) {
  */
 async function updateDockerComposeWithAvailablePorts() {
   try {
-    const dockerComposePath = path.join(PROJECT_ROOT, 'docker-compose.yml');
+    const dockerComposePath = path.join(PROJECT_ROOT, 'docker', 'docker-compose.yml');
     const dockerComposeContent = fs.readFileSync(dockerComposePath, 'utf8');
     
     // Parse the YAML content
@@ -341,8 +341,8 @@ function checkDockerAvailable() {
  */
 function setupEnvFile() {
   return new Promise((resolve) => {
-    const envPath = path.join(PROJECT_ROOT, '.env');
-    const envDockerPath = path.join(PROJECT_ROOT, '.env.docker');
+    const envPath = path.join(PROJECT_ROOT, 'config', '.env');
+    const envDockerPath = path.join(PROJECT_ROOT, 'docker', '.env.docker');
     
     if (!fs.existsSync(envPath)) {
       if (fs.existsSync(envDockerPath)) {

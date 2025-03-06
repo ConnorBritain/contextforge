@@ -40,7 +40,7 @@ ContextForge is a full-stack application that helps you generate professional co
   </tr>
   <tr>
     <td align="center"><strong>Database</strong></td>
-    <td>MongoDB with Mongoose ODM</td>
+    <td>MongoDB with Mongoose ODM for primary storage, Firebase Firestore as optional</td>
   </tr>
   <tr>
     <td align="center"><strong>AI</strong></td>
@@ -48,7 +48,7 @@ ContextForge is a full-stack application that helps you generate professional co
   </tr>
   <tr>
     <td align="center"><strong>Auth</strong></td>
-    <td>JWT-based authentication with secure cookie storage</td>
+    <td>Firebase Authentication (client-side) with JWT tokens (server-side)</td>
   </tr>
   <tr>
     <td align="center"><strong>DevOps</strong></td>
@@ -68,7 +68,11 @@ ContextForge is a full-stack application that helps you generate professional co
 - npm or yarn
 - Docker (optional, for containerized setup)
 - MongoDB (local or cloud instance)
+- Firebase project (for authentication and optional storage)
 - API keys for Anthropic Claude or OpenAI
+
+> **Note**: For development, you can run with mock services without MongoDB or Firebase. 
+> For production, both MongoDB and Firebase are recommended.
 
 ### Quick Start
 
@@ -87,8 +91,8 @@ ContextForge is a full-stack application that helps you generate professional co
 3. **Configure environment**
    ```bash
    # Copy and modify the sample environment file
-   cp .env.example .env
-   # Edit .env with your MongoDB URI and API keys
+   cp config/.env.example config/.env
+   # Edit config/.env with your MongoDB URI and API keys
    ```
 
 4. **Start development server**
@@ -191,11 +195,11 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
    ```
 </details>
 
-📚 For detailed deployment instructions including CI/CD setup and scaling options, see [DEPLOYMENT.md](./context-generator-src/DEPLOYMENT.md).
+📚 For detailed deployment instructions including CI/CD setup and scaling options, see [DEPLOYMENT.md](./context-generator-src/docs/DEPLOYMENT.md).
 
 ### Docker on Windows
 
-If you're deploying on Windows, see our [Docker Windows Guide](./context-generator-src/DOCKER_WINDOWS_GUIDE.md) for platform-specific instructions.
+If you're deploying on Windows, see our [Docker Windows Guide](./context-generator-src/docs/DOCKER_WINDOWS_GUIDE.md) for platform-specific instructions.
    
 ## 📁 Project Structure
 
@@ -210,9 +214,23 @@ context-generator-src/
 │       ├── services/     # API client services
 │       ├── styles/       # CSS stylesheets
 │       └── utils/        # Helper functions
+├── config/               # Configuration files
+│   ├── .env              # Environment variables (development)
+│   ├── .env.example      # Example environment file
+│   └── .env.production   # Production environment variables
+├── docker/               # Docker configuration
+│   ├── .env.docker       # Docker-specific environment
+│   ├── docker-compose.yml # Docker Compose configuration
+│   ├── docker-setup.bat  # Windows setup script
+│   ├── docker-setup.sh   # Linux/Mac setup script
+│   └── docker-troubleshoot.bat # Troubleshooting script
+├── docs/                 # Documentation
+│   ├── DEPLOYMENT.md     # Deployment instructions
+│   ├── DOCKER_WINDOWS_GUIDE.md # Windows Docker guide
+│   └── FIREBASE_SETUP.md # Firebase setup guide
 ├── server/               # Express backend
 │   ├── src/
-│   │   ├── config/       # Environment configurations
+│   │   ├── config/       # Server configurations
 │   │   ├── controllers/  # Request handlers
 │   │   ├── middleware/   # Express middleware
 │   │   ├── models/       # MongoDB schemas
@@ -228,12 +246,44 @@ context-generator-src/
 └── scripts/              # Deployment and setup scripts
 ```
 
+## 🏗️ Architecture
+
+### Database Strategy
+
+ContextForge uses a hybrid database approach:
+
+#### MongoDB (Primary Database)
+- Stores document data, user profiles, and usage analytics
+- Handles persistent data storage on the server
+- Used for complex queries and data aggregation
+- Required in production mode
+
+#### Firebase (Authentication & Client-side)
+- Handles user authentication including Google OAuth
+- Provides real-time capabilities for collaborative features
+- Offers client-side storage options
+- Simplifies mobile/web authentication flow
+
+#### Advantages of this approach:
+- **Separation of concerns**: Authentication is handled by Firebase's battle-tested system
+- **Flexibility**: Development can proceed without full database setup
+- **Transition path**: Allows gradual migration between database systems
+- **Performance**: Uses each database for its strengths
+- **Development simplicity**: Mock services can replace both in development
+
+#### Configuration:
+- Enable/disable MongoDB with `MONGODB_REQUIRED=true` in environment
+- Firebase is optional in development but recommended for auth in production
+- Mock services provide fallbacks when databases are unavailable
+
+> 📘 **For detailed database setup instructions, see [DATABASE_SETUP.md](./context-generator-src/docs/DATABASE_SETUP.md) and [FIREBASE_SETUP.md](./context-generator-src/docs/FIREBASE_SETUP.md)**
+
 ## 🔒 Security
 
 ContextForge implements industry-standard security practices:
 
 - **Data Protection**: HTTPS enforcement, secure cookies, encryption
-- **Authentication**: JWT with secure settings and proper expiration
+- **Authentication**: Firebase Auth with JWT tokens for server-side validation
 - **Request Safety**: Input validation, sanitization, XSS protection
 - **API Security**: Rate limiting, CORS configuration
 - **Infrastructure**: Secure Helmet HTTP headers, NoSQL injection protection
