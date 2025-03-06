@@ -6,8 +6,24 @@ A context generation platform for enhancing AI prompts with structured data.
 
 1. Clone this repository
 2. Install dependencies: `npm install`
-3. Set up Firebase (see [Firebase Setup Guide](./FIREBASE_SETUP.md))
-4. Start development server: `npm run dev`
+3. Set up environment configuration (see below)
+4. Set up Firebase (see [Firebase Setup Guide](./FIREBASE_SETUP.md))
+5. Start development server: `npm run dev`
+
+## Configuration Files
+
+The application uses several configuration files located in specific directories:
+
+- **Environment Variables**: Located in the `config/` directory
+  - `config/.env` - Main environment configuration
+  - `config/.env.example` - Example configuration template
+  - `config/.env.production` - Production environment configuration
+
+- **Docker Configuration**: Located in the `docker/` directory
+  - `docker/docker-compose.yml` - Docker Compose configuration
+  - `docker/.env.docker` - Docker-specific environment variables
+  - `docker/docker-setup.sh` - Setup script for Unix/Mac
+  - `docker/docker-setup.bat` - Setup script for Windows
 
 ## Firebase Setup
 
