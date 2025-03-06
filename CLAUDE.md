@@ -8,12 +8,28 @@
 - `npm run lint` - Run ESLint
 - `npm test` - Run tests
 - `npm test -- -t "test name"` - Run specific test
+- `cd context-generator-src/client && npm run firebase:emulators:start` - Start Firebase emulators for local development
+
+## Firebase Implementation
+- Project: ContextForge
+- Configuration stored in client/.env file (copy from .env.example)
+- Authentication: Email/password and Google OAuth
+- Database: Firestore for storing user profiles and documents
+- Storage: For document attachments and user uploads
+- To set up Firebase:
+  1. Create a Firebase project in the Firebase console
+  2. Enable Authentication (Email/password and Google providers)
+  3. Enable Firestore Database 
+  4. Enable Storage
+  5. Add a web app to your Firebase project
+  6. Copy the Firebase config to your .env file
+  7. Run `firebase init` in the project root to set up Firebase tools
 
 ## Code Style Guidelines
 - React functional components with hooks
 - ES6+ JavaScript with JSX
 - Frontend: React (18+) with context API for state management
-- Backend: Express.js with modular controller/service architecture
+- Backend: Express.js with modular controller/service architecture (transitioning to Firebase)
 - File naming: PascalCase for components, camelCase for utilities
 - Error handling: Try/catch in async functions, ErrorMessage component for UI
 - Import order: React/libraries, then local components, then styles

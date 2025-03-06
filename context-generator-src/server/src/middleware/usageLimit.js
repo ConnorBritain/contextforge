@@ -1,7 +1,7 @@
 /**
- * Middleware to check and enforce usage limits
+ * Middleware to check and enforce usage limits with Firebase
  */
-const User = require('../models/User');
+const userService = require('../services/userService');
 const { ForbiddenError } = require('./errorHandler');
 
 /**
@@ -14,48 +14,38 @@ const checkUsageLimit = async (req, res, next) => {
     if (!req.user || req.user.role === 'admin') {
       return next();
     }
-
-    // Get the full user object with usage data
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      throw new ForbiddenError('User not found');
-    }
-
+    
+    const usageData = await userService.checkUsageLimits(req.user.id);
+    
     // Check if subscription is active
-    if (!user.subscription.active) {
+    if (!usageData.isActive) {
       throw new ForbiddenError('Your subscription is inactive. Please renew your subscription.');
     }
-
+    
     // Check if subscription has expired
-    const now = new Date();
-    if (now > user.subscription.endDate) {
-      // Only enforce for paid plans, free plans don't expire but reset usage
-      if (user.subscription.plan !== 'free') {
-        user.subscription.active = false;
-        await user.save();
-        throw new ForbiddenError('Your subscription has expired. Please renew your subscription.');
-      }
+    if (usageData.isExpired) {
+      await userService.updateUser(req.user.id, {
+        'subscription.active': false
+      });
+      throw new ForbiddenError('Your subscription has expired. Please renew your subscription.');
     }
-
-    // Check and reset usage if necessary
-    await user.checkAndResetUsage();
-
+    
     // Check token limit
-    if (user.hasReachedTokenLimit()) {
+    if (usageData.isTokenLimitReached) {
       throw new ForbiddenError(
         'Monthly token limit reached. Please upgrade your plan for additional tokens.'
       );
     }
-
+    
     // Check document limit
-    if (user.hasReachedDocumentLimit()) {
+    if (usageData.isDocLimitReached) {
       throw new ForbiddenError(
         'Monthly document generation limit reached. Please upgrade your plan for additional documents.'
       );
     }
-
-    // Store user in request for later token usage update
-    req.currentUser = user;
+    
+    // Store user data in request for later usage
+    req.userData = usageData.userData;
     next();
   } catch (error) {
     next(error);
