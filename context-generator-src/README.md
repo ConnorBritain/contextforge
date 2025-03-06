@@ -7,7 +7,7 @@ A context generation platform for enhancing AI prompts with structured data.
 1. Clone this repository
 2. Install dependencies: `npm install`
 3. Set up environment configuration (see below)
-4. Set up Firebase (see [Firebase Setup Guide](./FIREBASE_SETUP.md))
+4. Set up Firebase (see [Firebase Setup Guide](./docs/FIREBASE_SETUP.md))
 5. Start development server: `npm run dev`
 
 ## Configuration Files
@@ -31,7 +31,7 @@ This application uses Firebase for authentication and data storage. You need to 
 
 1. Copy `client/src/config/firebase.js.example` to `client/src/config/firebase.js`
 2. Add your Firebase configuration values in the new file
-3. See the [Firebase Setup Guide](./FIREBASE_SETUP.md) for detailed instructions
+3. See the [Firebase Setup Guide](./docs/FIREBASE_SETUP.md) for detailed instructions
 
 ## Common Issues and Solutions
 
@@ -44,7 +44,7 @@ If you see CORS errors in the console, make sure:
 
 ### Authentication Errors
 
-- "auth/configuration-not-found": See the [Firebase Setup Guide](./FIREBASE_SETUP.md)
+- "auth/configuration-not-found": See the [Firebase Setup Guide](./docs/FIREBASE_SETUP.md)
 - Other authentication errors: Check that you've enabled Email/Password authentication in Firebase Console
 
 ## Development
