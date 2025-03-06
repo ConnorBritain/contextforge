@@ -18,7 +18,7 @@ ContextForge uses a hybrid database approach with:
    - Or use Docker: `docker run --name mongodb -p 27017:27017 -d mongo`
 
 2. **Configure environment variables**
-   Edit your `.env` file in the `config` directory:
+   Edit your `.env` file in the `config` directory (`/context-generator-src/config/.env`):
 
    ```
    MONGODB_URI=mongodb://localhost:27017/context-generator
@@ -77,7 +77,8 @@ ContextForge uses a hybrid database approach with:
    - Give your app a nickname (e.g., "ContextForge Web")
    - Register the app and copy the configuration
 
-2. **Add configuration to environment variables**
+2. **Add configuration to client environment variables**
+   Add to `/context-generator-src/client/.env`:
    ```
    REACT_APP_FIREBASE_API_KEY=your-api-key
    REACT_APP_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
@@ -85,6 +86,7 @@ ContextForge uses a hybrid database approach with:
    REACT_APP_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
    REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
    REACT_APP_FIREBASE_APP_ID=your-app-id
+   REACT_APP_FIREBASE_MEASUREMENT_ID=your-measurement-id
    ```
 
 ### Server-Side Firebase Setup (Admin SDK)
@@ -95,6 +97,7 @@ ContextForge uses a hybrid database approach with:
    - Download and secure the JSON file
 
 2. **Add to server environment variables**
+   Add to `/context-generator-src/config/.env`:
    ```
    # Format the entire service account JSON as a single line string
    FIREBASE_SERVICE_ACCOUNT={"type":"service_account","project_id":"your-project-id","private_key_id":"key-id","private_key":"-----BEGIN PRIVATE KEY-----\nkey-content\n-----END PRIVATE KEY-----\n","client_email":"firebase-adminsdk@your-project-id.iam.gserviceaccount.com","client_id":"client-id","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk%40your-project.iam.gserviceaccount.com"}
@@ -106,6 +109,7 @@ ContextForge uses a hybrid database approach with:
 For development without database setup:
 
 1. **Configure environment for mock services**
+   In `/context-generator-src/config/.env`:
    ```
    NODE_ENV=development
    MONGODB_REQUIRED=false
@@ -123,7 +127,7 @@ For development without database setup:
 
 ### Development to Production
 
-1. Update environment variables:
+1. Update server environment variables in `/context-generator-src/config/.env`:
    ```
    NODE_ENV=production
    MONGODB_REQUIRED=true
