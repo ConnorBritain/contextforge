@@ -113,7 +113,7 @@ async function setupDocker(options = {}) {
     if (!skipPrompts) {
       const editEnv = await askYesNo('Would you like to edit the .env file?', false);
       if (editEnv) {
-        const envPath = path.join(dockerUtils.PROJECT_ROOT, '.env');
+        const envPath = path.join(dockerUtils.PROJECT_ROOT, 'config', '.env');
         console.log(`Please edit the file at: ${envPath}`);
         
         // Open the file with the default editor based on the platform
