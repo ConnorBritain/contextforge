@@ -14,9 +14,7 @@ module.exports = {
       temperature: 0.7,
       maxTokens: 4000
     },
-    mongodb: {
-      uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/context-generator'
-    },
+    // Removed MongoDB configuration block
     jwt: {
       secret: process.env.JWT_SECRET || 'your-secret-key-for-development',
       expiresIn: '7d'
