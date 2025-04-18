@@ -8,10 +8,21 @@ const healthRoutes = require('./routes/healthRoutes');
 const configureSecurityMiddleware = require('./middleware/security');
 const configureCorsMiddleware = require('./middleware/cors');
 const { errorHandler } = require('./middleware/errorHandler');
-const firebaseAdmin = require('./services/firebaseAdmin');
+const firebaseAdmin = require('./services/firebaseAdmin'); // Keep existing Firebase Admin setup for Auth
+const { initializeFirestore } = require('./services/firestoreService'); // Import Firestore initializer
+const wizardController = require('./controllers/wizardController'); // Import wizard controller
+const authMiddleware = require('./middleware/auth'); // Import auth middleware
 
 // Initialize Express app
 const app = express();
+
+// Initialize Firestore
+try {
+  initializeFirestore();
+} catch (error) {
+  console.error('Failed to initialize Firestore:', error);
+  process.exit(1); // Exit if Firestore cannot be initialized
+}
 
 // Serve static files from the client/build directory
 const path = require('path');
@@ -48,6 +59,9 @@ app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
+
+// New wizard route - protected by auth middleware
+app.post('/api/wizard', authMiddleware.verifyToken, wizardController.save);
 
 // Backward compatibility for previous route
 app.use('/api/contexts', documentRoutes);

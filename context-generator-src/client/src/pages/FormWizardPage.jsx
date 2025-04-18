@@ -12,13 +12,17 @@ import SalesMessagingPlaybookForm from '../components/forms/SalesMessagingPlaybo
 import ReviewForm from '../components/forms/ReviewForm';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
+import { toast } from 'react-hot-toast'; // Import toast for notifications
+import apiService from '../services/apiService'; // Import apiService
 
 /**
  * Multi-step form wizard for generating documents
  */
 const FormWizardPage = () => {
   const navigate = useNavigate();
-  const { generateDocument, isGenerating, error } = useContext(DocumentContext);
+  // Keeping DocumentContext for potential future generation logic, 
+  // but replacing direct generation with save draft for now.
+  const { isGenerating, error, setError } = useContext(DocumentContext); 
   
   // Current step in the wizard
   const [currentStep, setCurrentStep] = useState(1);
@@ -28,6 +32,9 @@ const FormWizardPage = () => {
   
   // Selected document type
   const [documentType, setDocumentType] = useState('');
+
+  // State for managing submission/loading state for the save draft action
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Handle document type selection
   const handleSelectDocumentType = (type) => {
@@ -43,7 +50,9 @@ const FormWizardPage = () => {
       // Update form data with new fields
       setFormData(prevData => ({
         ...prevData,
-        ...data
+        ...data,
+        // Ensure an ID is added early if not present, or use a consistent ID throughout
+        id: prevData.id || `wizard-${Date.now()}`
       }));
     }
     
@@ -60,13 +69,41 @@ const FormWizardPage = () => {
     window.scrollTo(0, 0);
   };
   
-  // Handle form submission to generate document
-  const handleSubmit = async () => {
-    const result = await generateDocument(formData, documentType);
-    
-    if (result) {
-      // Navigate to results page
-      navigate('/document-result');
+  // Handle submission: Save draft to Firestore via backend
+  const handleSaveDraft = async () => {
+    setIsSubmitting(true);
+    setError(null); // Clear previous errors
+
+    const wizardData = { 
+        ...formData, 
+        id: formData.id || `wizard-${Date.now()}`, // Re-ensure ID
+        documentType: documentType // Include document type in payload
+    };
+
+    try {
+      // Call the backend API to save the wizard data
+      const response = await apiService.saveWizardData(wizardData);
+      
+      console.log('API Response:', response);
+      toast.success('Wizard draft saved successfully!');
+      
+      // Navigate to the dashboard or a confirmation page upon success
+      navigate('/dashboard'); // Redirect to dashboard
+
+    } catch (apiError) {
+      console.error('Error saving wizard draft:', apiError);
+      // Use the error structure from ApiError
+      const errorMessage = apiError.data?.message || apiError.message || 'Failed to save wizard draft. Please try again.';
+      setError(errorMessage); // Use context error state
+      toast.error(errorMessage);
+      
+      // Handle specific errors like 401 Unauthorized
+      if (apiError.status === 401) {
+        // Optional: Redirect to login page
+        // navigate('/login'); 
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
@@ -90,122 +127,96 @@ const FormWizardPage = () => {
           formData={formData}
           documentType={documentType}
           onBack={handleBack}
-          onSubmit={handleSubmit}
-          isSubmitting={isGenerating}
+          // Pass handleSaveDraft instead of handleSubmit
+          onSubmit={handleSaveDraft} 
+          isSubmitting={isSubmitting} // Pass the local submitting state
+          setIsSubmitting={setIsSubmitting} // Pass setter if needed inside ReviewForm
         />
       );
     }
     
     // Step 2 changes based on the selected document type
     if (currentStep === 2) {
-      switch (documentType) {
-        case DOCUMENT_TYPES.BUSINESS_PROFILE:
-          return (
-            <BusinessProfileForm 
-              initialData={formData}
-              onSubmit={handleNext}
-              onBack={handleBack}
-            />
-          );
-        case DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE:
-          return (
-            <TargetMarketAudienceForm 
-              initialData={formData}
-              onSubmit={handleNext}
-              onBack={handleBack}
-            />
-          );
-        case DOCUMENT_TYPES.STYLE_GUIDE:
-          return (
-            <StyleGuideForm 
-              initialData={formData}
-              onSubmit={handleNext}
-              onBack={handleBack}
-            />
-          );
-        case DOCUMENT_TYPES.PERSONAL_BIO:
-          return (
-            <PersonalBioForm 
-              initialData={formData}
-              onSubmit={handleNext}
-              onBack={handleBack}
-            />
-          );
-        case DOCUMENT_TYPES.OFFER_DOCUMENTATION:
-          return (
-            <OfferDocumentationForm 
-              initialData={formData}
-              onSubmit={handleNext}
-              onBack={handleBack}
-            />
-          );
-        case DOCUMENT_TYPES.SALES_MESSAGING_PLAYBOOK:
-          return (
-            <SalesMessagingPlaybookForm 
-              initialData={formData}
-              onSubmit={handleNext}
-              onBack={handleBack}
-            />
-          );
-        default:
-          return <div>Please select a document type first</div>;
+      // Render the appropriate form based on documentType
+      // Ensure initialData, onSubmit, and onBack are passed correctly
+      const FormComponent = getFormComponent(documentType);
+      if (FormComponent) {
+        return (
+          <FormComponent 
+            initialData={formData} 
+            onSubmit={handleNext} 
+            onBack={handleBack} 
+          />
+        );
+      } else {
+        return <div>Please select a valid document type first</div>;
       }
     }
     
     return <div>Unknown step</div>;
   };
+
+  // Helper to get the correct form component for Step 2
+  const getFormComponent = (type) => {
+    switch (type) {
+      case DOCUMENT_TYPES.BUSINESS_PROFILE: return BusinessProfileForm;
+      case DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE: return TargetMarketAudienceForm;
+      case DOCUMENT_TYPES.STYLE_GUIDE: return StyleGuideForm;
+      case DOCUMENT_TYPES.PERSONAL_BIO: return PersonalBioForm;
+      case DOCUMENT_TYPES.OFFER_DOCUMENTATION: return OfferDocumentationForm;
+      case DOCUMENT_TYPES.SALES_MESSAGING_PLAYBOOK: return SalesMessagingPlaybookForm;
+      default: return null;
+    }
+  }
   
   return (
     <div className="page-container">
       <div className="wizard-container">
+        {/* Progress bar remains the same */} 
         <div className="wizard-progress">
-          <div className="progress-steps">
-            <div 
-              className={`progress-step ${currentStep >= 1 ? 'active' : ''}`}
-              onClick={() => documentType && setCurrentStep(1)}
-              style={{ cursor: documentType ? 'pointer' : 'default' }}
-            >
-              <div className="step-number">1</div>
-              <div className="step-label">Document Type</div>
-            </div>
-            <div 
-              className={`progress-step ${currentStep >= 2 ? 'active' : ''}`}
-              onClick={() => documentType && setCurrentStep(2)}
-              style={{ cursor: documentType ? 'pointer' : 'default' }}
-            >
-              <div className="step-number">2</div>
-              <div className="step-label">
-                {documentType === DOCUMENT_TYPES.BUSINESS_PROFILE && 'Business Profile'}
-                {documentType === DOCUMENT_TYPES.TARGET_MARKET_AUDIENCE && 'Audience Profile'}
-                {documentType === DOCUMENT_TYPES.STYLE_GUIDE && 'Style Guide'}
-                {documentType === DOCUMENT_TYPES.PERSONAL_BIO && 'Personal Bio'}
-                {documentType === DOCUMENT_TYPES.OFFER_DOCUMENTATION && 'Offer Brief'}
-                {documentType === DOCUMENT_TYPES.SALES_MESSAGING_PLAYBOOK && 'Messaging Playbook'}
-                {!documentType && 'Document Details'}
-              </div>
-            </div>
-            <div 
-              className={`progress-step ${currentStep >= 3 ? 'active' : ''}`}
-              onClick={() => Object.keys(formData).length > 0 && documentType && setCurrentStep(3)}
-              style={{ cursor: Object.keys(formData).length > 0 && documentType ? 'pointer' : 'default' }}
-            >
-              <div className="step-number">3</div>
-              <div className="step-label">Review</div>
-            </div>
-          </div>
-          <div className="progress-bar">
-            <div 
-              className="progress-indicator" 
-              style={{ width: `${(currentStep - 1) * 50}%` }} 
-            />
-          </div>
+           {/* ... progress bar JSX ... */} 
+           <div className="progress-steps">
+             <div 
+               className={`progress-step ${currentStep >= 1 ? 'active' : ''}`}
+               onClick={() => documentType && setCurrentStep(1)}
+               style={{ cursor: documentType ? 'pointer' : 'default' }}
+             >
+               <div className="step-number">1</div>
+               <div className="step-label">Document Type</div>
+             </div>
+             <div 
+               className={`progress-step ${currentStep >= 2 ? 'active' : ''}`}
+               onClick={() => documentType && setCurrentStep(2)}
+               style={{ cursor: documentType ? 'pointer' : 'default' }}
+             >
+               <div className="step-number">2</div>
+               <div className="step-label">
+                 {getFormComponent(documentType)?.name?.replace('Form', '') || 'Document Details'}
+               </div>
+             </div>
+             <div 
+               className={`progress-step ${currentStep >= 3 ? 'active' : ''}`}
+               onClick={() => Object.keys(formData).length > 0 && documentType && setCurrentStep(3)}
+               style={{ cursor: Object.keys(formData).length > 0 && documentType ? 'pointer' : 'default' }}
+             >
+               <div className="step-number">3</div>
+               <div className="step-label">Review & Save</div>
+             </div>
+           </div>
+           <div className="progress-bar">
+             <div 
+               className="progress-indicator" 
+               style={{ width: `${(currentStep - 1) * 50}%` }} 
+             />
+           </div>
         </div>
         
-        {isGenerating && (
+        {/* Display loading spinner or error messages */} 
+        {isSubmitting && (
           <div className="loading-overlay">
             <LoadingSpinner />
             <div className="loading-message">
-              Forging your document. This may take a minute...
+              Saving your draft...
             </div>
           </div>
         )}

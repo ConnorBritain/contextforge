@@ -1,11 +1,16 @@
 import React from 'react';
 import '../../styles/forms.css';
+import apiService from '../../services/apiService'; // Import apiService
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import { toast } from 'react-hot-toast'; // Import toast for notifications
 
 /**
  * Form component for reviewing and confirming all input data
  * before generating the document
  */
-const ReviewForm = ({ formData, documentType, onBack, onSubmit, isSubmitting }) => {
+const ReviewForm = ({ formData, documentType, onBack, isSubmitting, setIsSubmitting }) => {
+  const navigate = useNavigate(); // Hook for navigation
+
   // Define document type display name
   const getDocumentTypeDisplay = () => {
     switch (documentType) {
@@ -17,12 +22,14 @@ const ReviewForm = ({ formData, documentType, onBack, onSubmit, isSubmitting }) 
         return 'AI Style Guide';
       case 'personalBio':
         return 'Personal Bio Document';
+      // Add other cases as needed
       default:
         return 'Document';
     }
   };
   
   // Organize the form data into sections for easier review
+  // (Assuming sections definition remains the same)
   const sections = [
     {
       title: 'Business Information',
@@ -62,18 +69,55 @@ const ReviewForm = ({ formData, documentType, onBack, onSubmit, isSubmitting }) 
         { key: 'marketingChannels', label: 'Marketing Channels' }
       ]
     }
+    // Add more sections/fields based on the specific documentType if needed
   ];
   
-  const handleSubmit = (e) => {
+  // Handle submission by calling the backend API
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit();
+    setIsSubmitting(true);
+    
+    // Ensure formData includes a unique ID (e.g., timestamp or UUID)
+    // If `formData.id` is not already set, generate one here
+    const wizardData = { 
+        ...formData, 
+        id: formData.id || `wizard-${Date.now()}`, // Ensure an ID exists
+        documentType: documentType // Include document type in payload
+    };
+
+    try {
+      // Call the backend API to save the wizard data
+      const response = await apiService.saveWizardData(wizardData);
+      
+      console.log('API Response:', response);
+      toast.success('Wizard data saved successfully!');
+      
+      // Navigate to the dashboard or a confirmation page upon success
+      // You might want to pass the documentId to the next page
+      // navigate(`/dashboard?saved=${response.documentId}`); 
+      navigate('/dashboard'); // Redirect to dashboard
+
+    } catch (error) {
+      console.error('Error saving wizard data:', error);
+      // Display specific error message from API if available
+      const errorMessage = error.data?.message || error.message || 'Failed to save wizard data. Please try again.';
+      toast.error(errorMessage);
+      
+      // Handle specific errors like 401 Unauthorized
+      if (error.status === 401) {
+        // Redirect to login page or show login modal
+        // navigate('/login');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <div className="form-header">
         <h2>Review Your Information</h2>
-        <p>Please review the information you've provided before forging your {getDocumentTypeDisplay()}.</p>
+        <p>Please review the information you've provided before saving.</p>
       </div>
       
       {sections.map((section, sectionIndex) => (
@@ -81,14 +125,16 @@ const ReviewForm = ({ formData, documentType, onBack, onSubmit, isSubmitting }) 
           <h3>{section.title}</h3>
           <div className="review-grid">
             {section.fields.map((field, fieldIndex) => {
-              // Skip fields that don't exist in the form data
-              if (formData[field.key] === undefined) return null;
+              // Only display fields that have data
+              const value = formData[field.key];
+              if (!value) return null;
               
               return (
                 <div key={fieldIndex} className="review-item">
                   <div className="review-label">{field.label}</div>
                   <div className="review-value">
-                    {formData[field.key] ? formData[field.key] : <em>Not provided</em>}
+                    {/* Render arrays as comma-separated strings or lists */}
+                    {Array.isArray(value) ? value.join(', ') : value}
                   </div>
                 </div>
               );
@@ -118,10 +164,10 @@ const ReviewForm = ({ formData, documentType, onBack, onSubmit, isSubmitting }) 
         
         <button 
           type="submit" 
-          className="generate-button"
+          className="generate-button" // Changed text to Save Draft
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Forging...' : 'Forge Document'}
+          {isSubmitting ? 'Saving...' : 'Save Draft'} 
         </button>
       </div>
     </form>

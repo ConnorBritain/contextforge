@@ -60,7 +60,7 @@ class ApiService {
           }
         } catch (error) {
           // Continue trying other ports
-          console.log(`API Service: Port ${port} not available, trying next...`);
+          // console.log(`API Service: Port ${port} not available, trying next...`); // Reduce noise
         }
       }
       
@@ -90,6 +90,12 @@ class ApiService {
       } else {
         delete this.defaultHeaders['x-auth-token'];
       }
+      // Ensure token is persisted to localStorage as well
+      if (token) {
+        localStorage.setItem('token', token);
+      } else {
+        localStorage.removeItem('token');
+      }
     }
   
     /**
@@ -118,6 +124,17 @@ class ApiService {
       });
       
       return this._handleResponse(response);
+    }
+
+    /**
+     * Save wizard data to the backend
+     * @param {object} wizardData - The complete wizard data payload.
+     * @returns {Promise<object>} The response from the server.
+     */
+    async saveWizardData(wizardData) {
+      // Ensure the auth token is set before making the request
+      this._initializeToken(); 
+      return this.post('/wizard', wizardData);
     }
   
     /**
@@ -174,43 +191,43 @@ class ApiService {
         switch (response.status) {
           case 400: // Bad Request
             throw new ApiError(
-              data.error?.message || 'Bad request - Invalid input', 
+              data.message || 'Bad request - Invalid input', 
               400, 
-              data.error
+              data
             );
           case 401: // Unauthorized
             // Clear token on auth errors
-            localStorage.removeItem('token');
-            this.setAuthToken(null);
+            this.setAuthToken(null); // Use the method to clear token
+            window.dispatchEvent(new Event('auth-error')); // Dispatch event for potential UI updates
             throw new ApiError(
-              data.error?.message || 'Authentication required', 
+              data.message || 'Authentication required', 
               401, 
-              data.error
+              data
             );
           case 403: // Forbidden
             throw new ApiError(
-              data.error?.message || 'Access denied', 
+              data.message || 'Access denied', 
               403, 
-              data.error
+              data
             );
           case 404: // Not Found
             throw new ApiError(
-              data.error?.message || 'Resource not found', 
+              data.message || 'Resource not found', 
               404, 
-              data.error
+              data
             );
           case 429: // Rate Limited
             throw new ApiError(
-              data.error?.message || 'Too many requests - please try again later', 
+              data.message || 'Too many requests - please try again later', 
               429, 
-              data.error
+              data
             );
           case 500: // Server Error
           default:
             throw new ApiError(
-              data.error?.message || 'Server error - please try again later', 
+              data.message || 'Server error - please try again later', 
               response.status, 
-              data.error
+              data
             );
         }
       }
