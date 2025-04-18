@@ -1,126 +1,82 @@
 import apiService from './apiService';
 
 /**
- * Service for document-related operations
+ * Service for wizard draft operations.
+ * Generation is now handled by Cloud Functions triggered via Firestore.
  */
 class DocumentService {
-  /**
-   * Generate a new document
-   * @param {Object} formData - The form data from the user
-   * @param {string} contextType - The type of document to generate
-   * @param {string} aiProvider - The AI provider to use (default: anthropic)
-   * @returns {Promise} - The generated document
-   */
-  async generateDocument(formData, contextType, aiProvider = 'anthropic') {
-    return apiService.post('/documents/generate', {
-      formData,
-      contextType,
-      aiProvider
-    });
-  }
 
   /**
-   * Get all documents for the current user
-   * @param {Object} options - Pagination options
-   * @returns {Promise} - The user's documents
+   * Fetches all saved wizard drafts for the current user.
+   * @param {object} options - Optional query parameters (e.g., pagination).
+   * @returns {Promise<Array>} A promise that resolves to an array of draft objects.
    */
-  async getUserDocuments(options = {}) {
-    const { page = 1, limit = 10 } = options;
-    return apiService.get(`/documents?page=${page}&limit=${limit}`);
-  }
-
-  /**
-   * Get a specific document by ID
-   * @param {string} id - The document ID
-   * @returns {Promise} - The document
-   */
-  async getDocumentById(id) {
-    return apiService.get(`/documents/${id}`);
-  }
-
-  /**
-   * Delete a document
-   * @param {string} id - The document ID
-   * @returns {Promise} - The result
-   */
-  async deleteDocument(id) {
-    return apiService.delete(`/documents/${id}`);
-  }
-
-  /**
-   * Export a document to a specific format
-   * @param {Object} document - The document to export
-   * @param {string} format - The format to export to (markdown, html, text)
-   * @returns {Promise} - The exported document
-   */
-  async exportDocument(document, format = 'markdown') {
-    // For saved documents with an ID
-    if (document.id) {
-      // Create a download link for the file
-      const link = document.createElement('a');
-      link.href = `${apiService.baseURL}/documents/${document.id}/export?format=${format}`;
-      link.download = `${document.title || document.type}-${new Date().toISOString().split('T')[0]}.${this._getFileExtension(format)}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      return Promise.resolve();
+  async getSavedDrafts(options = {}) {
+    console.log('Fetching saved drafts...');
+    // Calls GET /api/wizard/list
+    try {
+        const response = await apiService.get('/wizard/list', options);
+        // The backend returns { success: true, drafts: [...] }
+        return response?.drafts || []; 
+    } catch (error) {
+        console.error('Error fetching saved drafts:', error);
+        throw error; // Propagate error for handling in UI
     }
-    
-    // For unsaved documents, use the export endpoint
-    return new Promise((resolve, reject) => {
-      apiService.post(`/documents/export/current?format=${format}`, { document })
-        .then(response => {
-          // Create a blob from the response
-          const blob = new Blob([response], {
-            type: this._getContentType(format)
-          });
-          
-          // Create a download link for the blob
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `${document.title || document.type}-${new Date().toISOString().split('T')[0]}.${this._getFileExtension(format)}`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          
-          // Clean up the blob URL
-          window.URL.revokeObjectURL(url);
-          resolve();
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
+  }
+
+  /**
+   * Deletes a specific wizard draft using its composite ID.
+   * @param {string} docId - The composite Firestore document ID (e.g., userId_wizardId).
+   * @returns {Promise<object>} The response from the API.
+   */
+  async deleteDraft(docId) {
+    if (!docId) {
+        throw new Error('Document ID is required to delete a draft.');
+    }
+    console.log(`Requesting deletion of draft: ${docId}`);
+    // Calls DELETE /api/wizard/:docId
+    try {
+        const response = await apiService.delete(`/wizard/${docId}`);
+        // Backend returns { success: true, message: ... }
+        return response; 
+    } catch (error) {
+        console.error(`Error deleting draft ${docId}:`, error);
+        throw error; // Propagate error for handling in UI
+    }
+  }
+
+  // --- Generation Initiation (Removed) ---
+  // generateContextDocStream() removed as generation is triggered by Firestore create.
+
+  // --- Deprecated / Placeholder Methods (Consider Removing) --- 
+
+  async getUserDocuments(options = {}) {
+      console.warn('getUserDocuments is deprecated, use getSavedDrafts instead.');
+      return this.getSavedDrafts(options);
+  }
+
+  async getDocumentById(id) {
+      console.warn('getDocumentById is deprecated. Drafts are fetched via getSavedDrafts, editing loads into wizard.');
+      return Promise.resolve(null); 
+  }
+
+  async deleteDocument(id) {
+      console.warn('deleteDocument is deprecated, use deleteDraft instead.');
+      return this.deleteDraft(id);
+  }
+
+  async exportDocument(document, format = 'markdown') {
+      console.warn('exportDocument should be handled client-side based on generated document data.');
+      return Promise.reject(new Error('Export not implemented in service this way.'));
   }
   
-  /**
-   * Get the file extension for a format
-   * @param {string} format - The format
-   * @returns {string} - The file extension
-   */
+  // --- Client-Side Helper methods for Export (can be kept) --- 
   _getFileExtension(format) {
-    const extensions = {
-      markdown: 'md',
-      html: 'html',
-      text: 'txt'
-    };
-    
+    const extensions = { markdown: 'md', html: 'html', text: 'txt' };
     return extensions[format] || 'txt';
   }
-  
-  /**
-   * Get the content type for a format
-   * @param {string} format - The format
-   * @returns {string} - The content type
-   */
   _getContentType(format) {
-    const contentTypes = {
-      markdown: 'text/markdown',
-      html: 'text/html',
-      text: 'text/plain'
-    };
-    
+    const contentTypes = { markdown: 'text/markdown', html: 'text/html', text: 'text/plain' };
     return contentTypes[format] || 'text/plain';
   }
 }

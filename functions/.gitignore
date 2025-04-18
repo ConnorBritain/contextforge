@@ -1,0 +1,28 @@
+*.log
+*.lock
+
+node_modules/
+dist/
+coverage/
+
+# Firebase cache and config
+.firebase/
+firebase-debug.log
+*.secret*.local
+
+# Service account keys (NEVER commit these)
+*serviceAccountKey*.json
+*service-account*.json
+
+# Environment variables
+.env*
+!.env.example
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

@@ -1,209 +1,151 @@
-# Context Generator Deployment Guide
+# Deployment Guide for ContextForge
 
-This document provides instructions for testing and deploying the Context Generator application. It covers local development setup, Docker deployment for testing, and production deployment.
-
-## Table of Contents
-
-1. [Prerequisites](#prerequisites)
-2. [Environment Setup](#environment-setup)
-3. [Local Development](#local-development)
-4. [Docker Deployment](#docker-deployment)
-5. [Testing Token Tracking and Subscription](#testing-token-tracking-and-subscription)
-6. [Production Deployment](#production-deployment)
-7. [Security Considerations](#security-considerations)
-8. [Monitoring and Maintenance](#monitoring-and-maintenance)
+This guide outlines the steps necessary to deploy and run the ContextForge application, including frontend, backend API, and Cloud Functions for AI generation.
 
 ## Prerequisites
 
-Before starting, ensure you have the following installed:
+*   **Node.js:** Version 18 or later (check `.nvmrc` or `engines` in `package.json`).
+*   **npm:** Node Package Manager (usually included with Node.js).
+*   **Firebase Account:** A Google account with access to Firebase.
+*   **Firebase CLI:** Install or update the Firebase Command Line Interface: `npm install -g firebase-tools`.
+*   **Firebase Project:** A Firebase project created via the [Firebase Console](https://console.firebase.google.com/).
+*   **AI Provider API Keys:** API keys for OpenAI and/or Anthropic, depending on which service(s) you intend to use.
+*   **Git:** For cloning the repository.
 
-- Node.js (v14 or higher)
-- npm (v6 or higher)
-- Docker and Docker Compose
-- MongoDB (v4.4 or higher, optional for local development without Docker)
-- API keys for Anthropic and/or OpenAI
+## Deployment Steps
 
-## Environment Setup
-
-The application uses environment variables for configuration. Several example files are provided:
-
-- `.env.example`: Basic template with all available options
-- `.env.docker`: Configuration for Docker development environment
-- `.env.production`: Configuration for production deployment
-
-To set up your environment:
-
-1. For local development:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. For Docker testing:
-   ```bash
-   cp .env.docker .env
-   ```
-
-3. For production:
-   ```bash
-   cp .env.production .env
-   ```
-
-After copying the appropriate file, edit it to add your actual API keys and other sensitive information.
-
-## Local Development
-
-To run the application locally:
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-This will start both the client and server in development mode with hot reloading.
-
-Alternatively, you can start them individually:
+### 1. Clone Repository
 
 ```bash
-# Start server only
-npm run server
-
-# Start client only
-npm run client
+# Replace with your repository URL if different
+git clone https://github.com/connorbritain/contextforge.git
+cd contextforge
 ```
 
-## Docker Deployment
+### 2. Install Dependencies
 
-For a more production-like environment, use Docker:
-
-### Automated Setup
-
-We provide a script to automate the Docker setup and testing:
+Install dependencies for the root project (server) and the client application, then for the Cloud Functions.
 
 ```bash
-./scripts/setup-docker-test.sh
+# Installs root (server) deps and automatically runs client install
+npm install 
+
+# Install Cloud Functions dependencies
+cd functions
+npm install
+cd ..
 ```
 
-This script will:
-1. Check prerequisites
-2. Set up environment files
-3. Install dependencies
-4. Build Docker images
-5. Start Docker containers
-6. Optionally run tests
-7. Optionally stop containers when done
+### 3. Firebase Project Setup
 
-### Manual Setup
+Perform these steps in the [Firebase Console](https://console.firebase.google.com/) for your project:
 
-If you prefer manual setup:
+*   **Authentication:**
+    *   Navigate to **Build > Authentication**.
+    *   Click **Get started**.
+    *   Enable the desired Sign-in providers (e.g., **Email/Password**, Google, etc.).
+*   **Firestore Database:**
+    *   Navigate to **Build > Firestore Database**.
+    *   Click **Create database**.
+    *   Choose **Start in production mode** (recommended) or test mode.
+    *   Select a Firestore location (cannot be changed later).
+    *   Click **Enable**.
+*   **Register Web App:**
+    *   Go to **Project settings** (gear icon) > **General**.
+    *   Scroll down to **Your apps**.
+    *   Click the **Web** icon (`</>`) to register a new web app.
+    *   Give it a nickname (e.g., "ContextForge Web Client").
+    *   Click **Register app**.
+    *   **Important:** Copy the `firebaseConfig` object provided. You will need this for the client configuration.
+*   **Generate Service Account Key:**
+    *   Go to **Project settings** > **Service accounts**.
+    *   Ensure **Node.js** is selected.
+    *   Click **Generate new private key**.
+    *   Confirm by clicking **Generate key**.
+    *   A JSON file will download. **Save this file securely** and note its absolute path. You will need this for server and function configuration.
 
-1. Build the Docker images:
-   ```bash
-   docker-compose build
-   ```
+### 4. Application Configuration
 
-2. Start the containers:
-   ```bash
-   docker-compose up -d
-   ```
+Configure the environment variables and client settings:
 
-3. View logs:
-   ```bash
-   docker-compose logs -f
-   ```
+*   **Client Firebase Config:**
+    *   Copy `context-generator-src/client/src/config/firebase.js.example` to `context-generator-src/client/src/config/firebase.js`.
+    *   Paste the `firebaseConfig` object (obtained in Step 3) into this new file, replacing the placeholder values.
+*   **Server Environment (`.env`):**
+    *   Copy `context-generator-src/config/.env.example` to `context-generator-src/config/.env`.
+    *   Edit `.env` and set the following:
+        *   `FIREBASE_PROJECT_ID`: Your Firebase project ID.
+        *   `GOOGLE_APPLICATION_CREDENTIALS`: The **absolute path** to the service account key JSON file you downloaded in Step 3.
+        *   (Optional) Adjust `PORT`, `ALLOWED_ORIGINS` if needed for your deployment environment.
+*   **Cloud Functions Environment:**
+    *   Run these commands from the **root** project directory, replacing `YOUR_KEY` with your actual API keys:
+      ```bash
+      firebase login # Ensure you are logged into the correct Firebase account
+      firebase use YOUR_FIREBASE_PROJECT_ID # Set the active project
 
-4. Stop the containers:
-   ```bash
-   docker-compose down
-   ```
+      # Set API Keys (only include keys for services you will use)
+      firebase functions:config:set openai.key="YOUR_OPENAI_API_KEY"
+      firebase functions:config:set anthropic.key="YOUR_ANTHROPIC_API_KEY"
 
-## Testing Token Tracking and Subscription
+      # Optional: Set default AI service for functions (if applicable)
+      # firebase functions:config:set ai.service="openai"
 
-To test the token tracking and subscription functionality:
+      # Verify the config (optional)
+      # firebase functions:config:get
+      ```
+    *   **Note:** If you update function configurations later, you need to redeploy the functions for the changes to take effect.
 
-1. Ensure the application is running (either locally or in Docker)
+### 5. Deploy Firebase Resources
 
-2. Run the token tracking test script:
-   ```bash
-   node scripts/test-token-tracking.js
-   ```
+Deploy Firestore security rules and the Cloud Function from the root project directory:
 
-This script tests:
-- User registration and login
-- Document generation and token usage tracking
-- Subscription tier limits
-- Subscription upgrades and downgrades
+```bash
+# Deploy Firestore rules defined in firestore.rules
+firebase deploy --only firestore:rules
 
-## Production Deployment
+# Deploy Cloud Functions defined in the functions/ directory
+firebase deploy --only functions
+```
 
-For production deployment:
+*   Wait for the deployment to complete successfully.
 
-1. Configure your production environment:
-   ```bash
-   cp .env.production .env
-   ```
+### 6. Build and Deploy Frontend/Server (Example: Using Firebase Hosting)
 
-2. Update the `.env` file with your production values:
-   - Set strong passwords for MongoDB
-   - Use actual API keys
-   - Configure production URLs
-   - Set a strong JWT secret
+This step depends heavily on your chosen hosting provider. Here's an example using Firebase Hosting for the frontend and potentially Cloud Run or another service for the backend API (though the backend API is now minimal).
 
-3. Build and deploy using Docker:
-   ```bash
-   docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-   ```
+*   **Build the React Client:**
+    ```bash
+    cd context-generator-src/client
+    npm run build
+    cd ../.. 
+    ```
+*   **Firebase Hosting Setup (if not done):**
+    ```bash
+    # Run from root directory
+    firebase init hosting 
+    ```
+    *   Select your Firebase project.
+    *   Specify the **public directory**: `context-generator-src/client/build`
+    *   Configure as a single-page app: **Yes**
+    *   Set up automatic builds and deploys with GitHub: **No** (can be set up later)
+*   **Deploy to Firebase Hosting:**
+    ```bash
+    firebase deploy --only hosting
+    ```
+*   **Deploy Backend API (if needed):** The Express server is now mainly for user login/registration and saving/listing/deleting drafts. It doesn't handle generation. You could deploy this to:
+    *   **Cloud Run:** Containerize it (using the existing Dockerfile) and deploy.
+    *   **App Engine:** Adapt it for App Engine deployment.
+    *   **Other Node.js hosting:** Heroku, Render, etc.
+    *   **Crucial:** Ensure the deployed backend API has the correct `GOOGLE_APPLICATION_CREDENTIALS` path accessible and the `.env` file configured.
 
-### Considerations for Production
+### 7. Access Application
 
-- **Domain and SSL**: Set up a domain name and SSL certificates (using Let's Encrypt)
-- **Reverse Proxy**: Use Nginx or similar as a reverse proxy
-- **Database Backups**: Configure regular MongoDB backups
-- **Monitoring**: Set up health check monitoring
+*   If using Firebase Hosting, access the application via your Firebase Hosting URL (`YOUR_PROJECT_ID.web.app` or custom domain).
+*   Ensure the frontend can reach the deployed backend API (check CORS configuration `ALLOWED_ORIGINS` in the backend `.env` file).
 
-## Security Considerations
+## Post-Deployment Considerations
 
-Several security measures are implemented:
-
-1. **Rate Limiting**: Prevents abuse of the API
-2. **Input Validation**: All user input is validated
-3. **Authentication**: JWT-based authentication for API access
-4. **Data Sanitization**: Protection against XSS and NoSQL injection
-5. **HTTPS**: All production traffic should use HTTPS
-6. **Environment Variables**: Sensitive information is stored in environment variables
-
-## Monitoring and Maintenance
-
-### Health Checks
-
-The application provides health check endpoints:
-
-- `/api/health`: Basic status check
-- `/api/health/details`: Detailed status including database connection
-
-### Database Maintenance
-
-For MongoDB maintenance:
-
-1. **Backups**: Regular backups should be configured
-2. **Indexing**: Ensure proper indexing for performance
-3. **Monitoring**: Set up monitoring for database performance
-
-### Logs
-
-Logs are available through:
-
-- Docker logs: `docker-compose logs -f`
-- Application logs: Check the configured log files or stdout
-
-### Upgrades
-
-To update the application:
-
-1. Pull the latest code
-2. Build new Docker images
-3. Restart the containers with the new images
+*   **Monitoring:** Monitor Cloud Function logs and performance in the Firebase Console or Google Cloud Console.
+*   **Costs:** Be mindful of Firebase usage (Firestore reads/writes, Function invocations, Hosting bandwidth) and AI provider costs (token usage). Set up budget alerts if necessary.
+*   **Security:** Regularly review Firestore security rules and Cloud Function access controls.
+*   **Updates:** To update the application, make code changes, rebuild/redeploy the relevant parts (hosting, functions, backend API).

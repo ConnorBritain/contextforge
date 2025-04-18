@@ -1,58 +1,72 @@
 # ContextForge
 
-A context generation platform for enhancing AI prompts with structured data.
+A platform for generating professional context documents (e.g., marketing profiles, style guides) based on user input via a guided wizard. It leverages AI (OpenAI/Anthropic) for content generation and Firebase for persistence and backend processing.
+
+## Core Features
+
+*   **Multi-Step Wizard:** Guides users through providing detailed information relevant to various document types.
+*   **AI-Powered Generation:** Uses LLMs (configurable: OpenAI/Anthropic) to generate structured documents based on wizard input.
+*   **Firebase Integration:**
+    *   **Authentication:** Uses Firebase Authentication for user management.
+    *   **Firestore:** Persists wizard drafts in the `wizardResponses` collection.
+    *   **Cloud Functions:** Automatically triggers document generation via a Firestore `onCreate` trigger when a new draft is saved. The generated content is saved back to the corresponding Firestore document.
+*   **Real-time Updates:** (Leveraging Cloud Functions + Firestore listeners) Users can see the status and final generated document update in real-time.
+*   **Chunking for Large Inputs:** Automatically splits large wizard inputs into smaller chunks to fit within AI model context limits.
+
+## Project Structure
+
+*   `context-generator-src/client/`: React frontend application (Create React App).
+*   `context-generator-src/server/`: Node.js/Express backend server (handles user auth, saving initial drafts, potentially other API tasks).
+*   `context-generator-src/shared/`: Code shared between client and server (constants, types).
+*   `context-generator-src/config/`: Configuration files for the server.
+*   `context-generator-src/scripts/`: Helper scripts for setup, Docker, etc.
+*   `context-generator-src/docs/`: Detailed documentation guides.
+*   `functions/`: Firebase Cloud Functions code (handles the core AI generation process triggered by Firestore).
+*   `firestore.rules`: Security rules for Firestore database access.
 
 ## Getting Started
 
-1. Clone this repository
-2. Install dependencies: `npm install`
-3. Set up environment configuration (see below)
-4. Set up Firebase (see [Firebase Setup Guide](./docs/FIREBASE_SETUP.md))
-5. Start development server: `npm run dev`
+1.  **Clone Repository:** `git clone <repository-url>`
+2.  **Install Root Dependencies:** `cd contextforge && npm install` (Installs server deps and runs client install via `postinstall` script)
+3.  **Install Function Dependencies:** `cd functions && npm install && cd ..`
+4.  **Firebase Setup:**
+    *   Create a Firebase project (or use an existing one).
+    *   Enable **Authentication** (Email/Password provider at minimum).
+    *   Enable **Firestore Database**.
+    *   Follow the detailed [Firebase Setup Guide](./docs/FIREBASE_SETUP.md) to configure client-side SDKs and obtain a service account key for the backend/functions.
+5.  **Environment Configuration:**
+    *   **Client:** Copy `context-generator-src/client/src/config/firebase.js.example` to `firebase.js` and add your Firebase project's web app configuration details.
+    *   **Server:** Create `context-generator-src/config/.env` based on `.env.example`. Fill in your `FIREBASE_PROJECT_ID` and the *absolute path* to your downloaded Firebase Admin SDK service account key (`GOOGLE_APPLICATION_CREDENTIALS`).
+    *   **Cloud Functions:** Set required environment configuration using the Firebase CLI (run from the root directory):
+        ```bash
+        # Replace YOUR_KEY with actual keys
+        firebase functions:config:set openai.key="YOUR_OPENAI_API_KEY"
+        firebase functions:config:set anthropic.key="YOUR_ANTHROPIC_API_KEY"
+        # Optional: Set preferred AI service
+        # firebase functions:config:set ai.service="openai" 
+        # Deploy config changes if needed: firebase deploy --only functions
+        ```
+6.  **Deploy Firestore Rules & Cloud Function:**
+    *   `firebase deploy --only firestore:rules`
+    *   `firebase deploy --only functions`
+7.  **Start Development Server:** `cd context-generator-src && npm run dev` (Starts client & server concurrently)
 
-## Configuration Files
+## Development Workflow
 
-The application uses several configuration files located in specific directories:
+1.  Make changes to client, server, or functions code.
+2.  The development server (`npm run dev`) uses `nodemon` for automatic server restarts. The client uses React's hot-reloading.
+3.  If you change Cloud Functions code, redeploy them: `firebase deploy --only functions`.
+4.  If you change Firestore rules, redeploy them: `firebase deploy --only firestore:rules`.
 
-- **Environment Variables**: Located in the `config/` directory
-  - `config/.env` - Main environment configuration
-  - `config/.env.example` - Example configuration template
-  - `config/.env.production` - Production environment configuration
+## Key Technologies
 
-- **Docker Configuration**: Located in the `docker/` directory
-  - `docker/docker-compose.yml` - Docker Compose configuration
-  - `docker/.env.docker` - Docker-specific environment variables
-  - `docker/docker-setup.sh` - Setup script for Unix/Mac
-  - `docker/docker-setup.bat` - Setup script for Windows
-
-## Firebase Setup
-
-This application uses Firebase for authentication and data storage. You need to create a Firebase project and add your configuration.
-
-1. Copy `client/src/config/firebase.js.example` to `client/src/config/firebase.js`
-2. Add your Firebase configuration values in the new file
-3. See the [Firebase Setup Guide](./docs/FIREBASE_SETUP.md) for detailed instructions
-
-## Common Issues and Solutions
-
-### CORS Errors
-
-If you see CORS errors in the console, make sure:
-- Both the client and server are running
-- The server is using the correct port (usually 5000)
-- You've correctly set up the Firebase configuration
-
-### Authentication Errors
-
-- "auth/configuration-not-found": See the [Firebase Setup Guide](./docs/FIREBASE_SETUP.md)
-- Other authentication errors: Check that you've enabled Email/Password authentication in Firebase Console
-
-## Development
-
-- `npm run dev` - Start both client and server
-- `npm run client` - Start only the client
-- `npm run server` - Start only the server
+*   React (Frontend)
+*   Node.js / Express (Backend API - primarily for auth, initial draft save)
+*   Firebase (Auth, Firestore, Cloud Functions)
+*   OpenAI / Anthropic (AI Generation)
+*   Tiktoken (Token counting & chunking)
+*   React Hot Toast (Notifications)
 
 ## Contributing
 
-Contributions are welcome. Please ensure you follow the existing code style and patterns.
+Contributions are welcome. Please follow existing code patterns and ensure necessary environment setup is documented. Consider adding tests for new functionality.

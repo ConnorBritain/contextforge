@@ -5,42 +5,43 @@ const { BadRequestError } = require('../middleware/errorHandler');
 const userService = require('../services/userService');
 
 /**
- * Generate a context document based on form data
+ * Generate a context document based on directly provided form data.
+ * NOTE: This route might be deprecated or less used now that Cloud Functions handle generation from saved drafts.
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @param {Function} next - Express next middleware function
  */
 exports.generateContext = async (req, res, next) => {
+  console.warn('Direct /api/generate/context called. Consider using the Firestore-triggered Cloud Function flow.');
   try {
     const { contextType, formData } = req.body;
     
     if (!contextType || !formData) {
-      throw new BadRequestError('Missing required parameters: contextType or formData');
+      return next(new BadRequestError('Missing required parameters: contextType or formData'));
     }
     
-    // Build the appropriate prompt
+    // Build the prompt (assumes non-chunking)
     const prompt = PromptBuilder.buildPrompt(contextType, formData);
     
-    // Get the configured AI service
+    // Get AI service (uses server's config)
     const aiService = AIServiceFactory.getService();
     
-    // Generate the document
+    // Generate the document in one go
     const responseData = await aiService.generateContent(prompt);
     
-    // Process the response into a structured document
+    // Process the response
     const processedDocument = DocumentProcessor.processResponse(
-      responseData.content, 
+      responseData.content,
       contextType
     );
     
-    // If authenticated, update token usage with Firebase
-    if (req.user && req.userData) {
-      await userService.updateTokenUsage(req.user.id, responseData.tokensUsed);
-      await userService.incrementDocumentCount(req.user.id);
+    // Update token usage (if user is authenticated)
+    if (req.auth && req.userData) {
+      await userService.updateTokenUsage(req.auth.uid, responseData.tokensUsed);
+      await userService.incrementDocumentCount(req.auth.uid);
       
-      // Add usage information to the response
+      // Add usage info to the response
       const userData = req.userData;
-      
       processedDocument.usage = {
         tokensUsed: responseData.tokensUsed,
         currentMonthUsage: userData.usage?.tokenCount || 0,
@@ -56,7 +57,10 @@ exports.generateContext = async (req, res, next) => {
       context: processedDocument
     });
   } catch (error) {
-    console.error('Context generation error:', error);
+    console.error('Direct context generation error:', error);
     next(error);
   }
 };
+
+// Removed generateContextDoc function as it's now handled by Cloud Function
+

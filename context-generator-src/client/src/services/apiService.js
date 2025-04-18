@@ -11,7 +11,7 @@ class ApiError extends Error {
 }
 
 /**
- * Base API service for making HTTP requests
+ * Base API service for making HTTP requests and handling SSE
  */
 class ApiService {
     constructor() {
@@ -87,8 +87,11 @@ class ApiService {
     setAuthToken(token) {
       if (token) {
         this.defaultHeaders['x-auth-token'] = token;
+        // Also store token for potential use in EventSource URL
+        this.authToken = token; 
       } else {
         delete this.defaultHeaders['x-auth-token'];
+        this.authToken = null;
       }
       // Ensure token is persisted to localStorage as well
       if (token) {
@@ -132,9 +135,76 @@ class ApiService {
      * @returns {Promise<object>} The response from the server.
      */
     async saveWizardData(wizardData) {
-      // Ensure the auth token is set before making the request
       this._initializeToken(); 
       return this.post('/wizard', wizardData);
+    }
+
+    /**
+     * Initiates document generation via SSE.
+     * @param {string} wizardId - The ID of the wizard data to generate from.
+     * @returns {EventSource} An EventSource instance connected to the generation endpoint.
+     * @throws {Error} If authentication token is missing.
+     */
+    generateDocumentStream(wizardId) {
+        this._initializeToken(); // Ensure token is fresh
+        if (!this.authToken) {
+            throw new Error('Authentication token is required for document generation.');
+        }
+
+        // Construct the URL for the EventSource
+        // Note: EventSource doesn't easily support custom headers like 'x-auth-token'.
+        // A common workaround is to pass the token as a query parameter (requires server-side handling).
+        // Alternatively, the POST request could initiate the process and return a unique ID 
+        // for an EventSource connection that is then authorized via session/cookie or the ID itself.
+        // For simplicity here, we assume the POST request sets up the context and 
+        // the EventSource connection might rely on existing session/cookie auth or 
+        // the server needs modification to accept token via query param.
+        
+        // Let's try initiating with POST first to ensure the server knows which wizardId to process,
+        // and then maybe open the SSE connection? Or redesign server to accept wizardId in SSE setup?
+        // For now, sticking to the plan: POST request triggers SSE stream.
+        // We need a way to start the SSE stream *after* the POST is accepted.
+        
+        // Simplest approach for now: Use POST to *request* generation, and server handles the SSE stream.
+        // Let's adapt the method signature. It should POST the request and the component handles the stream.
+
+        // Let's redefine: This service will initiate the POST request. The component will handle the EventSource.
+        // This seems cleaner.
+
+        // --- Revised Approach --- 
+        // Method to *initiate* generation, assumes the component will set up EventSource separately.
+        // However, the prompt asks the *route* to handle fetching, chunking, and streaming.
+        // So, the EventSource connection *must* be to the POST endpoint, which is non-standard.
+        // Let's stick to the less standard but direct approach: EventSource to the POST endpoint.
+        // This requires the server to handle POST requests as SSE initiators.
+        // EventSource API standardly uses GET. A workaround involves using fetch with ReadableStream, 
+        // or a library that wraps EventSource to allow POST.
+
+        // --- Let's use a library or fetch for more control --- 
+        // Using fetch to handle the SSE stream initiated by a POST request.
+        // This function will return the ReadableStream body. 
+        
+        // --- Reverting to standard EventSource with GET --- 
+        // Modify server: POST /api/generate/request -> returns { generationId } 
+        // GET /api/generate/stream/{generationId} -> returns SSE stream 
+        // This is more standard but requires more server changes.
+
+        // --- Sticking to the prompt's implied flow: POST triggers SSE --- 
+        // We'll use fetch API directly to handle the streaming response from the POST endpoint.
+        // This method will return the fetch Response object, allowing the caller to process the stream.
+        console.log(`Initiating generation stream for wizard ID: ${wizardId}`);
+        const url = `${this.baseUrl}/generate/context-doc`;
+        const headers = { ...this.defaultHeaders }; // Include auth token
+
+        // Return the promise for the fetch response
+        return fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ wizardId: wizardId }),
+            // Keepalive might be useful for long processes, but not standard for fetch request itself
+            // The connection for SSE is managed differently by the browser/server.
+        });
+        // The calling component will need to handle response.body (ReadableStream).
     }
   
     /**
@@ -166,8 +236,19 @@ class ApiService {
      * Handle API response with improved error handling
      */
     async _handleResponse(response) {
-      let data;
+      // If response is stream (like from SSE fetch), return it directly
+      if (response.headers.get('content-type') && response.headers.get('content-type').includes('text/event-stream')) {
+          if (!response.ok) {
+              // Try to read error from stream or response status
+              throw new ApiError(
+                  `Failed to connect to stream: ${response.statusText}`,
+                  response.status
+              );
+          }
+          return response; // Return the raw response for stream handling
+      }
 
+      let data;
       try {
         // Check if the response has a JSON content type
         const contentType = response.headers.get('content-type');
@@ -190,45 +271,20 @@ class ApiService {
         // Determine error type based on status code
         switch (response.status) {
           case 400: // Bad Request
-            throw new ApiError(
-              data.message || 'Bad request - Invalid input', 
-              400, 
-              data
-            );
+            throw new ApiError(data.message || 'Bad request - Invalid input', 400, data);
           case 401: // Unauthorized
-            // Clear token on auth errors
-            this.setAuthToken(null); // Use the method to clear token
-            window.dispatchEvent(new Event('auth-error')); // Dispatch event for potential UI updates
-            throw new ApiError(
-              data.message || 'Authentication required', 
-              401, 
-              data
-            );
+            this.setAuthToken(null); 
+            window.dispatchEvent(new Event('auth-error'));
+            throw new ApiError(data.message || 'Authentication required', 401, data);
           case 403: // Forbidden
-            throw new ApiError(
-              data.message || 'Access denied', 
-              403, 
-              data
-            );
+            throw new ApiError(data.message || 'Access denied', 403, data);
           case 404: // Not Found
-            throw new ApiError(
-              data.message || 'Resource not found', 
-              404, 
-              data
-            );
+            throw new ApiError(data.message || 'Resource not found', 404, data);
           case 429: // Rate Limited
-            throw new ApiError(
-              data.message || 'Too many requests - please try again later', 
-              429, 
-              data
-            );
+            throw new ApiError(data.message || 'Too many requests - please try again later', 429, data);
           case 500: // Server Error
           default:
-            throw new ApiError(
-              data.message || 'Server error - please try again later', 
-              response.status, 
-              data
-            );
+            throw new ApiError(data.message || 'Server error - please try again later', response.status, data);
         }
       }
       
