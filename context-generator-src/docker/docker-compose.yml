@@ -1,4 +1,4 @@
-# docker-compose configuration
+# docker-compose configuration for ContextForge (Firebase Focused)
 
 services:
   app:
@@ -8,8 +8,10 @@ services:
     container_name: contextforge
     restart: unless-stopped
     ports:
-      - "3000:5000"
-      - "5000:5000"
+      # Map client port (if CRA default is used in container) and server port
+      # Note: Dockerfile likely exposes server PORT (5000), client is often 3000
+      - "3000:3000" # Assuming client runs on 3000 inside container
+      - "5000:5000" # Assuming server runs on 5000 inside container
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/api/health"]
       interval: 30s
@@ -17,34 +19,24 @@ services:
       retries: 3
       start_period: 30s
     environment:
+      # Server environment variables
       - NODE_ENV=development
       - PORT=5000
-      - MONGODB_URI=mongodb://user:password@mongodb:27017/contextforge?authSource=admin
-      - JWT_SECRET=contextforge-secret-key-for-testing
-      - AI_PROVIDER=mock
-      - USE_REAL_AI=false
+      - JWT_SECRET=contextforge-secret-key-for-testing # Keep for session/auth tokens if needed
+      - AI_SERVICE=mock # Default AI for Docker env?
       - CLIENT_URL=http://localhost:3000
       - SERVER_URL=http://localhost:5000
-      # Firebase config will be injected as a single environment variable
-      - FIREBASE_CONFIG=${FIREBASE_CONFIG}
-    depends_on:
-      - mongodb
-    networks:
-      - contextforge-network
-
-  mongodb:
-    image: mongo:6.0
-    container_name: contextforge-mongodb
-    restart: unless-stopped
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=user
-      - MONGO_INITDB_ROOT_PASSWORD=password
-      - MONGO_INITDB_DATABASE=contextforge
+      # Firebase Project ID (required by Admin SDK)
+      - FIREBASE_PROJECT_ID=your-firebase-project-id-in-docker # Replace or use .env file
+      # Path to service account key *inside the container*
+      # You need to mount the key file into the container (see volumes)
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/config/serviceAccountKey.json # Example path inside container
     volumes:
-      - mongo-data:/data/db
-    ports:
-      - "27017:27017"
-    command: --wiredTigerCacheSizeGB 1.5
+      # Mount the service account key into the container
+      # Replace /path/to/your/serviceAccountKey.json with the actual path on your host machine
+      - /path/to/your/serviceAccountKey.json:/app/config/serviceAccountKey.json:ro # Mount as read-only
+      # Optional: Mount source code for live reload (if nodemon/CRA supports it in container)
+      # - ../context-generator-src:/app/context-generator-src
     networks:
       - contextforge-network
 
@@ -52,5 +44,6 @@ networks:
   contextforge-network:
     driver: bridge
 
-volumes:
-  mongo-data:
+# MongoDB volume removed
+# volumes:
+#  mongo-data:
