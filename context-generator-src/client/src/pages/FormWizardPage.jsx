@@ -1,6 +1,7 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { DocumentContext } from '../context/DocumentContext';
+import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+// DocumentContext removed
+// import { DocumentContext } from '../context/DocumentContext'; 
 import { DOCUMENT_TYPES } from '../constants/documentTypes';
 import DocumentTypeSelector from '../components/forms/DocumentTypeSelector';
 import BusinessProfileForm from '../components/forms/BusinessProfileForm';
@@ -12,104 +13,127 @@ import SalesMessagingPlaybookForm from '../components/forms/SalesMessagingPlaybo
 import ReviewForm from '../components/forms/ReviewForm';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
-import { toast } from 'react-hot-toast'; // Import toast for notifications
-import apiService from '../services/apiService'; // Import apiService
+import { toast } from 'react-hot-toast';
+import apiService from '../services/apiService';
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext to check auth status
 
 /**
- * Multi-step form wizard for generating documents
+ * Multi-step form wizard for creating/editing document drafts.
  */
 const FormWizardPage = () => {
   const navigate = useNavigate();
-  // Keeping DocumentContext for potential future generation logic, 
-  // but replacing direct generation with save draft for now.
-  const { isGenerating, error, setError } = useContext(DocumentContext); 
+  const location = useLocation();
+  const { user } = useContext(AuthContext); // Check if user is logged in
   
-  // Current step in the wizard
-  const [currentStep, setCurrentStep] = useState(1);
-  
-  // Combined form data
-  const [formData, setFormData] = useState({});
-  
-  // Selected document type
-  const [documentType, setDocumentType] = useState('');
+  // Get initial data if passed from navigation state (for editing drafts)
+  const initialData = location.state?.initialData || {};
 
-  // State for managing submission/loading state for the save draft action
+  // Removed useContext(DocumentContext)
+  // const { isGenerating, error, setError } = useContext(DocumentContext); 
+
+  // Local state for error handling within the wizard
+  const [wizardError, setWizardError] = useState(null);
+
+  // Determine initial step and state based on initialData
+  const [currentStep, setCurrentStep] = useState(initialData.documentType ? 2 : 1); // Start at step 2 if editing
+  const [formData, setFormData] = useState(initialData);
+  const [documentType, setDocumentType] = useState(initialData.documentType || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Handle document type selection
+
+  // Effect to set initial state when editing
+  useEffect(() => {
+      if (location.state?.initialData) {
+          const data = location.state.initialData;
+          console.log("Loading initial data for editing:", data);
+          setFormData(data);
+          setDocumentType(data.documentType || '');
+          // Start at step 2 if editing an existing draft with a type
+          setCurrentStep(data.documentType ? 2 : 1);
+      }
+  }, [location.state]);
+
+  // Handle document type selection (only relevant when creating new)
   const handleSelectDocumentType = (type) => {
     setDocumentType(type);
+    // Reset form data if type changes, keeping only potential ID if editing?
+    // setFormData(prev => ({ id: prev.id })); // Decide on reset strategy
   };
-  
-  // Handle navigation to next step
-  const handleNext = (data) => {
-    // If data is just the document type (from step 1)
-    if (typeof data === 'string') {
-      setDocumentType(data);
-    } else {
-      // Update form data with new fields
+
+  // Handle navigation to next step, merging data
+  const handleNext = (newData) => {
+    // Clear previous step's error when moving forward
+    setWizardError(null);
+
+    if (typeof newData === 'string') { // From DocumentTypeSelector
+      setDocumentType(newData);
+      // Ensure ID from initialData is preserved if editing
+      setFormData(prev => ({ ...prev, documentType: newData, id: prev.id || `wizard-${Date.now()}` }));
+    } else { // From specific forms
       setFormData(prevData => ({
         ...prevData,
-        ...data,
-        // Ensure an ID is added early if not present, or use a consistent ID throughout
-        id: prevData.id || `wizard-${Date.now()}`
+        ...newData,
+        // Ensure an ID exists (from initial data or generate new)
+        id: prevData.id || initialData.id || `wizard-${Date.now()}` 
       }));
     }
-    
-    // Move to next step
     setCurrentStep(prevStep => prevStep + 1);
-    
-    // Scroll to top
     window.scrollTo(0, 0);
   };
-  
+
   // Handle navigation to previous step
   const handleBack = () => {
+    setWizardError(null); // Clear error when going back
     setCurrentStep(prevStep => prevStep - 1);
     window.scrollTo(0, 0);
   };
-  
+
   // Handle submission: Save draft to Firestore via backend
   const handleSaveDraft = async () => {
+    if (!user) {
+        toast.error("You must be logged in to save a draft.");
+        navigate('/login');
+        return;
+    }
+    
     setIsSubmitting(true);
-    setError(null); // Clear previous errors
+    setWizardError(null); // Clear previous errors
 
+    // Ensure ID and documentType are included
     const wizardData = { 
         ...formData, 
-        id: formData.id || `wizard-${Date.now()}`, // Re-ensure ID
-        documentType: documentType // Include document type in payload
+        id: formData.id || initialData.id || `wizard-${Date.now()}`, 
+        documentType: documentType 
     };
+
+    if (!wizardData.documentType) {
+        setWizardError("Document type is missing.");
+        setIsSubmitting(false);
+        toast.error("Cannot save draft: Document type not selected.");
+        setCurrentStep(1); // Go back to type selection
+        return;
+    }
 
     try {
       // Call the backend API to save the wizard data
       const response = await apiService.saveWizardData(wizardData);
-      
-      console.log('API Response:', response);
       toast.success('Wizard draft saved successfully!');
-      
-      // Navigate to the dashboard or a confirmation page upon success
-      navigate('/dashboard'); // Redirect to dashboard
-
+      // Navigate to saved documents page after successful save
+      navigate('/saved'); 
     } catch (apiError) {
       console.error('Error saving wizard draft:', apiError);
-      // Use the error structure from ApiError
       const errorMessage = apiError.data?.message || apiError.message || 'Failed to save wizard draft. Please try again.';
-      setError(errorMessage); // Use context error state
+      setWizardError(errorMessage); // Use local error state
       toast.error(errorMessage);
-      
-      // Handle specific errors like 401 Unauthorized
       if (apiError.status === 401) {
-        // Optional: Redirect to login page
-        // navigate('/login'); 
+        navigate('/login'); // Redirect to login on auth error
       }
     } finally {
       setIsSubmitting(false);
     }
   };
-  
-  // Render the current step of the wizard
+
+  // Render the current step component
   const renderStep = () => {
-    // Step 1 is always the document type selector
     if (currentStep === 1) {
       return (
         <DocumentTypeSelector 
@@ -120,25 +144,20 @@ const FormWizardPage = () => {
       );
     }
     
-    // Step 3 is always the review form
     if (currentStep === 3) {
       return (
         <ReviewForm 
           formData={formData}
           documentType={documentType}
           onBack={handleBack}
-          // Pass handleSaveDraft instead of handleSubmit
           onSubmit={handleSaveDraft} 
-          isSubmitting={isSubmitting} // Pass the local submitting state
-          setIsSubmitting={setIsSubmitting} // Pass setter if needed inside ReviewForm
+          isSubmitting={isSubmitting}
+          setIsSubmitting={setIsSubmitting} // Needed for form state
         />
       );
     }
     
-    // Step 2 changes based on the selected document type
     if (currentStep === 2) {
-      // Render the appropriate form based on documentType
-      // Ensure initialData, onSubmit, and onBack are passed correctly
       const FormComponent = getFormComponent(documentType);
       if (FormComponent) {
         return (
@@ -149,14 +168,17 @@ const FormWizardPage = () => {
           />
         );
       } else {
-        return <div>Please select a valid document type first</div>;
+        // Should not happen if navigating correctly, but handle defensively
+        setWizardError("Invalid document type selected.");
+        setCurrentStep(1); // Go back to selection
+        return <div>Invalid document type. Please select again.</div>;
       }
     }
     
-    return <div>Unknown step</div>;
+    return <div>Loading wizard step...</div>;
   };
 
-  // Helper to get the correct form component for Step 2
+  // Helper to get the correct form component based on type
   const getFormComponent = (type) => {
     switch (type) {
       case DOCUMENT_TYPES.BUSINESS_PROFILE: return BusinessProfileForm;
@@ -167,23 +189,24 @@ const FormWizardPage = () => {
       case DOCUMENT_TYPES.SALES_MESSAGING_PLAYBOOK: return SalesMessagingPlaybookForm;
       default: return null;
     }
-  }
-  
+  };
+
   return (
     <div className="page-container">
       <div className="wizard-container">
-        {/* Progress bar remains the same */} 
+        {/* Progress Bar */}
         <div className="wizard-progress">
-           {/* ... progress bar JSX ... */} 
            <div className="progress-steps">
+             {/* Step 1 */} 
              <div 
                className={`progress-step ${currentStep >= 1 ? 'active' : ''}`}
-               onClick={() => documentType && setCurrentStep(1)}
-               style={{ cursor: documentType ? 'pointer' : 'default' }}
+               onClick={() => !initialData.documentType && setCurrentStep(1)} // Allow click only if creating new
+               style={{ cursor: !initialData.documentType ? 'pointer' : 'default' }}
              >
                <div className="step-number">1</div>
                <div className="step-label">Document Type</div>
              </div>
+             {/* Step 2 */} 
              <div 
                className={`progress-step ${currentStep >= 2 ? 'active' : ''}`}
                onClick={() => documentType && setCurrentStep(2)}
@@ -191,38 +214,36 @@ const FormWizardPage = () => {
              >
                <div className="step-number">2</div>
                <div className="step-label">
-                 {getFormComponent(documentType)?.name?.replace('Form', '') || 'Document Details'}
+                 {getFormComponent(documentType)?.name?.replace('Form', '') || 'Details'}
                </div>
              </div>
+             {/* Step 3 */} 
              <div 
                className={`progress-step ${currentStep >= 3 ? 'active' : ''}`}
-               onClick={() => Object.keys(formData).length > 0 && documentType && setCurrentStep(3)}
-               style={{ cursor: Object.keys(formData).length > 0 && documentType ? 'pointer' : 'default' }}
+               onClick={() => documentType && setCurrentStep(3)}
+               style={{ cursor: documentType ? 'pointer' : 'default' }}
              >
                <div className="step-number">3</div>
                <div className="step-label">Review & Save</div>
              </div>
            </div>
            <div className="progress-bar">
-             <div 
-               className="progress-indicator" 
-               style={{ width: `${(currentStep - 1) * 50}%` }} 
-             />
+             <div className="progress-indicator" style={{ width: `${(currentStep - 1) * 50}%` }} />
            </div>
         </div>
         
-        {/* Display loading spinner or error messages */} 
+        {/* Loading overlay during submission */}
         {isSubmitting && (
           <div className="loading-overlay">
             <LoadingSpinner />
-            <div className="loading-message">
-              Saving your draft...
-            </div>
+            <div className="loading-message">Saving your draft...</div>
           </div>
         )}
         
-        {error && <ErrorMessage message={error} />}
+        {/* Display local wizard errors */}
+        {wizardError && <ErrorMessage message={wizardError} />}
         
+        {/* Render the current step form */}
         <div className="wizard-content">
           {renderStep()}
         </div>
