@@ -144,25 +144,27 @@ const SalesMessagingPlaybookForm = ({ initialData = {}, onSubmit, onBack }) => {
     { value: 'inspirational', label: 'Inspirational' }
   ];
   
-  const awarenessLevelOptions = [
-    { value: 'unaware', label: 'Unaware (No knowledge of problem)' },
-    { value: 'problem-aware', label: 'Problem Aware (Knows problem, not solutions)' },
-    { value: 'solution-aware', label: 'Solution Aware (Knows solutions exist, not yours)' },
-    { value: 'product-aware', label: 'Product Aware (Knows your solution, not convinced)' },
-    { value: 'most-aware', label: 'Most Aware (Ready to buy)' }
-  ];
+  // REMOVED unused awarenessLevelOptions
+  // const awarenessLevelOptions = [
+  //   { value: 'unaware', label: 'Unaware (No knowledge of problem)' },
+  //   { value: 'problem-aware', label: 'Problem Aware (Knows problem, not solutions)' },
+  //   { value: 'solution-aware', label: 'Solution Aware (Knows solutions exist, not yours)' },
+  //   { value: 'product-aware', label: 'Product Aware (Knows your solution, not convinced)' },
+  //   { value: 'most-aware', label: 'Most Aware (Ready to buy)' }
+  // ];
   
-  const emotionsOptions = [
-    { value: 'trust', label: 'Trust' },
-    { value: 'hope', label: 'Hope' },
-    { value: 'fear', label: 'Fear' },
-    { value: 'excitement', label: 'Excitement' },
-    { value: 'curiosity', label: 'Curiosity' },
-    { value: 'relief', label: 'Relief' },
-    { value: 'belonging', label: 'Belonging' },
-    { value: 'pride', label: 'Pride' },
-    { value: 'urgency', label: 'Urgency' }
-  ];
+  // REMOVED unused emotionsOptions
+  // const emotionsOptions = [
+  //   { value: 'trust', label: 'Trust' },
+  //   { value: 'hope', label: 'Hope' },
+  //   { value: 'fear', label: 'Fear' },
+  //   { value: 'excitement', label: 'Excitement' },
+  //   { value: 'curiosity', label: 'Curiosity' },
+  //   { value: 'relief', label: 'Relief' },
+  //   { value: 'belonging', label: 'Belonging' },
+  //   { value: 'pride', label: 'Pride' },
+  //   { value: 'urgency', label: 'Urgency' }
+  // ];
 
   return (
     <form className="form-container" onSubmit={handleSubmit}>
