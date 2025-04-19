@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 // DocumentContext removed
 // import { DocumentContext } from '../../context/DocumentContext';
-import SectionPreview from './SectionPreview';
+// Removed unused import: SectionPreview
+// import SectionPreview from './SectionPreview';
 import DocumentControls from './DocumentControls';
 import '../../styles/document.css';
 

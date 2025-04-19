@@ -130,14 +130,10 @@ const DocumentStatusPage = () => {
         console.error("Export failed:", err);
         toast.error("Failed to export document.");
     }
-}
+};
 
-const handleSave = () => {
-    // TODO: Implement saving the generated document to a new collection or structure if needed
-    // Currently, the result is stored within the wizardResponses doc itself.
-    // This function might save it to a separate 'publishedDocuments' collection.
-    toast.info("Save functionality (to separate collection) not implemented yet.");
-}
+// Removed unused handleSave function
+// const handleSave = () => { ... }
 
   return (
     <div className="page-container document-status-page">
@@ -168,7 +164,7 @@ const handleSave = () => {
           <div className="document-result-container">
               <div className="document-actions-header">
                 <button onClick={() => handleExport('markdown')} className="secondary-button">Export MD</button>
-                {/* <button onClick={handleSave} className="primary-button">Save Final</button> */}
+                {/* Removed save button */}
               </div>
               <DocumentPreview document={draftData.generatedDocument} />
           </div>

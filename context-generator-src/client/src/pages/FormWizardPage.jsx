@@ -116,16 +116,18 @@ const FormWizardPage = () => {
 
     try {
       // Call the backend API to save the wizard data
-      const response = await apiService.saveWizardData(wizardData);
+      // Removed unused 'response' variable assignment
+      await apiService.saveWizardData(wizardData);
       toast.success('Wizard draft saved successfully!');
       // Navigate to saved documents page after successful save
       navigate('/saved'); 
     } catch (apiError) {
       console.error('Error saving wizard draft:', apiError);
-      const errorMessage = apiError.data?.message || apiError.message || 'Failed to save wizard draft. Please try again.';
+      // Attempt to extract a more specific error message
+      const errorMessage = apiError.response?.data?.message || apiError.message || 'Failed to save wizard draft. Please try again.';
       setWizardError(errorMessage); // Use local error state
       toast.error(errorMessage);
-      if (apiError.status === 401) {
+      if (apiError.response?.status === 401 || apiError.status === 401) {
         navigate('/login'); // Redirect to login on auth error
       }
     } finally {

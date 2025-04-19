@@ -56,7 +56,8 @@ const authService = {
       
       return { user, token };
     } catch (error) {
-      throw { error: error.message || 'Google login failed' };
+      // Fixed: Use new Error()
+      throw new Error(error.message || 'Google login failed');
     }
   },
 
@@ -102,7 +103,8 @@ const authService = {
       
       return { user, token };
     } catch (error) {
-      throw { error: error.message || 'Registration failed' };
+      // Fixed: Use new Error()
+      throw new Error(error.message || 'Registration failed');
     }
   },
 
@@ -136,9 +138,12 @@ const authService = {
         errorMessage = 'Invalid password';
       } else if (error.code === 'auth/too-many-requests') {
         errorMessage = 'Too many failed login attempts. Please try again later.';
+      } else if (error.message) {
+         errorMessage = error.message; // Use Firebase message if available
       }
       
-      throw { error: errorMessage };
+      // Fixed: Use new Error()
+      throw new Error(errorMessage);
     }
   },
 
@@ -150,6 +155,8 @@ const authService = {
       await signOut(auth);
     } catch (error) {
       console.error('Logout error:', error);
+      // Optionally re-throw or handle differently
+      // throw new Error(error.message || 'Logout failed');
     }
   },
 
@@ -197,7 +204,8 @@ const authService = {
     try {
       await sendPasswordResetEmail(auth, email);
     } catch (error) {
-      throw { error: error.message || 'Failed to send password reset email' };
+      // Fixed: Use new Error()
+      throw new Error(error.message || 'Failed to send password reset email');
     }
   },
 
@@ -213,6 +221,8 @@ const authService = {
       return await getIdToken(user, true); // Force refresh
     } catch (error) {
       console.error('Error getting token:', error);
+      // Consider throwing an error here too for consistency
+      // throw new Error(error.message || 'Failed to get authentication token');
       return null;
     }
   },
@@ -232,7 +242,8 @@ const authService = {
   getProfile: async () => {
     const user = auth.currentUser;
     if (!user) {
-      throw { error: 'No authenticated user found' };
+      // Fixed: Use new Error()
+      throw new Error('No authenticated user found');
     }
     
     try {
@@ -245,10 +256,16 @@ const authService = {
         // Create profile if it doesn't exist
         await authService.createUserProfileIfNeeded(user);
         const newUserSnap = await getDoc(userRef);
-        return { ...newUserSnap.data(), id: user.uid };
+        if (newUserSnap.exists()) { // Check again after creation attempt
+            return { ...newUserSnap.data(), id: user.uid };
+        } else {
+            // Handle case where profile creation failed
+            throw new Error('Failed to create or find user profile');
+        }
       }
     } catch (error) {
-      throw { error: error.message || 'Failed to fetch profile' };
+      // Fixed: Use new Error()
+      throw new Error(error.message || 'Failed to fetch profile');
     }
   },
 
@@ -260,7 +277,8 @@ const authService = {
   updateProfile: async (profileData) => {
     const user = auth.currentUser;
     if (!user) {
-      throw { error: 'No authenticated user found' };
+      // Fixed: Use new Error()
+      throw new Error('No authenticated user found');
     }
     
     try {
@@ -273,8 +291,17 @@ const authService = {
       
       // Update profile in Firestore
       const userRef = doc(firestore, 'users', user.uid);
+      // Ensure sensitive/unintended fields aren't directly passed
+      const dataToUpdate = { ...profileData };
+      // Example: remove fields that shouldn't be updated this way
+      delete dataToUpdate.email;
+      delete dataToUpdate.uid;
+      delete dataToUpdate.createdAt;
+      delete dataToUpdate.subscription;
+      delete dataToUpdate.role;
+
       await updateDoc(userRef, {
-        ...profileData,
+        ...dataToUpdate,
         updatedAt: new Date().toISOString()
       });
       
@@ -282,7 +309,8 @@ const authService = {
       const updatedProfile = await authService.getProfile();
       return { user: updatedProfile };
     } catch (error) {
-      throw { error: error.message || 'Failed to update profile' };
+      // Fixed: Use new Error()
+      throw new Error(error.message || 'Failed to update profile');
     }
   },
 
@@ -298,7 +326,9 @@ const authService = {
       });
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Failed to fetch subscription plans' };
+      // Fixed: Use new Error() and extract message
+      const message = error.response?.data?.message || error.message || 'Failed to fetch subscription plans';
+      throw new Error(message);
     }
   },
 
@@ -321,7 +351,9 @@ const authService = {
       
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Failed to fetch subscription details' };
+      // Fixed: Use new Error() and extract message
+      const message = error.response?.data?.message || error.message || 'Failed to fetch subscription details';
+      throw new Error(message);
     }
   },
 
@@ -348,7 +380,9 @@ const authService = {
       
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Failed to update subscription' };
+      // Fixed: Use new Error() and extract message
+      const message = error.response?.data?.message || error.message || 'Failed to update subscription';
+      throw new Error(message);
     }
   },
 
@@ -371,7 +405,9 @@ const authService = {
       
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Failed to cancel subscription' };
+      // Fixed: Use new Error() and extract message
+      const message = error.response?.data?.message || error.message || 'Failed to cancel subscription';
+      throw new Error(message);
     }
   }
 };

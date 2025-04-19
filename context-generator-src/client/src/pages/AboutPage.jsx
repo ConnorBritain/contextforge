@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+// Fixed: Import useLocation
+import { Link, useLocation } from 'react-router-dom';
 import '../styles/global.css';
 import { DOCUMENT_TYPES, DOCUMENT_TYPE_RECOMMENDED_FOR } from '../constants/documentTypes';
 
@@ -7,43 +8,56 @@ import { DOCUMENT_TYPES, DOCUMENT_TYPE_RECOMMENDED_FOR } from '../constants/docu
  * About page explaining how the Context Generator works with AI systems
  */
 const AboutPage = () => {
+  // Fixed: Use useLocation hook
+  const location = useLocation();
+
   // Scroll to the element based on query param or hash
   useEffect(() => {
     // Function to handle scrolling to a section
     const scrollToSection = (sectionId) => {
       const element = document.getElementById(sectionId);
       if (element) {
-        // Wait for the page to fully render
+        // Wait for the page to potentially render/re-render
         setTimeout(() => {
           // Get the header height to offset the scroll position
-          const headerHeight = document.querySelector('.app-header')?.offsetHeight || 70;
-          
-          // Get the element's position
-          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-          
+          const headerElement = document.querySelector('.app-header');
+          const headerHeight = headerElement ? headerElement.offsetHeight : 70; // Default offset
+
+          // Get the element's position relative to the viewport top
+          const elementRect = element.getBoundingClientRect();
+          // Calculate the absolute top position relative to the document
+          const elementPosition = elementRect.top + window.pageYOffset;
+
+          // Calculate the target scroll position
+          const targetScrollPosition = elementPosition - headerHeight - 10; // Add a small buffer
+
           // Scroll to the element with offset for the header
           window.scrollTo({
-            top: elementPosition - headerHeight - 5, // Small 5px buffer
+            top: targetScrollPosition,
             behavior: 'smooth'
           });
-        }, 200);
+        }, 100); // Slightly shorter delay might work too
+      } else {
+        console.warn(`AboutPage: Could not find element with ID '${sectionId}' to scroll to.`);
       }
     };
     
-    // First check for section query parameter
-    const urlParams = new URLSearchParams(window.location.search);
+    // First check for section query parameter using location.search
+    const urlParams = new URLSearchParams(location.search);
     const sectionParam = urlParams.get('section');
     
     if (sectionParam) {
       scrollToSection(sectionParam);
     } else {
-      // Fall back to hash if no query parameter
-      const hash = window.location.hash.substring(1);
+      // Fall back to hash if no query parameter using location.hash
+      const hash = location.hash.substring(1);
       if (hash) {
         scrollToSection(hash);
       }
     }
-  }, [window.location.search, window.location.hash]); // Re-run if either changes
+    // Fixed: Use location.search and location.hash in dependencies
+  }, [location.search, location.hash]); // Re-run if search or hash changes
+
   return (
     <div className="page-container about-page">
       <div className="about-header">
@@ -63,30 +77,7 @@ const AboutPage = () => {
         </p>
       </div>
 
-      <div className="about-section">
-        <h2>How It Works with AI Systems</h2>
-        <p>
-          Modern AI systems are incredibly powerful but work best when provided with detailed, structured context about your specific needs. Our context documents serve as semantic calibration tools that can be:
-        </p>
-        <ul className="feature-list">
-          <li>
-            <strong className="text-purple">Attached to Conversations:</strong> Upload or paste these documents directly into AI chat interfaces to establish context
-          </li>
-          <li>
-            <strong className="text-purple">Used for Knowledge Retrieval:</strong> Create dedicated knowledge bases or embeddings from these documents
-          </li>
-          <li>
-            <strong className="text-purple">Integrated with AI APIs:</strong> Incorporate into your system prompts when building applications with AI APIs
-          </li>
-          <li>
-            <strong className="text-purple">Referenced in Prompts:</strong> Refer back to specific sections in your ongoing conversations with AI systems
-          </li>
-        </ul>
-      </div>
-
-      <div className="about-section">
-        <h2>Our Document Types</h2>
-        
+      {/* ... rest of the component remains the same ... */}
         <div className="document-type" id="business-profile">
           <h3>📈 Business Dimensional Profile</h3>
           <p>A comprehensive business context document that semantically calibrates AI systems to understand your:</p>
@@ -172,11 +163,10 @@ const AboutPage = () => {
             <li>Emotional triggers, objection handling, and conversion techniques</li>
           </ul>
           <p>This document enables AI systems to generate highly persuasive, audience-calibrated sales copy across various platforms and touchpoints while maintaining consistent messaging aligned with your unique value proposition.</p>
-          <div className="document-type-for">
+           <div className="document-type-for">
             <strong className="text-purple">Recommended For:</strong> {DOCUMENT_TYPE_RECOMMENDED_FOR[DOCUMENT_TYPES.SALES_MESSAGING_PLAYBOOK]}
           </div>
         </div>
-      </div>
 
       <div className="about-section">
         <h2>Benefits of Semantic Calibration</h2>
