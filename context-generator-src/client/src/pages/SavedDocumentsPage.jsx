@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react'; // Removed useContext
 import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
@@ -6,7 +6,7 @@ import { documentService } from '../services/documentService';
 import { toast } from 'react-hot-toast';
 // GenerationProgressModal is likely no longer needed here, replaced by Firestore listener on dedicated page
 // import GenerationProgressModal from '../components/document/GenerationProgressModal'; 
-import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext'; // Corrected import
 
 /**
  * Page for displaying saved wizard drafts.
@@ -14,7 +14,7 @@ import { AuthContext } from '../context/AuthContext';
  */
 const SavedDocumentsPage = () => {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { currentUser } = useAuth(); // Corrected usage
   const [savedDrafts, setSavedDrafts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -22,7 +22,8 @@ const SavedDocumentsPage = () => {
 
   // Fetch saved drafts function using useCallback
   const fetchSavedDrafts = useCallback(async () => {
-    if (!user) return;
+    // Use currentUser
+    if (!currentUser) return;
     setIsLoading(true);
     setError(null);
     try {
@@ -42,16 +43,17 @@ const SavedDocumentsPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [user]); // Dependency: user
+  }, [currentUser]); // Dependency: currentUser
 
   // Fetch drafts on mount and when user changes
   useEffect(() => {
-    if (user) {
+    // Use currentUser
+    if (currentUser) {
       fetchSavedDrafts();
     } else {
       setSavedDrafts([]); // Clear drafts if user logs out
     }
-  }, [user, fetchSavedDrafts]);
+  }, [currentUser, fetchSavedDrafts]); // Use currentUser
 
   // Handle viewing/editing a saved draft
   const handleEditDraft = (draft) => {
@@ -80,7 +82,8 @@ const SavedDocumentsPage = () => {
 
   // Handle draft deletion
   const handleDeleteDraft = async (docId) => {
-    if (!user || !docId) return;
+    // Use currentUser
+    if (!currentUser || !docId) return;
     console.log(`Attempting to delete draft with docId: ${docId}`);
     try {
       const response = await documentService.deleteDraft(docId);
@@ -159,7 +162,7 @@ const SavedDocumentsPage = () => {
             {savedDrafts.map(draft => (
               <div key={draft.docId} className="document-card">
                 <div className="document-card-content">
-                  <h3>{draft.title || getDocumentTypeDisplay(draft.documentType) || `Draft ${draft.id?.substring(0, 6)}`}</h3>
+                  <h3>{draft.title || getDocumentTypeDisplay(draft.documentType) || `Draft ${draft.docId?.substring(0, 6)}`}</h3>
                   <p className="document-type">{getDocumentTypeDisplay(draft.documentType)}</p>
                   <p className="document-date">Saved: {formatDate(draft.updatedAt || draft.createdAt)}</p>
                   <div className="document-status">
@@ -182,11 +185,12 @@ const SavedDocumentsPage = () => {
                       <button
                         className="primary-button"
                         onClick={() => handleViewStatus(draft.docId)}
-                        disabled={!draft.generationStatus && draft.generationStatus !== 'processing'} // Enable if status exists or processing
+                        // Disable view button until generation has started or finished
+                        disabled={!draft.generationStatus || draft.generationStatus === 'pending'}
                       >
                         {draft.generationStatus === 'complete' || draft.generationStatus === 'complete_with_errors' ? 'View Result' : 'View Status'}
                       </button>
-                      {/* Edit button - only if generation not complete? Or allow editing anytime? */}
+                      {/* Edit button - Allow editing anytime for now */}
                       <button
                         className="secondary-button"
                         onClick={() => handleEditDraft(draft)}

@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react'; // Removed useContext
 import { Routes as RouterRoutes, Route, Navigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext'; // Corrected import
 import HomePage from '../pages/HomePage';
 import FormWizardPage from '../pages/FormWizardPage';
 // DocumentResultPage removed
@@ -17,14 +17,15 @@ import DocumentStatusPage from '../pages/DocumentStatusPage';
  * Protected Route Component
  */
 const ProtectedRoute = ({ children }) => {
-    const { user, loading } = useContext(AuthContext);
+    const { currentUser, loading } = useAuth(); // Corrected usage
 
     if (loading) {
         // Optional: Show a loading spinner while checking auth state
         return <div>Loading...</div>;
     }
 
-    if (!user) {
+    // Use currentUser
+    if (!currentUser) {
         // Redirect to login if not authenticated
         return <Navigate to="/login" replace />;
     }

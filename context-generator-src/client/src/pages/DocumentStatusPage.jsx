@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react'; // Removed useContext
 import { useParams, useNavigate } from 'react-router-dom';
 import { getFirestore, doc, onSnapshot } from 'firebase/firestore';
-import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext'; // Corrected import
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 import DocumentPreview from '../components/document/DocumentPreview';
@@ -15,23 +15,25 @@ import '../styles/document.css'; // Reuse styles if applicable
 const DocumentStatusPage = () => {
   const { docId } = useParams(); // Get the composite docId (userId_wizardId) from URL
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
-  
+  const { currentUser } = useAuth(); // Corrected usage
+
   const [draftData, setDraftData] = useState(null);
   const [generationStatus, setGenerationStatus] = useState('loading'); // loading, pending, processing, complete, error
   const [errorMessage, setErrorMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!docId || !user) {
+    // Use currentUser instead of user
+    if (!docId || !currentUser) {
       // If docId or user is missing, cannot proceed
-      if (!user) navigate('/login'); // Redirect if user logs out
+      if (!currentUser) navigate('/login'); // Redirect if user logs out
       else navigate('/saved'); // Redirect if docId is bad
       return;
     }
 
     // Verify the docId belongs to the current user (basic check)
-    if (!docId.startsWith(user.uid + '_')) {
+    // Use currentUser.uid instead of user.uid
+    if (!docId.startsWith(currentUser.uid + '_')) {
         console.error('Mismatch between user ID and document ID.');
         setErrorMessage('You do not have permission to view this document.');
         setGenerationStatus('error');
@@ -46,24 +48,24 @@ const DocumentStatusPage = () => {
     setIsLoading(true);
 
     // Subscribe to real-time updates
-    const unsubscribe = onSnapshot(docRef, 
+    const unsubscribe = onSnapshot(docRef,
       (docSnap) => {
         if (docSnap.exists()) {
           const data = docSnap.data();
           console.log('Received Firestore update:', data);
           setDraftData(data); // Store the full draft data
-          
+
           // Update status based on the document field
           const status = data.generationStatus || 'pending';
           setGenerationStatus(status);
           setErrorMessage(status === 'error' ? (data.error || 'An unknown generation error occurred.') : null);
-          
+
           // If status indicates completion or error, stop the main loading indicator
           if (status === 'complete' || status === 'complete_with_errors' || status === 'error') {
             setIsLoading(false);
-          }\ else {
+          } else {
             // Still loading if status is pending/processing
-            setIsLoading(true); 
+            setIsLoading(true);
           }
 
         } else {
@@ -89,7 +91,7 @@ const DocumentStatusPage = () => {
       unsubscribe();
     };
 
-  }, [docId, user, navigate]); // Re-run if docId or user changes
+  }, [docId, currentUser, navigate]); // Use currentUser in dependency array
 
   // --- Render Helper Functions --- 
 

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // Removed useContext
 import { useNavigate, useLocation } from 'react-router-dom';
 // DocumentContext removed
 // import { DocumentContext } from '../context/DocumentContext'; 
@@ -15,7 +15,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 import { toast } from 'react-hot-toast';
 import apiService from '../services/apiService';
-import { AuthContext } from '../context/AuthContext'; // Import AuthContext to check auth status
+import { useAuth } from '../context/AuthContext'; // Corrected import
 
 /**
  * Multi-step form wizard for creating/editing document drafts.
@@ -23,7 +23,7 @@ import { AuthContext } from '../context/AuthContext'; // Import AuthContext to c
 const FormWizardPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useContext(AuthContext); // Check if user is logged in
+  const { currentUser } = useAuth(); // Corrected usage: useAuth hook and currentUser
   
   // Get initial data if passed from navigation state (for editing drafts)
   const initialData = location.state?.initialData || {};
@@ -89,7 +89,8 @@ const FormWizardPage = () => {
 
   // Handle submission: Save draft to Firestore via backend
   const handleSaveDraft = async () => {
-    if (!user) {
+    // Use currentUser
+    if (!currentUser) {
         toast.error("You must be logged in to save a draft.");
         navigate('/login');
         return;
